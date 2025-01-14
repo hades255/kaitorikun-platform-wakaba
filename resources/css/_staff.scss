@@ -1,0 +1,267 @@
+@use "./color";
+
+.sidebar-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: color.$backColor;
+
+    .tabs {
+        width: 100%;
+        border-bottom: 2px solid color.$textColor;
+        display: flex;
+        padding: 0 4px;
+
+        a {
+            width: 100px;
+            padding: 2px 0;
+            border: 2px solid color.$textColor;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: -2px;
+            background-color: #fff;
+            font-weight: bold;
+            color: color.$lighttextColor;
+
+            &.active {
+                background-color: color.$backColor;
+                color: color.$textColor;
+                border-bottom-color: transparent;
+            }
+        }
+    }
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.flex-base {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.flex-left {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 10px;
+}
+
+.staff-menu-items {
+    height: 40px;
+    border-bottom: solid 1px #bcb7b7;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 80px;
+    padding: 0px 50px;
+    background-color: #F5F5F5;
+}
+
+.staff-top-items {
+    position: relative;
+    height: 40px;
+    border-bottom: solid 1px #bcb7b7;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 40px;
+    padding: 0px 50px;
+}
+
+.staff-top-items .left {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 40px;
+}
+
+.staff-top-items .left .title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.staff-top-items .right {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 40px;
+    position: absolute;
+    right: 10px;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+}
+
+.scrap-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    gap: 20px;
+}
+
+.filter-field {
+    width: 700px;
+    height: 35px;
+}
+
+.nav-link {
+    color: white !important;
+}
+
+.nav-link-icon {
+    color: black !important;
+}
+
+.sidebar {
+    background-color: #313239 !important;
+}
+
+.three-count-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    position: absolute;
+    right: 20px;
+}
+
+.count-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.count-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: black;
+    width: 23px;
+    height: 23px;
+    border: solid 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.count-value {
+    font-size: 17px;
+    color: black;
+    margin-left: 5px;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    padding-top: 20px;
+    margin-bottom: 20px;
+}
+
+.input-label {
+    font-size: 15px;
+    min-width: 150px;
+    max-width: 150px;
+    text-align: right;
+    padding-right: 20px;
+}
+
+.input-value {
+    font-size: 15px;
+    min-width: 300px;
+    max-width: 300px;
+}
+
+.min-w-400 {
+    min-width: 400px;
+}
+
+.shop-select {
+    width: 175px;
+    height: 30px;
+    background: white;
+    border: solid 0.5px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.w-150 {
+    width: 150px !important;
+}
+
+.w-100 {
+    width: 100px !important;
+}
+
+.w-70 {
+    width: 70px !important;
+}
+
+.m-l-5 {
+    margin-left: 5px;
+}
+
+.staff-policy-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.staff-policy {
+    width: 80%;
+    resize: none;
+}
+
+.menu-item {
+    color: black;
+    transition: background-color 0.3s, color 0.3s !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.add-icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.file-icon {
+    width: 30px;
+    height: 30px;
+    background-color: black;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.image-show-btn {
+    width: 150px;
+    height: 30px;
+    border: solid 1px black;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+}

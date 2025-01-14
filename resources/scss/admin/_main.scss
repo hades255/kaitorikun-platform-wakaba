@@ -1,0 +1,260 @@
+@use "../color";
+.admin-layout {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    &.iscollapse {
+        .admin-sidebar {
+            width: 70px;
+            .sidebar-inner {
+                .logo {
+                    text-align: center;
+                    span {
+                        line-height: 1;
+                    }
+                    .pc {
+                        display: none;
+                    }
+                    .sp {
+                        display: block;
+                    }
+                }
+                .menu-items {
+                    .p-menu {
+                        .menu-tab {
+                            padding: 0.5rem 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            span {
+                                display: none;
+                            }
+                            .has-child {
+                                display: none;
+                            }
+                        }
+                        .sub-menus {
+                            padding: 0;
+                            .submenu-tab {
+                                padding: 0.5rem 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                span {
+                                    display: none;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .c-container {
+            width: calc(100% - 70px);
+            margin-left: 70px;
+        }
+    }
+    .admin-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 220px;
+        height: 100vh;
+        overflow: auto;
+        border-right: 1px solid #f0f0f0;
+        font-size: 14px;
+        background-color: color.$darkColor;
+        .logo {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            .pc {
+                display: block;
+            }
+            .sp {
+                display: none;
+            }
+        }
+        .menu-items {
+            padding: 0.5rem 0;
+            border-top: 1px solid #e0e0e0;
+            .p-menu {
+                &__inner {
+                    margin: 0.25rem 0;
+                    padding: 0 0.75rem;
+                    .menu-tab {
+                        position: relative;
+                        padding: 0.5rem 1rem;
+                        box-sizing: border-box;
+                        display: flex;
+                        align-items: center;
+                        border-radius: 5px;
+                        transition: 0.2s ease;
+                        color: #fff;
+                        cursor: pointer;
+                        .has-child {
+                            position: absolute;
+                            right: 0;
+                        }
+                        &:hover {
+                            background-color: #ffffff30;
+                        }
+                        &.active {
+                            background-color: #ffffff30;
+                            font-weight: bold;
+                        }
+                    }
+                    .sub-menus {
+                        padding-left: 1rem;
+                        display: none;
+                        height: 0;
+                        overflow: hidden;
+                        font-size: 13px;
+                        color: #fff;
+                        .submenu-tab {
+                            position: relative;
+                            display: flex;
+                            align-items: center;
+                            padding: 0.5rem 1rem;
+                            margin-bottom: 3px;
+                            box-sizing: border-box;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            transition: 0.2s ease;
+                            &:hover {
+                                border-radius: 5px;
+                                background-color: #ffffff30;
+                            }
+                            &.active {
+                                background-color: #ffffff30;
+                                font-weight: bold;
+                            }
+                        }
+                    }
+                    &.expand {
+                        .sub-menus {
+                            display: block;
+                            height: 100%;
+                            .submenu-tab {
+                                svg {
+                                    font-size: 20px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .c-container {
+        width: calc(100% - 220px);
+        margin-left: 220px;
+        .admin-navigation {
+            height: 50px;
+            background-color: #fff;
+            box-shadow: 0 3px 4px #30303020;
+            .navbar {
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                .expand-icon {
+                    display: flex;
+                    height: 100%;
+                    align-items: center;
+                    cursor: pointer;
+                    &:hover {
+                        background-color: #f0f0f0;
+                    }
+                }
+                .menus {
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    border-left: 1px solid #f0f0f0;
+                    .menu-item {
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 0 1rem;
+                        cursor: pointer;
+                        &:hover {
+                            background-color: #f0f0f0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.admin-layout {
+    .staff-detail {
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            .main-info {
+                .row {
+                    display: flex;
+                    height: 30px;
+                    align-items: center;
+                    margin-bottom: 2px;
+                    gap: 2px;
+                    border-radius: 5px;
+                    overflow: hidden;
+                    .label {
+                        display: flex;
+                        align-items: center;
+                        min-width: 200px;
+                        height: 100%;
+                        padding: 0 10px;
+                        background-color: #d0d0d0;
+                        vertical-align: middle;
+                    }
+                    .value {
+                        display: flex;
+                        align-items: center;
+                        height: 100%;
+                        padding: 0 10px;
+                        background-color: #f0f0f0;
+                        width: 100%;
+                    }
+                }
+            }
+            .verify-docs {
+                .files {
+                    .thumbnail {
+                        border-radius: 5px;
+                        box-shadow: 0 3px 4px #40404030;
+                        overflow: hidden;
+                        cursor: pointer;
+                        .img-content {
+                            width: 200px;
+                            height: 180px;
+                            overflow: hidden;
+                            img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                            }
+                        }
+                        .caption {
+                            padding: 5px;
+                            background-color: #b7b7b7;
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .master-store-list {
+        display: grid;
+        grid-template-columns: 1fr 500px;
+        gap: 30px;
+    }
+}

@@ -62,7 +62,7 @@ const App = () => {
     };
     return (
         <div className="wrapper">
-            {isAuthenticated.length !== 0 ? (
+            {/* {isAuthenticated.length !== 0 ? ( */}
                 <div>
                     {top && <Top />}
                     {menu && <Menu />}
@@ -74,14 +74,14 @@ const App = () => {
                     <LoadingBar color={"red"} progress={progress} />
                     {loading.content && <LoadingContent />}
                 </div>
-            ) : (
+            {/* ) : (
                 <div>
                     {loading.content && <LoadingContent />}
                     {localStorage.clear()}
                     <Redirect to="/" />
                     {content && <Content />}
                 </div>
-            )}
+            )} */}
             <div
                 id="sidebar-overlay"
                 role="presentation"

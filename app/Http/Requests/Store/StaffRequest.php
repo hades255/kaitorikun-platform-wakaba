@@ -53,7 +53,7 @@ class StaffRequest extends FormRequest
                 'required',
                 'integer',
             ],
-            'name' => [ // お名前
+            'name' => [ // 名前
                 'required',
                 'string',
             ],
@@ -61,7 +61,7 @@ class StaffRequest extends FormRequest
                 'required',
                 'string',
             ],
-            'phone_number' => [ // お電話番号
+            'phone_number' => [ // 電話番号
                 'required',
                 'string',
             ],

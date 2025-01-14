@@ -265,7 +265,7 @@ let FormStaffRegister = (props) => {
             return;
         }
         if (name === undefined) {
-            ToastNotification("error", "お名前は必須です。");
+            ToastNotification("error", "名前は必須です。");
             return;
         }
         if (nameKana === undefined) {
@@ -273,7 +273,7 @@ let FormStaffRegister = (props) => {
             return;
         }
         if (phoneNumber === undefined) {
-            ToastNotification("error", "お電話番号は必須です。");
+            ToastNotification("error", "電話番号は必須です。");
             return;
         }
         if (birthday === undefined) {
@@ -473,7 +473,6 @@ let FormStaffRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">種別</span>
                                 </MenuItem>
-                                <MenuItem value={1}>オーナー</MenuItem>
                                 <MenuItem value={2}>マネージャー</MenuItem>
                                 <MenuItem value={3}>店長</MenuItem>
                                 <MenuItem value={4}>社員</MenuItem>
@@ -491,7 +490,7 @@ let FormStaffRegister = (props) => {
                 </div>
                 <div className="col-lg-4 mt-10 col-lg-4 mt-10">
                     <div className="flex-center min-w-400">
-                        <div className="input-label">お名前</div>
+                        <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
                                 id="name"
@@ -500,7 +499,7 @@ let FormStaffRegister = (props) => {
                                 className="mt-1 block w-full"
                                 onChange={(e) => setName(e.target.value)}
                                 required
-                                placeholder="お名前"
+                                placeholder="名前"
                             />
                         </div>
                     </div>
@@ -523,12 +522,12 @@ let FormStaffRegister = (props) => {
                 </div>
                 <div className="col-lg-4 mt-10 col-lg-4 mt-10">
                     <div className="flex-center min-w-400">
-                        <div className="input-label">お電話番号</div>
+                        <div className="input-label">電話番号</div>
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
                                 name="phone"
-                                placeholder='お電話番号'
+                                placeholder='電話番号'
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                             />
                         </div>
@@ -776,7 +775,6 @@ let FormStaffRegister = (props) => {
                     {previewPdf && (
                         <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
                         onLoadError={(error) => console.error("Error loading PDF:", error)}>
-                            <Page pageNumber={1} />
                         </Document>
                     )}
                 </DialogContent>

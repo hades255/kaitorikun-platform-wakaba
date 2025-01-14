@@ -309,7 +309,7 @@ let FormStaffExit = (props) => {
                 </div>
                 <div className="col-lg-4 mt-10 col-lg-4 mt-10">
                     <div className="flex-center min-w-400">
-                        <div className="input-label">お名前</div>
+                        <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
                                 value={name}
@@ -333,7 +333,7 @@ let FormStaffExit = (props) => {
                 </div>
                 <div className="col-lg-4 mt-10 col-lg-4 mt-10">
                     <div className="flex-center min-w-400">
-                        <div className="input-label">お電話番号</div>
+                        <div className="input-label">電話番号</div>
                         <div className="input-value">
                             <TextInput
                                 value={phoneNumber}
@@ -503,7 +503,7 @@ let FormStaffExit = (props) => {
                 fullWidth>
                 <DialogContent dividers>
                     {previewPdf && (
-                        <Document file={"http://127.0.0.1:8000/storage/uploads/qZobcdDe8mC3ucXFhR8sHwMQnX5ZAi8Jn9K7OnlJ.pdf"}
+                        <Document file={previewPdf}
                             onLoadSuccess={onDocumentLoadSuccess}
                             onLoadError={(error) => console.error("Error loading document:", error)}>
                         </Document>

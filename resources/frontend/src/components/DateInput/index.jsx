@@ -15,6 +15,15 @@ export default forwardRef(function TextInput({ value, onChange, className = '', 
   const dates = Array.from({ length: new Date(year, month, 0).getDate() || 31 }, (_, i) => i + 1)
 
   useEffect(() => {
+    if (value) {
+      let date = new Date(value);
+      setYear(date.getFullYear())
+      setMonth(date.getMonth())
+      setDate(date.getDate())
+    }
+  }, [value]);
+
+  useEffect(() => {
     if (year && month && date) {
       const formatted = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
       setFullDate(formatted);

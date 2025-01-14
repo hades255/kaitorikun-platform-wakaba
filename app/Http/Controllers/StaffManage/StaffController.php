@@ -85,7 +85,7 @@ class StaffController extends Controller
         // バリデーションされたデータを取得
         $validatedData = $request->validated();
         $validatedData['password'] = Crypt::encrypt($validatedData['password']);
-
+        $uploadedFilePaths = array();
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 // Store the file and get its path

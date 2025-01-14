@@ -14,7 +14,7 @@ const Menu = () => {
     return (
         <div className="staff-menu-items">
             <Link to="#" className="menu-item">始業</Link>
-            <Link to="#" className="menu-item">顧客一覧</Link>
+            <Link to="/customer/list" className="menu-item">顧客一覧</Link>
             <Link to="#" className="menu-item">買取計算書</Link>
             <Link to="#" className="menu-item">商品一覧</Link>
             <Link to="#" className="menu-item">業者査定シート</Link>

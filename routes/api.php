@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomerManage\CustomerController;
 use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,16 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'sendForgotPasswordEmail']);
+Route::post('/password/reset', [AuthController::class, 'resetPassword']);
 Route::get('/datas', [StaffController::class, 'initDatas']);
 
 Route::post('/staff/register', [StaffController::class, 'createOrUpdate']);
 Route::post('/staff/info', [StaffController::class, 'index']);
 Route::post('/staff/exit', [StaffController::class, 'destroy']);
-Route::get('/test-file', function () {
-    $filePath = storage_path('app/public/uploads/6bxVWpU8EBUUc4vgb6UywhTQE9BSCne9aCmv0ojx.png');
-    
-    if (!file_exists($filePath)) {
-        return 'File does not exist.';
-    }
-    return response()->file($filePath);
-});
+
+Route::post('/customer/register', [CustomerController::class, 'createOrUpdate']);
+Route::post('/customer/list', [CustomerController::class, 'index']);
+Route::post('/customer/delete', [CustomerController::class, 'destroy']);

@@ -2,7 +2,11 @@ import { DemoTabel, FormControl, Login } from "../../pages";
 import ForgotPassword from "../../pages/forgot-password";
 import Dashboard from "../../pages/shop-manage/dashboard";
 import StaffRegister from "../../pages/shop-manage/register";
+import CustomerRegister from "../../pages/customer-menage/register";
+import CustomerList from "../../pages/customer-menage/list";
+import CustomerEdit from "../../pages/customer-menage/edit";
 import StaffExit from "../../pages/shop-manage/exit";
+import ResetPassword from "../../pages/reset-password";
 
 const MenuRoutes = [
   {
@@ -16,6 +20,12 @@ const MenuRoutes = [
     exact: true,
     title: "パスワードリセット",
     component: () => <ForgotPassword />
+  },
+  {
+    path: "/reset-password",
+    exact: true,
+    title: "パスワードリセット",
+    component: () => <ResetPassword />
   },
   {
     path: "/todo",
@@ -34,6 +44,24 @@ const MenuRoutes = [
     exact: true,
     title: "退会",
     component: () => <StaffExit />
+  },
+  {
+    path: "/customer/list",
+    exact: true,
+    title: "顧客一覧",
+    component: () => <CustomerList />
+  },
+  {
+    path: "/customer/register",
+    exact: true,
+    title: "顧客登録",
+    component: () => <CustomerRegister />
+  },
+  {
+    path: "/customer/edit",
+    exact: true,
+    title: "顧客編集",
+    component: () => <CustomerEdit />
   },
 
   {

@@ -6,6 +6,21 @@ import { submit } from "./redux";
 const DemoTabel = () => {
     const modal = useSelector(selectorUtility.getModal)
     const dispatch = useDispatch()
+
+    let data = [
+        {
+            id: 1,
+            username: "samsularifin05",
+            first_name: "Samsul",
+            last_name: "Arifin",
+        },
+        {
+            id: 2,
+            username: "andra02",
+            first_name: "Andra",
+            last_name: "Sudrajat",
+        },
+    ];
     return (
         <PanelContent
             title="Master DemoTabel"
@@ -14,10 +29,12 @@ const DemoTabel = () => {
             headerContent
         >
             <Card title="Data DemoTabel">
-                <DataTabel />
+                <DataTabel
+                    dataSource={data}
+                />
             </Card>
             <ModalGlobal title={`${modal.isEdit ? "Edit" : "Create"} User Data`}>
-                <FormDataUser onSubmit={(data)=> dispatch(submit(data))}  />
+                <FormDataUser onSubmit={(data) => dispatch(submit(data))} />
             </ModalGlobal>
         </PanelContent>
     );

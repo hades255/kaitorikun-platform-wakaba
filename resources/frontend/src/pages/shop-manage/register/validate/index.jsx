@@ -13,7 +13,7 @@ const Validate = (value) => {
       errors.shop_name = "店舗名は必須です";
     }
     if (!value.name) {
-      errors.name = "お名前は必須です";
+      errors.name = "名前は必須です";
     }
     if (!value.name_kana) {
       errors.name_kana = "カタカナ名は必須です";

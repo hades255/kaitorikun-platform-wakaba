@@ -1,7 +1,7 @@
 import {
     React,
     Button,
-    TabelMaster,
+    TableMaster,
     Row,
     Col,
     useDispatch,
@@ -56,23 +56,8 @@ const DataTabel = () => {
         },
     ];
 
-    let data = [
-        {
-            id: 1,
-            username: "samsularifin05",
-            first_name: "Samsul",
-            last_name: "Arifin",
-        },
-        {
-            id: 2,
-            username: "andra02",
-            first_name: "Andra",
-            last_name: "Sudrajat",
-        },
-    ];
-
     return (
-        <TabelMaster
+        <TableMaster
             addButtonTitle={"Add Data"}
             rowKey="id"
             onAddButtonClick={() =>
@@ -85,7 +70,6 @@ const DataTabel = () => {
                 )
             }
             columns={columns}
-            dataSource={data}
         />
     );
 };

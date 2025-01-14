@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
                 'name' => 'スーパー管理者',
                 'email' => 'super.manager@gmail.com',
                 'email_verified_at' => NULL,
-                'password' => '$2y$12$NNqJeAmdfAthA7yp0.8tm.EY1iHxcIXd//99.RTn.K0EYYhbETr.u',
+                'password' => '$2y$10$QDS3VrcIpx2AEPETSWyCUuAbdKTdP944jOOVqifv4td4iVAPpYZbu',
                 'role' => 1,
                 'status' => 1,
                 'last_login' => NULL,

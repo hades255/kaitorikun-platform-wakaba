@@ -16,12 +16,12 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name' => 'superadmin',
-            'email' => 'superadmin@gmail.com',
-            'password' => bcrypt('123456'),
-            'remember_token' => Str::random(10),
-            'expires_at' => Carbon::now()->addYear(),
-        ]);
+        // User::create([
+        //     'name' => 'superadmin',
+        //     'email' => 'superadmin@gmail.com',
+        //     'password' => bcrypt('123456'),
+        //     'remember_token' => Str::random(10),
+        //     'expires_at' => Carbon::now()->addYear(),
+        // ]);
     }
 }

@@ -1,9 +1,12 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
+    "/assets/logo.png": "/assets/logo.png",
+    "/assets/sp_logo.png": "/assets/sp_logo.png",
     "/css/app.css.br": "/css/app.css.br",
     "/css/app.css.gz": "/css/app.css.gz",
     "/favicon.ico": "/favicon.ico",
+    "/favicon.png": "/favicon.png",
     "/fonts/vendor/@fortawesome/fontawesome-free/webfa-brands-400.ttf": "/fonts/vendor/@fortawesome/fontawesome-free/webfa-brands-400.ttf",
     "/fonts/vendor/@fortawesome/fontawesome-free/webfa-brands-400.woff2": "/fonts/vendor/@fortawesome/fontawesome-free/webfa-brands-400.woff2",
     "/fonts/vendor/@fortawesome/fontawesome-free/webfa-regular-400.ttf": "/fonts/vendor/@fortawesome/fontawesome-free/webfa-regular-400.ttf",

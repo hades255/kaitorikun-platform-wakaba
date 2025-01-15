@@ -16,7 +16,7 @@ import {
     calculateWindowSize,
     useDispatch,
     addWindowClass,
-    checkSidebarClass
+    checkSidebarClass,
 } from "./components/index.jsx";
 import { selectorThemes, selectorUtility, utilityAction } from "./reduxStore";
 import { Redirect } from "react-router-dom";
@@ -60,20 +60,21 @@ const App = () => {
     const handleToggleMenuSidebar = () => {
         dispatch(utilityAction.toggleSidebarMenu(!menuSidebarCollapsed));
     };
+
     return (
         <div className="wrapper">
             {/* {isAuthenticated.length !== 0 ? ( */}
-                <div>
-                    {top && <Top />}
-                    {menu && <Menu />}
-                    <div className="wrap">
-                        {header && <Header />}
-                        {sidebar && <Sidebar />}
-                        {content && <Content />}
-                    </div>
-                    <LoadingBar color={"red"} progress={progress} />
-                    {loading.content && <LoadingContent />}
+            <div>
+                {top && <Top />}
+                {menu && <Menu />}
+                <div className="wrap">
+                    {header && <Header />}
+                    {sidebar && <Sidebar />}
+                    {content && <Content />}
                 </div>
+                <LoadingBar color={"red"} progress={progress} />
+                {loading.content && <LoadingContent />}
+            </div>
             {/* ) : (
                 <div>
                     {loading.content && <LoadingContent />}

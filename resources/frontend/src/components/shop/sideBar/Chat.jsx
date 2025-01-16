@@ -9,56 +9,24 @@ import {
     Typography,
     Paper,
 } from "@mui/material";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import clsx from "clsx";
 
 const ChatSidebar = () => {
-    const socket = null;
-
     const [selectedUser, setSelectedUser] = useState(null);
-    const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
     const [suggestedUsers] = useState([
         { id: 1, name: "John Doe" },
         { id: 2, name: "Jane Smith" },
-        // Add more suggested users
     ]);
     const [recentChats, setRecentChats] = useState([]);
     const [pinnedChats, setPinnedChats] = useState([]);
-
-    useEffect(() => {
-        socket?.on("receive-message", (message) => {
-            setMessages((prev) => [...prev, message]);
-            updateRecentChats(message.sender);
-        });
-
-        return () => socket?.off("receive-message");
-    }, [socket]);
-
-    const updateRecentChats = (userId) => {
-        if (!recentChats.includes(userId)) {
-            setRecentChats((prev) => [...prev, userId]);
-        }
-    };
-
-    const handleSendMessage = () => {
-        if (message.trim() && selectedUser) {
-            const newMessage = {
-                content: message,
-                sender: "currentUser",
-                receiver: selectedUser.id,
-                timestamp: new Date(),
-            };
-            socket?.emit("new-message", newMessage);
-            setMessages((prev) => [...prev, newMessage]);
-            setMessage("");
-            updateRecentChats(selectedUser.id);
-        }
-    };
 
     return (
         <Box
             sx={{
                 borderColor: "divider",
-                p: 2,
+                py: 2,
             }}
         >
             <Typography variant="p" fontSize={12} color="white" pl={2}>
@@ -99,13 +67,7 @@ const ChatSidebar = () => {
             </Typography>
             <List>
                 {suggestedUsers.map((user) => (
-                    <ListItem
-                        key={user.id}
-                        onClick={() => setSelectedUser(user)}
-                        sx={{ color: "white" }}
-                    >
-                        <ListItemText primary={user.name} />
-                    </ListItem>
+                    <ChatItem key={user.id} user={user} />
                 ))}
             </List>
         </Box>
@@ -114,38 +76,51 @@ const ChatSidebar = () => {
 
 export default ChatSidebar;
 
-const ChatItem = (chat) => (
-    <div className="flex items-center justify-between p-3 hover:bg-gray-700 rounded-md cursor-pointer group">
-        <div className="flex items-center space-x-3">
-            <div className="relative">
-                <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-                    <UserIcon className="w-4 h-4 text-gray-300" />
+const getStatusColor = (status) => {
+    switch (status) {
+        case "online":
+            return "bg-green-500";
+        case "away":
+            return "bg-yellow-500";
+        default:
+            return "bg-gray-500";
+    }
+};
+
+const ChatItem = ({ user }) => {
+    return (
+        <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group">
+            <div className="w-full flex items-center space-x-3">
+                <div className="relative">
+                    <AccountCircleOutlinedIcon className="text-gray-300 !w-8 !h-8" />
+                    <div
+                        className={clsx(
+                            `w-3 h-3 rounded-full absolute -bottom-0.5 -right-0.5`,
+                            getStatusColor("online")
+                        )}
+                    />
                 </div>
-                <Circle
-                    className={`w-3 h-3 absolute -bottom-0.5 -right-0.5 ${getStatusColor(
-                        chat.participants[1].status
-                    )}`}
-                />
-            </div>
-            <div>
-                <p className="text-gray-200">{chat.participants[1].username}</p>
-                {chat.lastMessage && (
+                <div className="w-full flex flex-col">
+                    <div className="flex justify-between items-center">
+                        <p className="text-gray-200">{user.name}</p>
+                        <p className="text-gray-400 text-xs">{"10:18"}</p>
+                    </div>
                     <p className="text-gray-400 text-sm truncate">
-                        {chat.lastMessage.message}
+                        {"lastMessage"}
                     </p>
-                )}
+                </div>
             </div>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    // togglePinChat(user.id);
+                }}
+                className={`px-1 rounded-full ${
+                    user.isPinned ? "text-blue-400" : "text-gray-400"
+                } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
+            >
+                <PushPinOutlinedIcon className="!w-4 !h-4" />
+            </button>
         </div>
-        <button
-            onClick={(e) => {
-                e.stopPropagation();
-                togglePinChat(chat.id);
-            }}
-            className={`p-1 rounded-full ${
-                chat.isPinned ? "text-blue-400" : "text-gray-400"
-            } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
-        >
-            <Pin className="w-4 h-4" />
-        </button>
-    </div>
-);
+    );
+};

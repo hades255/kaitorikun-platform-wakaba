@@ -24,9 +24,7 @@ const ChannelSidebar = () => {
             <List>
                 <Link to="/channels/new">
                     <ListItem onClick={handleClick}>
-                        <ListItemIcon>
-                            <AddIcon />
-                        </ListItemIcon>
+                        <AddIcon color="!white" />
                         <ListItemText primary="Create Channel" />
                     </ListItem>
                 </Link>

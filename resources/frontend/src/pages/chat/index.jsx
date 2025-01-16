@@ -14,7 +14,10 @@ import { PanelContent } from "../../components";
 const ChatsPage = () => {
     const socket = null;
 
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUser, setSelectedUser] = useState({
+        id: 1,
+        name: "John Doe",
+    });
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const [suggestedUsers] = useState([
@@ -57,63 +60,58 @@ const ChatsPage = () => {
 
     return (
         <PanelContent headerContent title="Messages">
-            <Box sx={{ display: "flex", height: "100%" }}>
-                <Box sx={{ flexGrow: 1, p: 2 }}>
-                    {selectedUser ? (
-                        <>
-                            <Box
-                                sx={{
-                                    height: "calc(100% - 80px)",
-                                    overflow: "auto",
-                                }}
-                            >
-                                {messages.map((msg, index) => (
-                                    <Paper
-                                        key={index}
-                                        sx={{
-                                            p: 2,
-                                            mb: 1,
-                                            ml:
-                                                msg.sender === "currentUser"
-                                                    ? "auto"
-                                                    : 0,
-                                            mr:
-                                                msg.sender === "currentUser"
-                                                    ? 0
-                                                    : "auto",
-                                            maxWidth: "70%",
-                                        }}
-                                    >
-                                        <Typography>{msg.content}</Typography>
-                                    </Paper>
-                                ))}
-                            </Box>
-                            <Box sx={{ display: "flex", mt: 2 }}>
-                                <TextField
-                                    fullWidth
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Type a message..."
-                                    sx={{ mr: 1 }}
-                                />
-                                <Button
-                                    variant="contained"
-                                    onClick={handleSendMessage}
-                                >
-                                    Send
-                                </Button>
-                            </Box>
-                        </>
-                    ) : (
-                        <Typography
-                            variant="h6"
-                            sx={{ textAlign: "center", mt: 4 }}
+            <div className="p-2 h-[calc(100vh_-_200px)]">
+                {selectedUser ? (
+                    <>
+                        <Box
+                            sx={{
+                                height: "calc(100% - 80px)",
+                                overflow: "auto",
+                            }}
                         >
-                            Select a user to start chatting
-                        </Typography>
-                    )}
-                </Box>
-            </Box>
+                            {messages.map((msg, index) => (
+                                <Paper
+                                    key={index}
+                                    sx={{
+                                        p: 2,
+                                        mb: 1,
+                                        ml:
+                                            msg.sender === "currentUser"
+                                                ? "auto"
+                                                : 0,
+                                        mr:
+                                            msg.sender === "currentUser"
+                                                ? 0
+                                                : "auto",
+                                        maxWidth: "70%",
+                                    }}
+                                >
+                                    <Typography>{msg.content}</Typography>
+                                </Paper>
+                            ))}
+                        </Box>
+                        <Box sx={{ display: "flex", mt: 2 }}>
+                            <TextField
+                                fullWidth
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="Type a message..."
+                                sx={{ mr: 1 }}
+                            />
+                            <Button
+                                variant="contained"
+                                onClick={handleSendMessage}
+                            >
+                                Send
+                            </Button>
+                        </Box>
+                    </>
+                ) : (
+                    <div className="flex h-full justify-center items-center">
+                        Select a user to start chatting
+                    </div>
+                )}
+            </div>
         </PanelContent>
     );
 };

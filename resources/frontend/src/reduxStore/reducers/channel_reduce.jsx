@@ -39,7 +39,6 @@ const initialState = {
     posts: [],
 };
 const channels = (state = initialState, actions) => {
-    console.log(actions, state.posts);
     switch (actions.type) {
         case NEW_CHANNEL:
             return {

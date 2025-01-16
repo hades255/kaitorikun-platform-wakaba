@@ -69,7 +69,7 @@ const Post = ({ post }) => {
                         <AddIcon />
                     </IconButton>
                     {post.reactions.map((emoji, index) => (
-                        <span key={index}>{emoji}</span>
+                        <span key={index}>{emoji.emoji}</span>
                     ))}
                     {showEmojiPicker && (
                         <Box sx={{ position: "absolute", zIndex: 1 }}>

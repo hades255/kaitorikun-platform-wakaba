@@ -4,6 +4,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerManage\CustomerController;
 use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostReactionController;
+use App\Http\Controllers\PostReplyController;
+use App\Http\Controllers\InvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +33,19 @@ Route::post('/staff/exit', [StaffController::class, 'destroy']);
 Route::post('/customer/register', [CustomerController::class, 'createOrUpdate']);
 Route::post('/customer/list', [CustomerController::class, 'index']);
 Route::post('/customer/delete', [CustomerController::class, 'destroy']);
+
+
+// Channels routes 
+Route::apiResource('channels', ChannelController::class);
+
+// Posts routes 
+Route::apiResource('posts', PostController::class);
+
+// Post reactions routes 
+Route::apiResource('post-reactions', PostReactionController::class);
+
+// Post replies routes 
+Route::apiResource('post-replies', PostReplyController::class);
+
+// Invitations routes 
+Route::apiResource('invitations', InvitationController::class);

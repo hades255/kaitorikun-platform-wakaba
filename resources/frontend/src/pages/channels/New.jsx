@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { PanelContent, useDispatch } from "../../components";
 import { actionChannel } from "../../reduxStore";
+import api from "../../api";
 
 const CreateChannel = (props) => {
     const dispatch = useDispatch();
@@ -24,12 +25,25 @@ const CreateChannel = (props) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const id = Date.now();
-        dispatch(actionChannel.handleAddChannel({ ...channelData, id }));
-        setTimeout(() => {
-            dispatch(actionChannel.handleSelectChannel(id));
-            props.history.push("/channels");
-        }, 300);
+        const saveChannel = async () => {
+            try {
+                const response = await api.post("channels", channelData);
+                dispatch(actionChannel.handleAddChannel(response.data.channel));
+                setTimeout(() => {
+                    dispatch(
+                        actionChannel.handleSelectChannel({
+                            channel: response.data.channel,
+                            posts: [],
+                            users: [response.data.user],
+                        })
+                    );
+                    props.history.push("/channels");
+                }, 300);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        saveChannel();
     };
 
     return (

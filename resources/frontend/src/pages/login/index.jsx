@@ -10,9 +10,11 @@ import {
 import { actionTheme, utilityAction } from "../../reduxStore";
 import { withRouter } from "react-router-dom";
 import FormLogin from "./form";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Login = (props) => {
     const dispatch = useDispatch();
+    const auth = useAuth();
 
     useEffect(() => {
         if (getItem("userdata").length === 0) {
@@ -37,10 +39,10 @@ const Login = (props) => {
             let feedback = await postData("login", {
                 email: data.email,
                 password: data.password,
-            })
+            });
             if (feedback.status === 200) {
-                
                 setItem("userdata", feedback.data.result);
+                auth.setAuth(feedback.data.result);
                 console.log(getItem("userdata"));
 
                 setTimeout(() => {
@@ -50,25 +52,20 @@ const Login = (props) => {
             }
             // dispatch(utilityAction.stopLoading());
         } catch (error) {
-            console.log(error)
+            console.log(error);
             ToastNotification("error", error?.message);
             dispatch(utilityAction.stopLoading());
         }
     };
+
     return (
         <div className="login-box container" style={{ marginTop: "10%" }}>
             <div className="card card-outline card-primary">
                 <div className="card-header text-center">
-                    <img
-                        src="img/logo.png"
-                        width={"200px"}
-                        alt="logo"
-                    />
+                    <img src="img/logo.png" width={"200px"} alt="logo" />
                 </div>
                 <div className="card-body">
-                    <p className="login-box-msg">
-                        ログイン
-                    </p>
+                    <p className="login-box-msg">ログイン</p>
                     <FormLogin onSubmit={(data) => handleSubmit(data)} />
                 </div>
             </div>

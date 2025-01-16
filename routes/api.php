@@ -34,18 +34,17 @@ Route::post('/customer/register', [CustomerController::class, 'createOrUpdate'])
 Route::post('/customer/list', [CustomerController::class, 'index']);
 Route::post('/customer/delete', [CustomerController::class, 'destroy']);
 
+Route::get('channels/getPublic', [ChannelController::class, 'getPublic'])->name('channels.getPublic');
+Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');;
 
-// Channels routes 
-Route::apiResource('channels', ChannelController::class);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('channels', [ChannelController::class, 'store'])->name('channels.store');
+    Route::get('channels/getMine', [ChannelController::class, 'getMine'])->name('channels.getMine');
+    Route::get('channels/getWorking', [ChannelController::class, 'getWorking'])->name('channels.getWorking');
 
-// Posts routes 
-Route::apiResource('posts', PostController::class);
+    Route::post('posts', [PostController::class, 'store'])->name('posts.store');
 
-// Post reactions routes 
-Route::apiResource('post-reactions', PostReactionController::class);
-
-// Post replies routes 
-Route::apiResource('post-replies', PostReplyController::class);
-
-// Invitations routes 
-Route::apiResource('invitations', InvitationController::class);
+    Route::post('postreply', [PostReplyController::class, 'store'])->name('postreply.store');
+    Route::post('postreaction', [PostReactionController::class, 'store'])->name('postreaction.store');
+    Route::post('postreaction/toggle', [PostReactionController::class, 'toggle'])->name('postreaction.toggle');
+});

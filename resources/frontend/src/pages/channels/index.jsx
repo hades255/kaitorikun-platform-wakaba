@@ -1,41 +1,36 @@
-import React, { useMemo, useState } from "react";
-import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Typography,
-    Dialog,
-    TextField,
-} from "@mui/material";
-import { PanelContent, useDispatch, useSelector } from "../../components";
-import PostEditor from "./PostEditor";
+import React, { useState } from "react";
+import { Box, Button, Typography, Dialog, TextField } from "@mui/material";
+import api from "../../api";
 import { actionChannel, selectorChannel } from "../../reduxStore";
+import { PanelContent, useDispatch, useSelector } from "../../components";
 import Post from "./Post";
+import PostEditor from "./PostEditor";
 
 const Channels = () => {
     const dispatch = useDispatch();
 
     const channel = useSelector(selectorChannel.handleGetChannel);
-    const _posts = useSelector(selectorChannel.handleGetPosts);
-    const posts = useMemo(
-        () => _posts.filter((item) => item.channel == channel?.id),
-        [channel, _posts]
-    );
+    const posts = useSelector(selectorChannel.handleGetPosts);
+    const users = useSelector(selectorChannel.handleGetUsers);
+
     const [showPostEditor, setShowPostEditor] = useState(false);
     const [showInviteDialog, setShowInviteDialog] = useState(false);
     const [inviteEmail, setInviteEmail] = useState("");
 
     const handleCreatePost = (post) => {
-        const id = Date.now();
-        dispatch(
-            actionChannel.handleAddPostToChannel({
-                ...post,
-                id,
-                channel: channel.id,
-            })
-        );
-        setShowPostEditor(false);
+        const createPostFunc = async () => {
+            try {
+                const response = await api.post("posts", {
+                    ...post,
+                    channel_id: channel.id,
+                });
+                dispatch(actionChannel.handleAddPostToChannel(response.data));
+                setShowPostEditor(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        createPostFunc();
     };
 
     const handleInvite = () => {
@@ -74,7 +69,7 @@ const Channels = () => {
                     )}
 
                     {posts.map((post, index) => (
-                        <Post key={index} post={post} />
+                        <Post key={index} post={post} users={users} />
                     ))}
 
                     <Dialog

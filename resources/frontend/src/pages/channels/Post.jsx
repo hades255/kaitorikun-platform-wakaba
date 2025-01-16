@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import clsx from "clsx";
 import {
     Card,
     CardContent,
@@ -9,84 +10,168 @@ import {
     IconButton,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import EmojiPicker from "emoji-picker-react";
-import { useDispatch } from "../../components";
+import api from "../../api";
+import { getUserStatusColor } from "../../feature/action";
 import { actionChannel } from "../../reduxStore";
+import { useDispatch } from "../../components";
+import { useAuth } from "../../contexts/AuthContext";
 
-const Post = ({ post }) => {
+const Post = ({ post, users }) => {
     const dispatch = useDispatch();
+    const auth = useAuth();
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
     const [reply, setReply] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [reactions, setReactions] = useState([]);
+
+    useEffect(() => {
+        if (post.reactions && post.reactions.length > 0) {
+            let res = {};
+            post.reactions.forEach((item) => {
+                if (res[item.reaction]) {
+                    res[item.reaction] = {
+                        mine:
+                            res[item.reaction].mine ||
+                            item.user_id == auth.auth?.id,
+                        count: res[item.reaction].count + 1,
+                    };
+                } else {
+                    res[item.reaction] = { mine: item.user_id == auth.auth?.id, count: 1 };
+                }
+            });
+            let res_a = [];
+            for (let r in res) res_a.push({ reaction: r, ...res[r] });
+            setReactions(res_a);
+        }
+    }, [post, auth]);
 
     const handleReply = () => {
-        const newReply = {
-            content: reply,
-            timestamp: new Date(),
+        const saveFunc = async () => {
+            try {
+                const response = await api.post("postreply", {
+                    reply,
+                    post_id: post.id,
+                    channel_id: post.channel_id,
+                });
+                dispatch(actionChannel.handleReplyPost(response.data));
+                setReply("");
+                setShowReplyInput(false);
+            } catch (error) {
+                console.log(error);
+            }
         };
-        dispatch(
-            actionChannel.handleReplyPost({ post: post.id, reply: newReply })
-        );
-        setReply("");
-        setShowReplyInput(false);
+        saveFunc();
     };
 
     const handleNewEmojiClick = (emojiData) => {
-        dispatch(
-            actionChannel.handleAddREACTION({
-                post: post.id,
-                reaction: { user: 1, emoji: emojiData.emoji },
-            })
-        );
-        setShowEmojiPicker(false);
+        if (
+            post.reactions.find(
+                (item) =>
+                    item.user_id == auth.auth?.id &&
+                    item.reaction == emojiData.emoji
+            )
+        ) {
+            setShowEmojiPicker(false);
+            return;
+        }
+        const saveFunc = async () => {
+            try {
+                const response = await api.post("postreaction", {
+                    reaction: emojiData.emoji,
+                    post_id: post.id,
+                    channel_id: post.channel_id,
+                });
+                dispatch(actionChannel.handleAddREACTION(response.data));
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setShowEmojiPicker(false);
+            }
+        };
+        saveFunc();
     };
 
-    const handleEmojiClick = (emojiData) => {
-        dispatch(
-            actionChannel.handleRemoveREACTION({
-                post: post.id,
-                user: 1,
-                reaction: emojiData,
-            })
-        );
-        setShowEmojiPicker(false);
+    const handleEmojiClick = (reaction) => {
+        if (reaction.mine) {
+            const saveFunc = async () => {
+                try {
+                    const response = await api.post("postreaction/toggle", {
+                        reaction: reaction.reaction,
+                        post_id: post.id,
+                        channel_id: post.channel_id,
+                    });
+                    dispatch(
+                        actionChannel.handleRemoveREACTION({
+                            post_id: post.id,
+                            reaction_id: response.data.id,
+                        })
+                    );
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            saveFunc();
+        } else {
+            const saveFunc = async () => {
+                try {
+                    const response = await api.post("postreaction", {
+                        reaction: reaction.reaction,
+                        post_id: post.id,
+                        channel_id: post.channel_id,
+                    });
+                    dispatch(actionChannel.handleAddREACTION(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            saveFunc();
+        }
     };
 
     return (
         <Card sx={{ mb: 2 }}>
             <CardContent>
-                <Typography variant="h6">{post.title}</Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h6">{post.title}</Typography>
+                    <Typography variant="subtitle1">
+                        {post.created_at}
+                    </Typography>
+                </Box>
                 <Typography variant="subtitle1" color="text.secondary">
                     {post.subject}
                 </Typography>
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
-
-                <Box sx={{ mt: 2 }}>
+                <div className="flex items-center">
                     <IconButton
                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
                         <AddIcon />
                     </IconButton>
-                    {post.reactions.map((emoji, index) => (
-                        <span key={index}>{emoji.emoji}</span>
+                    {reactions?.map((item, index) => (
+                        <EmojiItem
+                            key={index}
+                            reaction={item}
+                            users={users}
+                            onClick={handleEmojiClick}
+                        />
                     ))}
                     {showEmojiPicker && (
                         <Box sx={{ position: "absolute", zIndex: 1 }}>
                             <EmojiPicker onEmojiClick={handleNewEmojiClick} />
                         </Box>
                     )}
-                </Box>
-
-                <Box sx={{ mt: 2 }}>
+                </div>
+                <Box>
                     <Button onClick={() => setShowReplyInput(!showReplyInput)}>
                         Reply
                     </Button>
                     <Button onClick={() => setShowReplies(!showReplies)}>
-                        View Conversation
+                        {showReplies ? "hide" : "View"} Conversation
                     </Button>
                 </Box>
-
                 {showReplyInput && (
                     <Box sx={{ mt: 2 }}>
                         <TextField
@@ -102,18 +187,73 @@ const Post = ({ post }) => {
                         </Button>
                     </Box>
                 )}
-
-                {showReplies &&
-                    post.replies.map((reply, index) => (
-                        <Card key={index} sx={{ mt: 1, ml: 2 }}>
-                            <CardContent>
-                                <Typography>{reply.content}</Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
+                {showReplies && (
+                    <div className="flex flex-col gap-2">
+                        {post.replies?.map((item, index) => (
+                            <ReplyItem key={index} reply={item} users={users} />
+                        ))}
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
 };
 
 export default Post;
+
+const ReplyItem = ({ reply, users }) => {
+    const user = users.find(({ id }) => id == reply.user_id);
+
+    return (
+        <div className="flex items-start justify-between px-3 py-2 rounded-md shadow-lg shadow-[#0008]">
+            <div className="w-full flex items-center space-x-3">
+                <div className="relative">
+                    <AccountCircleOutlinedIcon className="text-gray-700 !w-8 !h-8" />
+                    <div
+                        className={clsx(
+                            `w-3 h-3 rounded-full absolute -bottom-0.5 -right-0.5`,
+                            getUserStatusColor("online")
+                        )}
+                    />
+                </div>
+                <div className="w-full flex flex-col">
+                    <div className="flex justify-between items-center">
+                        <p className="text-gray-700">
+                            {user ? user.name : "Unknown User"}
+                        </p>
+                        <p className="text-gray-500 text-xs">
+                            {reply.created_at}
+                        </p>
+                    </div>
+                    <p className="text-gray-600 text-sm truncate">
+                        {reply.reply}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const EmojiItem = ({ reaction, onClick }) => {
+    const handleClick = () => {
+        onClick(reaction);
+    };
+
+    return (
+        <>
+            <span
+                className={clsx(
+                    "cursor-pointer mx-[1px] px-[1px] rounded border text-[#1976d2]",
+                    {
+                        "px-1 bg-[#0004]": reaction.mine,
+                    }
+                )}
+                onClick={handleClick}
+                title={reaction.count}
+            >
+                {reaction.reaction}
+                {reaction.count > 1 && reaction.count}
+            </span>
+        </>
+    );
+};

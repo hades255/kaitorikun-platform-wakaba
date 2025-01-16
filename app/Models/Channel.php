@@ -11,15 +11,45 @@ class Channel extends Model
 
     protected $fillable = ['name', 'description', 'icon', 'requireApproval', 'isPublic', 'user_id'];
 
-    public function posts() {
+    public function posts()
+    {
         return $this->hasMany(Post::class);
     }
 
-    public function users() {
+    public function limitedPosts($limit = 10, $offset = 0, $sortBy = 'created_at', $sortOrder = 'desc')
+    {
+        return $this->posts()
+            ->orderBy($sortBy, $sortOrder)
+            ->skip($offset)
+            ->take($limit)
+            ->with(['reactions', 'replies'])
+            ->get();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function users()
+    {
         return $this->belongsToMany(User::class, 'channel_users');
     }
 
-    public function invitations() {
+    public function invitations()
+    {
         return $this->hasMany(Invitation::class);
+    }
+
+    public static function getMyChannels($userId)
+    {
+        return self::where('user_id', $userId)->get();
+    }
+
+    public static function getChannelsForUser($userId)
+    {
+        return self::whereHas('users', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
     }
 }

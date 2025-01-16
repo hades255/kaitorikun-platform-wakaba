@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -27,7 +29,24 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'content' => 'nullable|string|max:1000',
+            'channel_id' => 'required|integer',
+            'notifyEmail' => 'required|boolean',
+        ]);
+        $post = new Post();
+        $post->title = $validatedData['title'];
+        $post->subject = $validatedData['subject'];
+        $post->content = $validatedData['content'];
+        $post->notifyEmail = $validatedData['notifyEmail'];
+        $post->channel_id = $validatedData['channel_id'];
+        $post->user_id = Auth::id();
+        if ($post->save()) {
+            return response()->json($post, 201);
+        }
+        return response()->json(['error' => 'Failed to create post'], 500);
     }
 
     /**

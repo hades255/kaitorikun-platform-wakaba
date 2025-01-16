@@ -26,7 +26,6 @@ export const addWindowClass = (classList) => {
 export const checkSidebarClass = (classList) => {
     const window = document && document.getElementById("sidebar_tab");
     const sidebar = document && document.getElementsByClassName("sidebar-collapse");
-    console.log(sidebar.length);
     
     if (window) {
         // @ts-ignore

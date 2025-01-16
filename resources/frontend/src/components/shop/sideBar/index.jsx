@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import { Link, Route, React, getItem } from "../../../components";
+import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
 import menu2 from "./menu2";
 import menu3 from "./menu3";
@@ -10,6 +10,8 @@ import menu6 from "./menu6";
 import SidebarNavList from "./SidebarNavList";
 import ChatSidebar from "./Chat";
 import ChannelSidebar from "./Channel";
+import { actionChannel } from "../../../reduxStore";
+import api from "../../../api";
 
 const tabs = [
     {
@@ -27,7 +29,22 @@ const tabs = [
 ];
 
 const Sidebar = (props) => {
+    const dispatch = useDispatch();
     const [roleMenu, setRoleMenu] = useState(menu1);
+
+    useEffect(() => {
+        const fetchChannels = async () => {
+            try {
+                const response = await api.get(`channels/getMine`);
+                dispatch(
+                    actionChannel.handleSetChannel(response.data.channels)
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        fetchChannels();
+    }, [dispatch]);
 
     useEffect(() => {
         let userData = getItem("userdata");

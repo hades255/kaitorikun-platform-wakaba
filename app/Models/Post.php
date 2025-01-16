@@ -11,15 +11,23 @@ class Post extends Model
 
     protected $fillable = ['title', 'subject', 'content', 'notifyEmail', 'channel_id'];
 
-    public function channel() {
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function channel()
+    {
         return $this->belongsTo(Channel::class);
     }
 
-    public function reactions() {
+    public function reactions()
+    {
         return $this->hasMany(PostReaction::class);
     }
 
-    public function replies() {
+    public function replies()
+    {
         return $this->hasMany(PostReply::class);
     }
 }

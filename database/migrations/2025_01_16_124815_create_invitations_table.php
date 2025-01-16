@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('channel_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sender_id')->constrained()->onDelete('cascade'); // User sending the invitation
-            $table->foreignId('receiver_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sender_id');
+            $table->foreignId('receiver_id');
             $table->timestamps();
         });
     }

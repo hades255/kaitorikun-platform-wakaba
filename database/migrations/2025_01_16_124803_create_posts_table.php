@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('content');
             $table->boolean('notifyEmail')->default(false);
             $table->foreignId('channel_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

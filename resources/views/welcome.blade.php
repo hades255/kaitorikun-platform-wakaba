@@ -9,6 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <meta http-equiv="Cache-control" content="public"> --}}
     <link href={{ mix('css/app.css') }} rel="stylesheet">
+    <link href={{ mix('css/tailwind.css') }} rel="stylesheet">
     <title>laravel-react-admin-lte</title>
 </head>
 

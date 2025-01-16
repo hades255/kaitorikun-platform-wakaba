@@ -7,78 +7,97 @@ import CustomerList from "../../pages/customer-menage/list";
 import CustomerEdit from "../../pages/customer-menage/edit";
 import StaffExit from "../../pages/shop-manage/exit";
 import ResetPassword from "../../pages/reset-password";
+import Channels from "../../pages/channels";
+import NewChannel from "../../pages/channels/New";
+import ChatsPage from "../../pages/chat";
 
 const MenuRoutes = [
-  {
-    path: "/",
-    exact: true,
-    title: "ログイン",
-    component: () => <Login />
-  },
-  {
-    path: "/forgot-password",
-    exact: true,
-    title: "パスワードリセット",
-    component: () => <ForgotPassword />
-  },
-  {
-    path: "/reset-password",
-    exact: true,
-    title: "パスワードリセット",
-    component: () => <ResetPassword />
-  },
-  {
-    path: "/todo",
-    exact: true,
-    title: "TODO",
-    component: () => <Dashboard />
-  },
-  {
-    path: "/staff/register",
-    exact: true,
-    title: "スタッフ登録",
-    component: () => <StaffRegister />
-  },
-  {
-    path: "/staff/exit",
-    exact: true,
-    title: "退会",
-    component: () => <StaffExit />
-  },
-  {
-    path: "/customer/list",
-    exact: true,
-    title: "顧客一覧",
-    component: () => <CustomerList />
-  },
-  {
-    path: "/customer/register",
-    exact: true,
-    title: "顧客登録",
-    component: () => <CustomerRegister />
-  },
-  {
-    path: "/customer/edit",
-    exact: true,
-    title: "顧客編集",
-    component: () => <CustomerEdit />
-  },
-
-  {
-    path: "/form-control",
-    exact: true,
-    title: "Form Control",
-    component: () => <FormControl />
-  },
-
-  {
-    path: "/demo-tabel",
-    exact: true,
-    title: "Demo Tabel",
-    component: () => <DemoTabel />
-  },
-
-
+    {
+        path: "/",
+        exact: true,
+        title: "ログイン",
+        component: () => <Login />,
+    },
+    {
+        path: "/forgot-password",
+        exact: true,
+        title: "パスワードリセット",
+        component: () => <ForgotPassword />,
+    },
+    {
+        path: "/reset-password",
+        exact: true,
+        title: "パスワードリセット",
+        component: () => <ResetPassword />,
+    },
+    {
+        path: "/todo",
+        exact: true,
+        title: "TODO",
+        component: () => <Dashboard />,
+    },
+    {
+        path: "/staff/register",
+        exact: true,
+        title: "スタッフ登録",
+        component: () => <StaffRegister />,
+    },
+    {
+        path: "/staff/exit",
+        exact: true,
+        title: "退会",
+        component: () => <StaffExit />,
+    },
+    {
+        path: "/customer/list",
+        exact: true,
+        title: "顧客一覧",
+        component: () => <CustomerList />,
+    },
+    {
+        path: "/customer/register",
+        exact: true,
+        title: "顧客登録",
+        component: () => <CustomerRegister />,
+    },
+    {
+        path: "/customer/edit",
+        exact: true,
+        title: "顧客編集",
+        component: () => <CustomerEdit />,
+    },
+    {
+        path: "/form-control",
+        exact: true,
+        title: "Form Control",
+        component: () => <FormControl />,
+    },
+    {
+        path: "/demo-tabel",
+        exact: true,
+        title: "Demo Tabel",
+        component: () => <DemoTabel />,
+    },
+    /** channel&chat start */
+    {
+        path: "/channels",
+        exact: true,
+        title: "Channels",
+        component: () => <Channels />,
+    },
+    {
+        path: "/channels/new",
+        exact: true,
+        title: "New Channel",
+        component: () => <NewChannel />,
+    },
+    {
+        path: "/chat",
+        exact: true,
+        title: "Chat",
+        component: () => <ChatsPage />,
+    },
+    /** channel&chat end */
 ];
 
 export default MenuRoutes;

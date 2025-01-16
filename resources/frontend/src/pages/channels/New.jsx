@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { withRouter } from "react-router-dom";
 import {
     Box,
     TextField,
@@ -8,9 +9,11 @@ import {
     Typography,
     Paper,
 } from "@mui/material";
-import { PanelContent } from "../../components";
+import { PanelContent, useDispatch } from "../../components";
+import { actionChannel } from "../../reduxStore";
 
-const CreateChannel = () => {
+const CreateChannel = (props) => {
+    const dispatch = useDispatch();
     const [channelData, setChannelData] = useState({
         name: "",
         description: "",
@@ -21,8 +24,12 @@ const CreateChannel = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle channel creation logic here
-        // navigate("/");
+        const id = Date.now();
+        dispatch(actionChannel.handleAddChannel({ ...channelData, id }));
+        setTimeout(() => {
+            dispatch(actionChannel.handleSelectChannel(id));
+            props.history.push("/channels");
+        }, 300);
     };
 
     return (
@@ -43,9 +50,9 @@ const CreateChannel = () => {
                                 name: e.target.value,
                             })
                         }
+                        required
                         sx={{ mb: 2 }}
                     />
-
                     <TextField
                         fullWidth
                         label="Channel Icon URL"
@@ -58,7 +65,6 @@ const CreateChannel = () => {
                         }
                         sx={{ mb: 2 }}
                     />
-
                     <TextField
                         fullWidth
                         multiline
@@ -73,7 +79,6 @@ const CreateChannel = () => {
                         }
                         sx={{ mb: 2 }}
                     />
-
                     <FormControlLabel
                         control={
                             <Switch
@@ -89,7 +94,6 @@ const CreateChannel = () => {
                         label="Require approval to join"
                         sx={{ mb: 1 }}
                     />
-
                     <FormControlLabel
                         control={
                             <Switch
@@ -105,7 +109,6 @@ const CreateChannel = () => {
                         label="Public channel"
                         sx={{ mb: 2 }}
                     />
-
                     <Box sx={{ display: "flex", gap: 2 }}>
                         <Button variant="contained" type="submit">
                             Create Channel
@@ -120,4 +123,4 @@ const CreateChannel = () => {
     );
 };
 
-export default CreateChannel;
+export default withRouter(CreateChannel);

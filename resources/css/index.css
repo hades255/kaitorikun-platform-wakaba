@@ -52,7 +52,7 @@ input.password-hide-css {
 
 .main-sidebar-top {
     top: 80px !important;
-    height: 100%;
+    height: calc(100% - 80px);
     min-height: calc(100vh - 80px) !important;
     background-color: #313239 ;
     /* min-height: auto !important; */

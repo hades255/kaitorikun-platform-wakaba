@@ -61,7 +61,7 @@ const ChatSidebar = () => {
                 p: 2,
             }}
         >
-            <Typography variant="h6" color="white">
+            <Typography variant="p" fontSize={12} color="white" pl={2}>
                 Pinned
             </Typography>
             <List>
@@ -76,7 +76,7 @@ const ChatSidebar = () => {
                 ))}
             </List>
 
-            <Typography variant="h6" color="white">
+            <Typography variant="p" fontSize={12} color="white" pl={2}>
                 Recent
             </Typography>
             <List>
@@ -94,7 +94,7 @@ const ChatSidebar = () => {
                 })}
             </List>
 
-            <Typography variant="h6" color="white">
+            <Typography variant="p" fontSize={12} color="white" pl={2}>
                 Suggested
             </Typography>
             <List>
@@ -113,3 +113,39 @@ const ChatSidebar = () => {
 };
 
 export default ChatSidebar;
+
+const ChatItem = (chat) => (
+    <div className="flex items-center justify-between p-3 hover:bg-gray-700 rounded-md cursor-pointer group">
+        <div className="flex items-center space-x-3">
+            <div className="relative">
+                <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                    <UserIcon className="w-4 h-4 text-gray-300" />
+                </div>
+                <Circle
+                    className={`w-3 h-3 absolute -bottom-0.5 -right-0.5 ${getStatusColor(
+                        chat.participants[1].status
+                    )}`}
+                />
+            </div>
+            <div>
+                <p className="text-gray-200">{chat.participants[1].username}</p>
+                {chat.lastMessage && (
+                    <p className="text-gray-400 text-sm truncate">
+                        {chat.lastMessage.message}
+                    </p>
+                )}
+            </div>
+        </div>
+        <button
+            onClick={(e) => {
+                e.stopPropagation();
+                togglePinChat(chat.id);
+            }}
+            className={`p-1 rounded-full ${
+                chat.isPinned ? "text-blue-400" : "text-gray-400"
+            } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
+        >
+            <Pin className="w-4 h-4" />
+        </button>
+    </div>
+);

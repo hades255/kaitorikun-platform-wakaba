@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewChannel;
 use App\Models\Channel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +34,9 @@ class ChannelController extends Controller
         $channel->isPublic = $validatedData['isPublic'];
         $channel->user_id = Auth::id();
         if ($channel->save()) {
+            if ($channel->isPublic) {   //  broadcase public channel
+                broadcast(new NewChannel($channel));
+            }
             $channel->users()->attach(Auth::id());
             return response()->json(["channel" => $channel, "user" => Auth::user()], 201);
         }

@@ -77,7 +77,7 @@ const channels = (state = initialState, actions) => {
                               ...item,
                               reactions: (item.reactions ?? []).filter(
                                   ({ id }) =>
-                                      id != actions.payload.data.reaction_id
+                                      id != actions.payload.data.id
                               ),
                           }
                         : item

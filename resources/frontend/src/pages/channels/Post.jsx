@@ -54,12 +54,13 @@ const Post = ({ post, users }) => {
     const handleReply = () => {
         const saveFunc = async () => {
             try {
-                const response = await api.post("postreply", {
+                // const response =
+                await api.post("postreply", {
                     reply,
                     post_id: post.id,
                     channel_id: post.channel_id,
                 });
-                dispatch(actionChannel.handleReplyPost(response.data));
+                // dispatch(actionChannel.handleReplyPost(response.data));
                 setReply("");
                 setShowReplyInput(false);
             } catch (error) {
@@ -83,12 +84,13 @@ const Post = ({ post, users }) => {
         }
         const saveFunc = async () => {
             try {
-                const response = await api.post("postreaction", {
+                // const response =
+                await api.post("postreaction", {
                     reaction: emojiData.emoji,
                     post_id: post.id,
                     channel_id: post.channel_id,
                 });
-                dispatch(actionChannel.handleAddREACTION(response.data));
+                // dispatch(actionChannel.handleAddREACTION(response.data));
             } catch (error) {
                 console.log(error);
             } finally {
@@ -102,17 +104,13 @@ const Post = ({ post, users }) => {
         if (reaction.mine) {
             const saveFunc = async () => {
                 try {
-                    const response = await api.post("postreaction/toggle", {
+                    // const response =
+                    await api.post("postreaction/toggle", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                         channel_id: post.channel_id,
                     });
-                    dispatch(
-                        actionChannel.handleRemoveREACTION({
-                            post_id: post.id,
-                            reaction_id: response.data.id,
-                        })
-                    );
+                    // dispatch(actionChannel.handleRemoveREACTION(response.data));
                 } catch (error) {
                     console.log(error);
                 }
@@ -121,12 +119,13 @@ const Post = ({ post, users }) => {
         } else {
             const saveFunc = async () => {
                 try {
-                    const response = await api.post("postreaction", {
+                    // const response =
+                    await api.post("postreaction", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                         channel_id: post.channel_id,
                     });
-                    dispatch(actionChannel.handleAddREACTION(response.data));
+                    // dispatch(actionChannel.handleAddREACTION(response.data));
                 } catch (error) {
                     console.log(error);
                 }

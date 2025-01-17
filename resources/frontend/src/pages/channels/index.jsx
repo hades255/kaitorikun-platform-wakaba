@@ -20,11 +20,12 @@ const Channels = () => {
     const handleCreatePost = (post) => {
         const createPostFunc = async () => {
             try {
-                const response = await api.post("posts", {
+                // const response = 
+                await api.post("posts", {
                     ...post,
                     channel_id: channel.id,
                 });
-                dispatch(actionChannel.handleAddPostToChannel(response.data));
+                // dispatch(actionChannel.handleAddPostToChannel(response.data));
                 setShowPostEditor(false);
             } catch (error) {
                 console.log(error);

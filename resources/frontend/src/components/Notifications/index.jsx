@@ -14,7 +14,7 @@ const Notifications = () => {
 
         const handleChannelCreated = (data) => {
             if (data && data.channel)
-                dispatch(actionChannel.handleAddChannel(data.channel));
+                dispatch(actionChannel.handleAddPublicChannel(data.channel));
         };
         const handlePostCreated = (data) => {
             if (data && data.post)

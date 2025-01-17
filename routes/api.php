@@ -41,6 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('channels', [ChannelController::class, 'store'])->name('channels.store');
     Route::get('channels/getMine', [ChannelController::class, 'getMine'])->name('channels.getMine');
     Route::get('channels/getWorking', [ChannelController::class, 'getWorking'])->name('channels.getWorking');
+    Route::post('channels/sendinvite', [ChannelController::class, 'sendInvitation'])->name('channels.sendInvitation');
 
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
 

@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
+import axios from "axios";
+import api from "../../../api";
+import { API_ROUTE } from "../../../config";
+import { actionChannel } from "../../../reduxStore";
 import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
 import menu2 from "./menu2";
@@ -7,11 +11,9 @@ import menu3 from "./menu3";
 import menu4 from "./menu4";
 import menu5 from "./menu5";
 import menu6 from "./menu6";
-import SidebarNavList from "./SidebarNavList";
 import ChatSidebar from "./Chat";
 import ChannelSidebar from "./Channel";
-import { actionChannel } from "../../../reduxStore";
-import api from "../../../api";
+import SidebarNavList from "./SidebarNavList";
 
 const tabs = [
     {
@@ -38,6 +40,14 @@ const Sidebar = (props) => {
                 const response = await api.get(`channels/getMine`);
                 dispatch(
                     actionChannel.handleSetChannel(response.data.channels)
+                );
+                const publicChannelsResponse = await axios.get(
+                    `${API_ROUTE}channels/getPublic`
+                );
+                dispatch(
+                    actionChannel.handleSetPublicChannel(
+                        publicChannelsResponse.data.channels
+                    )
                 );
             } catch (err) {
                 console.log(err);

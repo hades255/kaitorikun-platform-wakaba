@@ -13,13 +13,10 @@ import { Add as AddIcon } from "@mui/icons-material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import EmojiPicker from "emoji-picker-react";
 import api from "../../api";
-import { getUserStatusColor } from "../../feature/action";
-import { actionChannel } from "../../reduxStore";
-import { useDispatch } from "../../components";
 import { useAuth } from "../../contexts/AuthContext";
+import { getUserStatusColor } from "../../feature/action";
 
 const Post = ({ post, users }) => {
-    const dispatch = useDispatch();
     const auth = useAuth();
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);

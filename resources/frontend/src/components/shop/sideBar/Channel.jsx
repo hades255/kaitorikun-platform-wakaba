@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
+import axios from "axios";
 import { List, ListItem, ListItemText, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import { Link, useDispatch, useSelector } from "../../../components";
-import { actionChannel, selectorChannel } from "../../../reduxStore";
-import api from "../../../api";
-import axios from "axios";
 import { API_ROUTE } from "../../../config";
+import { useAuth } from "../../../contexts/AuthContext";
+import { actionChannel, selectorChannel } from "../../../reduxStore";
+import { Link, useDispatch, useSelector } from "../../../components";
 
 const ChannelSidebar = () => {
     const dispatch = useDispatch();
@@ -97,21 +97,12 @@ const ChannelItem = ({ channel, active }) => {
 };
 
 const PublicChannels = ({ channel }) => {
-    const [channels, setChannels] = useState([]);
-
-    useEffect(() => {
-        const fetchChannels = async () => {
-            try {
-                const response = await axios.get(
-                    `${API_ROUTE}channels/getPublic`
-                );
-                setChannels(response.data.channels);
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        fetchChannels();
-    }, []);
+    const { auth } = useAuth();
+    const _channels = useSelector(selectorChannel.handleGetPublicChannels);
+    const channels = useMemo(
+        () => _channels.filter(({ user_id }) => user_id !== auth.id),
+        [auth, _channels]
+    );
 
     return (
         channels.length > 0 && (

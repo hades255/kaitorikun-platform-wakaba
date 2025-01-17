@@ -1,8 +1,8 @@
 import { useState } from "react";
+import clsx from "clsx";
 import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import clsx from "clsx";
 import { getUserStatusColor } from "../../../feature/action";
 
 const ChatSidebar = () => {

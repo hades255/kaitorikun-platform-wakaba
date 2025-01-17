@@ -9,9 +9,17 @@ class Invitation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['channel_id', 'sender_id', 'receiver_id'];
+    protected $fillable = ['channel_id', 'sender_id', 'receiver_id', 'token'];
 
     public function channel() {
         return $this->belongsTo(Channel::class);
+    }
+
+    public function sender() {
+        return $this->belongsTo(User::class);
+    }
+
+    public function receiver() {
+        return $this->belongsTo(User::class);
     }
 }

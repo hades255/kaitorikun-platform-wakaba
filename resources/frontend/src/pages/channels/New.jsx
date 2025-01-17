@@ -48,16 +48,17 @@ const CreateChannel = (props) => {
     };
 
     return (
-        <PanelContent headerContent title="Create new Channel">
+        <PanelContent headerContent title="新しいチャンネルを作成">
             <Paper sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
                 <Typography variant="h5" sx={{ mb: 3 }}>
-                    Create New Channel
+                    {/* Create New Channel */}新しいチャンネルを作成
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
                     <TextField
                         fullWidth
-                        label="Channel Name"
+                        label="チャンネル名"
+                        // label="Channel Name"
                         value={channelData.name}
                         onChange={(e) =>
                             setChannelData({
@@ -70,7 +71,8 @@ const CreateChannel = (props) => {
                     />
                     <TextField
                         fullWidth
-                        label="Channel Icon URL"
+                        // label="Channel Icon URL"
+                        label="チャンネルアイコン URL"
                         value={channelData.icon}
                         onChange={(e) =>
                             setChannelData({
@@ -84,7 +86,8 @@ const CreateChannel = (props) => {
                         fullWidth
                         multiline
                         rows={4}
-                        label="Description"
+                        label="説明"
+                        // label="Description"
                         value={channelData.description}
                         onChange={(e) =>
                             setChannelData({
@@ -106,7 +109,8 @@ const CreateChannel = (props) => {
                                 }
                             />
                         }
-                        label="Require approval to join"
+                        label="参加するには承認が必要"
+                        // label="Require approval to join"
                         sx={{ mb: 1 }}
                     />
                     <FormControlLabel
@@ -121,15 +125,16 @@ const CreateChannel = (props) => {
                                 }
                             />
                         }
-                        label="Public channel"
+                        label="公開チャンネル"
+                        // label="Public channel"
                         sx={{ mb: 2 }}
                     />
                     <Box sx={{ display: "flex", gap: 2 }}>
                         <Button variant="contained" type="submit">
-                            Create Channel
+                            {/* Create Channel */}チャンネルを作成
                         </Button>
                         <Button variant="outlined" onClick={() => {}}>
-                            Cancel
+                            {/* Cancel */}キャンセル
                         </Button>
                     </Box>
                 </form>

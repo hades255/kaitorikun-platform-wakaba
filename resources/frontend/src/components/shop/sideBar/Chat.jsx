@@ -22,7 +22,7 @@ const ChatSidebar = () => {
             }}
         >
             <Typography variant="p" fontSize={12} color="white" pl={2}>
-                Pinned
+                {/* Pinned */}固定
             </Typography>
             <List>
                 {pinnedChats.map((user) => (
@@ -37,7 +37,7 @@ const ChatSidebar = () => {
             </List>
 
             <Typography variant="p" fontSize={12} color="white" pl={2}>
-                Recent
+                {/* Recent */}最近
             </Typography>
             <List>
                 {recentChats.map((userId) => {
@@ -55,7 +55,7 @@ const ChatSidebar = () => {
             </List>
 
             <Typography variant="p" fontSize={12} color="white" pl={2}>
-                Suggested
+                {/* Suggested */}おすすめ
             </Typography>
             <List>
                 {suggestedUsers.map((user) => (

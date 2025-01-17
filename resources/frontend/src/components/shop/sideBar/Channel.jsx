@@ -40,7 +40,8 @@ const ChannelSidebar = () => {
                 <Link to="/channels/new">
                     <ListItem onClick={handleClick}>
                         <AddIcon color="!white" />
-                        <ListItemText primary="Create Channel" />
+                        <ListItemText primary="チャンネルを作成" />
+                        {/* <ListItemText primary="Create Channel" /> */}
                     </ListItem>
                 </Link>
                 <Link to="/channels">
@@ -116,7 +117,8 @@ const PublicChannels = ({ channel }) => {
         channels.length > 0 && (
             <>
                 <Typography variant="p" fontSize={12} color="white" pl={2}>
-                    Public Channels
+                    {/* Public Channels */}
+                    公開チャンネル
                 </Typography>
                 <List>
                     <Link to="/channels">

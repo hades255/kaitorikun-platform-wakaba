@@ -33,7 +33,8 @@ export default function PostEditor({ onPost, onClose }) {
             <form onSubmit={handlePost}>
                 <TextField
                     fullWidth
-                    label="Title"
+                    // label="Title"
+                    label="タイトル"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
@@ -41,7 +42,8 @@ export default function PostEditor({ onPost, onClose }) {
                 />
                 <TextField
                     fullWidth
-                    label="Subject"
+                    // label="Subject"
+                    label="件名"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     sx={{ mb: 2 }}
@@ -65,14 +67,15 @@ export default function PostEditor({ onPost, onClose }) {
                             onChange={(e) => setNotifyEmail(e.target.checked)}
                         />
                     }
-                    label="Also notify via email"
+                    // label="Also notify via email"
+                    label="メールでも通知"
                 />
                 <Box sx={{ mt: 2 }}>
                     <Button variant="contained" type="submit" sx={{ mr: 1 }}>
-                        Post
+                        {/* Post */}投稿
                     </Button>
                     <Button variant="outlined" onClick={onClose}>
-                        Close
+                        {/* Close */}閉じる
                     </Button>
                 </Box>
             </form>

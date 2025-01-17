@@ -20,7 +20,7 @@ const Channels = () => {
     const handleCreatePost = (post) => {
         const createPostFunc = async () => {
             try {
-                // const response = 
+                // const response =
                 await api.post("posts", {
                     ...post,
                     channel_id: channel.id,
@@ -41,7 +41,7 @@ const Channels = () => {
     };
 
     return (
-        <PanelContent headerContent title={channel ? channel.name : "Channels"}>
+        <PanelContent headerContent title={channel ? channel.name : "チャンネル"}>
             {channel ? (
                 <Box>
                     {!showPostEditor && (
@@ -51,13 +51,13 @@ const Channels = () => {
                                 onClick={() => setShowPostEditor(true)}
                                 sx={{ mr: 1 }}
                             >
-                                Start New Post
+                                {/* Start New Post */}新しい投稿を開始
                             </Button>
                             <Button
                                 variant="outlined"
                                 onClick={() => setShowInviteDialog(true)}
                             >
-                                Invite People
+                                {/* Invite People */}人を招待
                             </Button>
                         </Box>
                     )}
@@ -78,22 +78,25 @@ const Channels = () => {
                         onClose={() => setShowInviteDialog(false)}
                     >
                         <Box sx={{ p: 2 }}>
-                            <Typography variant="h6">Invite People</Typography>
+                            <Typography variant="h6">
+                                {/* Invite People */}人を招待
+                            </Typography>
                             <TextField
                                 fullWidth
-                                label="Email"
+                                // label="Email"
+                                label="メール"
                                 value={inviteEmail}
                                 onChange={(e) => setInviteEmail(e.target.value)}
                                 sx={{ my: 2 }}
                             />
                             <Button variant="contained" onClick={handleInvite}>
-                                Send Invite
+                                {/* Send Invite */}招待を送信
                             </Button>
                         </Box>
                     </Dialog>
                 </Box>
             ) : (
-                <Box>Create new Channel</Box>
+                <Box>{/* Create new Channel */}新しいチャンネルを作成</Box>
             )}
         </PanelContent>
     );

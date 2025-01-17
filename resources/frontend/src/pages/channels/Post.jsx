@@ -169,10 +169,10 @@ const Post = ({ post, users }) => {
                 </div>
                 <Box>
                     <Button onClick={() => setShowReplyInput(!showReplyInput)}>
-                        Reply
+                        {/* Reply */}返信
                     </Button>
                     <Button onClick={() => setShowReplies(!showReplies)}>
-                        {showReplies ? "hide" : "View"} Conversation
+                        {showReplies ? "会話を非表示" : "会話を表示"}
                     </Button>
                 </Box>
                 {showReplyInput && (
@@ -186,7 +186,7 @@ const Post = ({ post, users }) => {
                             sx={{ mb: 1 }}
                         />
                         <Button variant="contained" onClick={handleReply}>
-                            Send Reply
+                            {/* Send Reply */}返信を送信
                         </Button>
                     </Box>
                 )}

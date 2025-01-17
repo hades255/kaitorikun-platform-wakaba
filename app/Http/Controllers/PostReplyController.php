@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ReplyToPost;
+use App\Jobs\ReplyToPostJob;
 use App\Models\PostReply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +42,7 @@ class PostReplyController extends Controller
         $reply->channel_id = $validatedData['channel_id'];
         $reply->user_id = Auth::id();
         if ($reply->save()) {
-            //  todo    push notification
+            ReplyToPostJob::dispatch($reply);
             return response()->json($reply, 201);
         }
         return response()->json(['error' => 'Failed to create reply'], 500);

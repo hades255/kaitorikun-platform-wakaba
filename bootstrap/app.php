@@ -52,4 +52,7 @@ $app->singleton(
 |
 */
 
+$app->register(Illuminate\Queue\QueueServiceProvider::class);
+
+
 return $app;

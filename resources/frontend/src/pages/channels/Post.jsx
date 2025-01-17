@@ -39,7 +39,10 @@ const Post = ({ post, users }) => {
                         count: res[item.reaction].count + 1,
                     };
                 } else {
-                    res[item.reaction] = { mine: item.user_id == auth.auth?.id, count: 1 };
+                    res[item.reaction] = {
+                        mine: item.user_id == auth.auth?.id,
+                        count: 1,
+                    };
                 }
             });
             let res_a = [];
@@ -68,6 +71,7 @@ const Post = ({ post, users }) => {
 
     const handleNewEmojiClick = (emojiData) => {
         if (
+            post.reactions &&
             post.reactions.find(
                 (item) =>
                     item.user_id == auth.auth?.id &&

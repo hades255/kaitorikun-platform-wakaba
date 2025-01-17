@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewPost;
+use App\Jobs\NewPostJob;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +46,7 @@ class PostController extends Controller
         $post->channel_id = $validatedData['channel_id'];
         $post->user_id = Auth::id();
         if ($post->save()) {
+            NewPostJob::dispatch($post);
             return response()->json($post, 201);
         }
         return response()->json(['error' => 'Failed to create post'], 500);

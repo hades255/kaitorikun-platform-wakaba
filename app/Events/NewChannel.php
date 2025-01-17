@@ -26,20 +26,14 @@ class NewChannel implements ShouldBroadcast
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
      */
     public function broadcastOn()
     {
-        // return [
-        //     new PrivateChannel('channel-name'),
-        // ];
-        return new Channel('channel'); // Specify the channel name
-
+        return new Channel('channel');
     }
 
     public function broadcastAs()
     {
-        return 'channel.created'; // Custom event name (optional)
+        return 'channel.created';
     }
 }

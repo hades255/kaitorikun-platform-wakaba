@@ -1,14 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-    Box,
-    List,
-    ListItem,
-    ListItemText,
-    TextField,
-    Button,
-    Typography,
-    Paper,
-} from "@mui/material";
+import { Box, TextField, Button, Typography, Paper } from "@mui/material";
 import { PanelContent } from "../../components";
 
 const ChatsPage = () => {

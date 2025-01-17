@@ -1,17 +1,9 @@
-import { useState, useEffect } from "react";
-import {
-    Box,
-    List,
-    ListItem,
-    ListItemText,
-    TextField,
-    Button,
-    Typography,
-    Paper,
-} from "@mui/material";
+import { useState } from "react";
+import clsx from "clsx";
+import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import clsx from "clsx";
+import { getUserStatusColor } from "../../../feature/action";
 
 const ChatSidebar = () => {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -30,7 +22,7 @@ const ChatSidebar = () => {
             }}
         >
             <Typography variant="p" fontSize={12} color="white" pl={2}>
-                Pinned
+                {/* Pinned */}固定
             </Typography>
             <List>
                 {pinnedChats.map((user) => (
@@ -45,7 +37,7 @@ const ChatSidebar = () => {
             </List>
 
             <Typography variant="p" fontSize={12} color="white" pl={2}>
-                Recent
+                {/* Recent */}最近
             </Typography>
             <List>
                 {recentChats.map((userId) => {
@@ -63,7 +55,7 @@ const ChatSidebar = () => {
             </List>
 
             <Typography variant="p" fontSize={12} color="white" pl={2}>
-                Suggested
+                {/* Suggested */}おすすめ
             </Typography>
             <List>
                 {suggestedUsers.map((user) => (
@@ -76,17 +68,6 @@ const ChatSidebar = () => {
 
 export default ChatSidebar;
 
-const getStatusColor = (status) => {
-    switch (status) {
-        case "online":
-            return "bg-green-500";
-        case "away":
-            return "bg-yellow-500";
-        default:
-            return "bg-gray-500";
-    }
-};
-
 const ChatItem = ({ user }) => {
     return (
         <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group">
@@ -96,7 +77,7 @@ const ChatItem = ({ user }) => {
                     <div
                         className={clsx(
                             `w-3 h-3 rounded-full absolute -bottom-0.5 -right-0.5`,
-                            getStatusColor("online")
+                            getUserStatusColor("online")
                         )}
                     />
                 </div>

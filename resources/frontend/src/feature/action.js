@@ -1,4 +1,3 @@
-
 export async function getAddress(zipCode) {
     let zipCodePattern = /(^\d{3}-\d{4})|^\d{7}$/;
 
@@ -11,7 +10,7 @@ export async function getAddress(zipCode) {
         await fetch(endPoint)
             .then((res) => res.json())
             .then((data) => {
-                if(data) {
+                if (data) {
                     status = data.status;
                     prefecture = data.results[0].address1;
                     area = data.results[0].address2;
@@ -23,7 +22,7 @@ export async function getAddress(zipCode) {
             .catch((error) => {
                 console.log(error);
             });
-        return { prefecture, area, address }
+        return { prefecture, area, address };
     }
 }
 
@@ -42,4 +41,15 @@ export const previewThumbnail = (file) => {
             reject(new Error("Failed to read the file."));
         };
     });
+};
+
+export const getUserStatusColor = (status) => {
+    switch (status) {
+        case "online":
+            return "bg-green-500";
+        case "away":
+            return "bg-yellow-500";
+        default:
+            return "bg-gray-500";
+    }
 };

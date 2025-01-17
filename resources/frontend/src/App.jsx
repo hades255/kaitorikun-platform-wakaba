@@ -1,11 +1,10 @@
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import {
     Content,
     Header,
     Top,
     Menu,
     Sidebar,
-    Footer,
     React,
     LoadingBar,
     useSelector,
@@ -16,10 +15,9 @@ import {
     calculateWindowSize,
     useDispatch,
     addWindowClass,
-    checkSidebarClass,
 } from "./components/index.jsx";
 import { selectorThemes, selectorUtility, utilityAction } from "./reduxStore";
-import { Redirect } from "react-router-dom";
+import Notifications from "./components/Notifications/index.jsx";
 //Tes
 const App = () => {
     const windowSize = useWindowSize();
@@ -63,6 +61,7 @@ const App = () => {
 
     return (
         <div className="wrapper">
+            <Notifications />
             {/* {isAuthenticated.length !== 0 ? ( */}
             <div>
                 {top && <Top />}

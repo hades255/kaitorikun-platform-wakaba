@@ -150,9 +150,9 @@ const Post = ({ post, users }) => {
                     >
                         <AddIcon />
                     </IconButton>
-                    {reactions?.map((item, index) => (
+                    {reactions?.map((item) => (
                         <EmojiItem
-                            key={index}
+                            key={item.reaction}
                             reaction={item}
                             users={users}
                             onClick={handleEmojiClick}
@@ -189,8 +189,12 @@ const Post = ({ post, users }) => {
                 )}
                 {showReplies && (
                     <div className="flex flex-col gap-2">
-                        {post.replies?.map((item, index) => (
-                            <ReplyItem key={index} reply={item} users={users} />
+                        {post.replies?.map((item) => (
+                            <ReplyItem
+                                key={item.id}
+                                reply={item}
+                                users={users}
+                            />
                         ))}
                     </div>
                 )}

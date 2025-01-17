@@ -98,8 +98,8 @@ const Channels = () => {
                         />
                     )}
 
-                    {posts.map((post, index) => (
-                        <Post key={index} post={post} users={users} />
+                    {posts.map((post) => (
+                        <Post key={post.id} post={post} users={users} />
                     ))}
 
                     <Dialog

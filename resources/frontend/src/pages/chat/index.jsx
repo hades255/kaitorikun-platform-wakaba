@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "react-chat-elements";
+import "react-chat-elements/dist/main.css";
 import { TextField, Button } from "@mui/material";
 import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectorChat } from "../../reduxStore/selector/selectorChat";
-import { PanelContent, useDispatch, useSelector } from "../../components";
-import "react-chat-elements/dist/main.css";
 import { actionChat } from "../../reduxStore/actions/chat_action";
+import { PanelContent, useDispatch, useSelector } from "../../components";
 
 const ChatsPage = () => {
     const { auth } = useAuth();
@@ -80,7 +80,11 @@ const ChatsPage = () => {
     }, [handleReadChat, chats, selectedUser]);
 
     return (
-        <PanelContent headerContent title="Messages">
+        <PanelContent
+            headerContent
+            // title="Messages"
+            title="メッセージ"
+        >
             <div className="p-2 h-[calc(100vh_-_200px)] container max-w-[768px]">
                 {selectedUser ? (
                     <>
@@ -100,18 +104,20 @@ const ChatsPage = () => {
                                     fullWidth
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Type a message..."
+                                    // placeholder="Type a message..."
+                                    placeholder="メッセージを入力..."
                                     sx={{ mr: 1 }}
                                 />
                                 <Button variant="contained" type="submit">
-                                    Send
+                                    {/* Send */}送信
                                 </Button>
                             </div>
                         </form>
                     </>
                 ) : (
                     <div className="flex h-full justify-center items-center">
-                        Select a user to start chatting
+                        {/* Select a user to start chatting */}
+                        チャットを開始するユーザーを選択
                     </div>
                 )}
             </div>

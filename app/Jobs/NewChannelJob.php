@@ -14,12 +14,14 @@ class NewChannelJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $channel;
+    protected $name;
     /**
      * Create a new job instance.
      */
-    public function __construct($channel)
+    public function __construct($channel, $name)
     {
         $this->channel = $channel;
+        $this->name = $name;
     }
 
     /**
@@ -27,6 +29,6 @@ class NewChannelJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new NewChannel($this->channel));
+        broadcast(new NewChannel($this->channel, $this->name));
     }
 }

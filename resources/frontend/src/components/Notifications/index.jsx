@@ -1,38 +1,53 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { usePusher } from "../../contexts/PusherContext";
+import { useNotification } from "../../contexts/NotificationContext";
 import { actionChannel } from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";
-import api from "../../api";
 
 const Notifications = () => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
+    const { showNotification } = useNotification();
     const { subscribeToChannel, bindEvent, unbindEvent } = usePusher();
 
     useEffect(() => {
         const channel = subscribeToChannel("channel");
 
         const handleChannelCreated = (data) => {
-            if (data && data.channel)
+            if (data && data.channel) {
                 dispatch(actionChannel.handleAddPublicChannel(data.channel));
+                if (data.name)
+                    showNotification("New Channel", {
+                        message: `${data.name} created a channel.\n${data.channel.name}`,
+                    });
+            }
         };
         const handlePostCreated = (data) => {
-            if (data && data.post)
+            if (data && data.post) {
                 dispatch(actionChannel.handleAddPostToChannel(data.post));
+                if (data.name)
+                    showNotification("New Channel", {
+                        message: `${data.name} created a post.\n${data.post.title}`,
+                    });
+            }
         };
         const handleReplyToPost = (data) => {
-            if (data && data.reply)
+            if (data && data.reply) {
                 dispatch(actionChannel.handleReplyPost(data.reply));
+            }
         };
         const handleAddReactionToPost = (data) => {
-            if (data && data.reaction)
+            if (data && data.reaction) {
                 dispatch(actionChannel.handleAddREACTION(data.reaction));
+            }
         };
         const handleRemoveReactFromPost = (data) => {
-            if (data && data.reaction)
+            if (data && data.reaction) {
                 dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+            }
         };
 
         const handleNewChat = (data) => {
@@ -43,6 +58,10 @@ const Notifications = () => {
                 (data.chat.from == auth.id || data.chat.to == auth.id)
             )
                 dispatch(actionChat.handleReceiveChat(data.chat));
+            if (data.name)
+                showNotification("New Channel", {
+                    message: `${data.name} send a message.`,
+                });
         };
 
         bindEvent("channel.created", handleChannelCreated);
@@ -65,7 +84,14 @@ const Notifications = () => {
                 channel.unsubscribe();
             }
         };
-    }, [dispatch, subscribeToChannel, bindEvent, unbindEvent, auth]);
+    }, [
+        dispatch,
+        showNotification,
+        subscribeToChannel,
+        bindEvent,
+        unbindEvent,
+        auth,
+    ]);
 
     useEffect(() => {
         if (auth) {
@@ -97,7 +123,7 @@ const Notifications = () => {
             getUsers();
             getMyChats();
         }
-    }, [dispatch, auth]);
+    }, [dispatch, showNotification, auth]);
 
     return <></>;
 };

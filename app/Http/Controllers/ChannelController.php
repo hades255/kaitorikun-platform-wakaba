@@ -38,7 +38,7 @@ class ChannelController extends Controller
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             if ($channel->isPublic) {   //  broadcase public channel
-                NewChannelJob::dispatch($channel);
+                NewChannelJob::dispatch($channel, Auth::user()->name);
             }
             $channel->users()->attach(Auth::id());
             return response()->json(["channel" => $channel, "user" => Auth::user()], 201);

@@ -14,12 +14,14 @@ class ReplyToPostJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $reply;
+    protected $name;
     /**
      * Create a new job instance.
      */
-    public function __construct($reply)
+    public function __construct($reply, $name)
     {
         $this->reply = $reply;
+        $this->name = $name;
     }
 
     /**
@@ -27,6 +29,6 @@ class ReplyToPostJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new ReplyToPost($this->reply));
+        broadcast(new ReplyToPost($this->reply, $this->name));
     }
 }

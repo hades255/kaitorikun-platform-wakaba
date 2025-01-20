@@ -14,13 +14,15 @@ class NewPostJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $post;
+    protected $name;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($post)
+    public function __construct($post, $name)
     {
         $this->post = $post;
+        $this->name = $name;
     }
 
     /**
@@ -28,6 +30,6 @@ class NewPostJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new NewPost($this->post));
+        broadcast(new NewPost($this->post, $this->name));
     }
 }

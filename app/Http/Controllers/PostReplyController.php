@@ -42,7 +42,7 @@ class PostReplyController extends Controller
         $reply->channel_id = $validatedData['channel_id'];
         $reply->user_id = Auth::id();
         if ($reply->save()) {
-            ReplyToPostJob::dispatch($reply);
+            ReplyToPostJob::dispatch($reply, Auth::user()->name);
             return response()->json($reply, 201);
         }
         return response()->json(['error' => 'Failed to create reply'], 500);

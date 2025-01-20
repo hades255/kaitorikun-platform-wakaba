@@ -51,7 +51,7 @@ class ChatController extends Controller
         $chat->emoji = $validatedData['emoji'];
         $chat->from = Auth::id();
         if ($chat->save()) {
-            NewChatJob::dispatch($chat);
+            NewChatJob::dispatch($chat, Auth::user()->name);
             return response()->json(["chat" => $chat], 201);
         }
         return response()->json(['error' => 'Failed to create chat'], 500);

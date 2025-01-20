@@ -14,12 +14,14 @@ class RemoveReactionToPostJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $reaction;
+    protected $name;
     /**
      * Create a new job instance.
      */
-    public function __construct($reaction)
+    public function __construct($reaction, $name)
     {
         $this->reaction = $reaction;
+        $this->name = $name;
     }
 
     /**
@@ -27,6 +29,6 @@ class RemoveReactionToPostJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new RemoveReactionToPost($this->reaction));
+        broadcast(new RemoveReactionToPost($this->reaction, $this->name));
     }
 }

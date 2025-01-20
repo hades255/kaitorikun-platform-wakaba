@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
+import clsx from "clsx";
 import axios from "axios";
 import api from "../../../api";
 import { API_ROUTE } from "../../../config";
@@ -82,19 +83,7 @@ const Sidebar = (props) => {
             <div id="sidebar_tab" className="sidebar-header pt-3">
                 <div className="tabs">
                     {tabs.map((item) => (
-                        <Link
-                            key={item.url}
-                            to={item.url}
-                            className={
-                                props.history.location.pathname.includes(
-                                    item.url
-                                )
-                                    ? "active"
-                                    : ""
-                            }
-                        >
-                            {item.title}
-                        </Link>
+                        <TabItem key={item.title} tab={item} props={props} />
                     ))}
                 </div>
             </div>
@@ -215,3 +204,22 @@ const Sidebar = (props) => {
 };
 
 export default withRouter(Sidebar);
+
+const TabItem = ({ tab, props }) => {
+    return (
+        <Link
+            to={tab.url}
+            className={clsx(
+                "relative",
+                props.history.location.pathname.includes(tab.url)
+                    ? "active"
+                    : ""
+            )}
+        >
+            {tab.title}
+            {/* <div className="absolute top-1 right-1 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-xs flex justify-center items-center">
+                0
+            </div> */}
+        </Link>
+    );
+};

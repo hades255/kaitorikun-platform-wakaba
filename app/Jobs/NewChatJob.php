@@ -14,13 +14,15 @@ class NewChatJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $chat;
+    protected $name;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($chat)
+    public function __construct($chat, $name)
     {
         $this->chat = $chat;
+        $this->name = $name;
     }
 
     /**
@@ -28,6 +30,6 @@ class NewChatJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new NewChat($this->chat));
+        broadcast(new NewChat($this->chat, $this->name));
     }
 }

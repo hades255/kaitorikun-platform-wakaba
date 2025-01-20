@@ -42,11 +42,11 @@ class PostController extends Controller
         $post->title = $validatedData['title'];
         $post->subject = $validatedData['subject'];
         $post->content = $validatedData['content'];
-        $post->notifyEmail = $validatedData['notifyEmail'];
+        $post->notifyEmail = $validatedData['notifyEmail']; 
         $post->channel_id = $validatedData['channel_id'];
         $post->user_id = Auth::id();
         if ($post->save()) {
-            NewPostJob::dispatch($post);
+            NewPostJob::dispatch($post, Auth::user()->name);
             return response()->json($post, 201);
         }
         return response()->json(['error' => 'Failed to create post'], 500);

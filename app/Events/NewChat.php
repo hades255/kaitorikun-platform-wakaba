@@ -15,13 +15,15 @@ class NewChat implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $chat;
+    public $name;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($chat)
+    public function __construct($chat, $name)
     {
         $this->chat = $chat;
+        $this->name = $name;
     }
 
     /**

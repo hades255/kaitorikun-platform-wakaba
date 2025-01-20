@@ -15,13 +15,15 @@ class NewPost implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $post;
+    public $name;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($post)
+    public function __construct($post, $name)
     {
         $this->post = $post;
+        $this->name = $name;
     }
 
     /**

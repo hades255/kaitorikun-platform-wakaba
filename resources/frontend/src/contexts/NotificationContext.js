@@ -20,7 +20,12 @@ export const NotificationProvider = ({ children }) => {
             requestNotificationPermission();
         }
         if ("Notification" in window && permission === "granted") {
-            new Notification(title, options);
+            new Notification(title, {
+                ...options,
+                // icon: options.avatar,
+                icon: "https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png",
+                body: options.message,
+            });
         }
     };
 

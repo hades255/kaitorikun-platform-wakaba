@@ -15,13 +15,15 @@ class NewChannel implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $channel;
+    public $name;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($channel)
+    public function __construct($channel, $name)
     {
         $this->channel = $channel;
+        $this->name = $name;
     }
 
     /**

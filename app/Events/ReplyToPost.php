@@ -15,13 +15,15 @@ class ReplyToPost implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $reply;
+    public $name;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($reply)
+    public function __construct($reply, $name)
     {
         $this->reply = $reply;
+        $this->name = $name;
     }
 
     /**

@@ -15,12 +15,14 @@ class RemoveReactionToPost implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $reaction;
+    public $name;
     /**
      * Create a new event instance.
      */
-    public function __construct($reaction)
+    public function __construct($reaction, $name)
     {
         $this->reaction = $reaction;
+        $this->name = $name;
     }
 
     /**

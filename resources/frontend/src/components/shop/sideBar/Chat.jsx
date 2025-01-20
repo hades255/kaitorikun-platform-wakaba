@@ -1,18 +1,36 @@
-import { useState } from "react";
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
-import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Box, List, Typography } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import { getUserStatusColor } from "../../../feature/action";
+import { selectorChat } from "../../../reduxStore/selector/selectorChat";
+import { actionChat } from "../../../reduxStore/actions/chat_action";
 
 const ChatSidebar = () => {
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [suggestedUsers] = useState([
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Smith" },
-    ]);
-    const [recentChats, setRecentChats] = useState([]);
-    const [pinnedChats, setPinnedChats] = useState([]);
+    const dispatch = useDispatch();
+
+    const users = useSelector(selectorChat.handleGetUsers);
+    const selectedUser = useSelector(selectorChat.handleGetCurrentUser);
+
+    const recentChats = users.filter((item) => item.recent);
+    const pinnedChats = users.filter((item) => item.pinned);
+    const suggestedUsers = users.filter((item) => !item.pinned && !item.pinned);
+
+    const handleSetSelectedUser = useCallback(
+        (user) => {
+            dispatch(actionChat.handleSetCurrentUser(user));
+        },
+        [dispatch]
+    );
+
+    const handleSetPinUser = useCallback(
+        (userId, pinned) => {
+            dispatch(actionChat.handlePinUser({ userId, pinned }));
+        },
+        [dispatch]
+    );
 
     return (
         <Box
@@ -26,13 +44,13 @@ const ChatSidebar = () => {
             </Typography>
             <List>
                 {pinnedChats.map((user) => (
-                    <ListItem
+                    <ChatItem
                         key={user.id}
-                        onClick={() => setSelectedUser(user)}
-                        sx={{ color: "white" }}
-                    >
-                        <ListItemText primary={user.name} />
-                    </ListItem>
+                        user={user}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        setPin={handleSetPinUser}
+                    />
                 ))}
             </List>
 
@@ -40,18 +58,15 @@ const ChatSidebar = () => {
                 {/* Recent */}最近
             </Typography>
             <List>
-                {recentChats.map((userId) => {
-                    const user = suggestedUsers.find((u) => u.id === userId);
-                    return (
-                        <ListItem
-                            key={userId}
-                            onClick={() => setSelectedUser(user)}
-                            sx={{ color: "white" }}
-                        >
-                            <ListItemText primary={user.name} />
-                        </ListItem>
-                    );
-                })}
+                {recentChats.map((user) => (
+                    <ChatItem
+                        key={user.id}
+                        user={user}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        setPin={handleSetPinUser}
+                    />
+                ))}
             </List>
 
             <Typography variant="p" fontSize={12} color="white" pl={2}>
@@ -59,7 +74,13 @@ const ChatSidebar = () => {
             </Typography>
             <List>
                 {suggestedUsers.map((user) => (
-                    <ChatItem key={user.id} user={user} />
+                    <ChatItem
+                        key={user.id}
+                        user={user}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        setPin={handleSetPinUser}
+                    />
                 ))}
             </List>
         </Box>
@@ -68,9 +89,26 @@ const ChatSidebar = () => {
 
 export default ChatSidebar;
 
-const ChatItem = ({ user }) => {
+const ChatItem = ({ user, selected, onClick, setPin }) => {
+    const handleClick = useCallback(() => {
+        onClick(user);
+    }, [onClick, user]);
+
+    const handleClickPin = (e) => {
+        e.stopPropagation();
+        setPin(user.id, !user.pinned);
+    };
+
     return (
-        <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group">
+        <div
+            className={clsx(
+                "flex items-center justify-between mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all",
+                {
+                    "bg-[#fff2]": selected?.id == user.id,
+                }
+            )}
+            onClick={handleClick}
+        >
             <div className="w-full flex items-center space-x-3">
                 <div className="relative">
                     <AccountCircleOutlinedIcon className="text-gray-300 !w-8 !h-8" />
@@ -92,10 +130,7 @@ const ChatItem = ({ user }) => {
                 </div>
             </div>
             <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    // togglePinChat(user.id);
-                }}
+                onClick={handleClickPin}
                 className={`px-1 rounded-full ${
                     user.isPinned ? "text-blue-400" : "text-gray-400"
                 } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}

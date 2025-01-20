@@ -8,7 +8,7 @@ export const REPLY_POST = "REPLY_POST";
 export const ADD_REACTION = "ADD_REACTION";
 export const REMOVE_REACTION = "REMOVE_REACTION";
 
-const handler = (data, action) => (dispatch) => {
+export const handler = (data, action) => (dispatch) => {
     dispatch({
         type: action,
         payload: {

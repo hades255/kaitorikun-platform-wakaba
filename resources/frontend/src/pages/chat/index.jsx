@@ -1,38 +1,13 @@
-import { useState, useEffect } from "react";
-import { Box, TextField, Button, Typography, Paper } from "@mui/material";
-import { PanelContent } from "../../components";
+import { useState } from "react";
+import { TextField, Button, Typography, Paper } from "@mui/material";
+import api from "../../api";
+import { selectorChat } from "../../reduxStore/selector/selectorChat";
+import { PanelContent, useSelector } from "../../components";
 
 const ChatsPage = () => {
-    const socket = null;
-
-    const [selectedUser, setSelectedUser] = useState({
-        id: 1,
-        name: "John Doe",
-    });
+    const selectedUser = useSelector(selectorChat.handleGetCurrentUser);
+    const chats = useSelector(selectorChat.handleGetChats);
     const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
-    const [suggestedUsers] = useState([
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Smith" },
-        // Add more suggested users
-    ]);
-    const [recentChats, setRecentChats] = useState([]);
-    const [pinnedChats, setPinnedChats] = useState([]);
-
-    useEffect(() => {
-        socket?.on("receive-message", (message) => {
-            setMessages((prev) => [...prev, message]);
-            updateRecentChats(message.sender);
-        });
-
-        return () => socket?.off("receive-message");
-    }, [socket]);
-
-    const updateRecentChats = (userId) => {
-        if (!recentChats.includes(userId)) {
-            setRecentChats((prev) => [...prev, userId]);
-        }
-    };
 
     const handleSendMessage = () => {
         if (message.trim() && selectedUser) {
@@ -42,10 +17,17 @@ const ChatsPage = () => {
                 receiver: selectedUser.id,
                 timestamp: new Date(),
             };
-            socket?.emit("new-message", newMessage);
-            setMessages((prev) => [...prev, newMessage]);
-            setMessage("");
-            updateRecentChats(selectedUser.id);
+            const sendMsgFunc = async () => {
+                try {
+                    const response = await api.post("chats", newMessage);
+                    console.log(response.data);
+                    setMessage("");
+                    // updateRecentChats(selectedUser.id);  //  todo    necessary it to change the order of the users list
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            sendMsgFunc();
         }
     };
 
@@ -54,13 +36,13 @@ const ChatsPage = () => {
             <div className="p-2 h-[calc(100vh_-_200px)]">
                 {selectedUser ? (
                     <>
-                        <Box
+                        <div
                             sx={{
                                 height: "calc(100% - 80px)",
                                 overflow: "auto",
                             }}
                         >
-                            {messages.map((msg, index) => (
+                            {chats.map((msg, index) => (
                                 <Paper
                                     key={index}
                                     sx={{
@@ -80,8 +62,8 @@ const ChatsPage = () => {
                                     <Typography>{msg.content}</Typography>
                                 </Paper>
                             ))}
-                        </Box>
-                        <Box sx={{ display: "flex", mt: 2 }}>
+                        </div>
+                        <div sx={{ display: "flex", mt: 2 }}>
                             <TextField
                                 fullWidth
                                 value={message}
@@ -95,7 +77,7 @@ const ChatsPage = () => {
                             >
                                 Send
                             </Button>
-                        </Box>
+                        </div>
                     </>
                 ) : (
                     <div className="flex h-full justify-center items-center">

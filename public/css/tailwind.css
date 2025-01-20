@@ -535,6 +535,9 @@ video {
 .static {
   position: static;
 }
+.fixed {
+  position: fixed;
+}
 .absolute {
   position: absolute;
 }
@@ -555,6 +558,18 @@ video {
 }
 .right-2 {
   right: 0.5rem;
+}
+.left-0 {
+  left: 0px;
+}
+.top-\[200px\] {
+  top: 200px;
+}
+.left-\[400px\] {
+  left: 400px;
+}
+.z-50 {
+  z-index: 50;
 }
 .float-right {
   float: right;

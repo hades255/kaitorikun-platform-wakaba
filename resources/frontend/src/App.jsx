@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { selectorThemes, selectorUtility, utilityAction } from "./reduxStore";
 import {
     Content,
     Header,
@@ -16,7 +17,6 @@ import {
     useDispatch,
     addWindowClass,
 } from "./components/index.jsx";
-import { selectorThemes, selectorUtility, utilityAction } from "./reduxStore";
 import Notifications from "./components/Notifications/index.jsx";
 //Tes
 const App = () => {

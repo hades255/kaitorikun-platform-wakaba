@@ -1,22 +1,62 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import { Box, List, Typography } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import { getUserStatusColor } from "../../../feature/action";
-import { selectorChat } from "../../../reduxStore/selector/selectorChat";
+import { useAuth } from "../../../contexts/AuthContext";
 import { actionChat } from "../../../reduxStore/actions/chat_action";
+import { selectorChat } from "../../../reduxStore/selector/selectorChat";
 
 const ChatSidebar = () => {
+    const { auth } = useAuth();
     const dispatch = useDispatch();
 
     const users = useSelector(selectorChat.handleGetUsers);
     const selectedUser = useSelector(selectorChat.handleGetCurrentUser);
+    const pinnedUsers = useSelector(selectorChat.handleGetPinned);
+    const recentlyUsers = useSelector(selectorChat.handleGetRecently);
+    const chats = useSelector(selectorChat.handleGetChats);
 
-    const recentChats = users.filter((item) => item.recent);
-    const pinnedChats = users.filter((item) => item.pinned);
-    const suggestedUsers = users.filter((item) => !item.pinned && !item.pinned);
+    const newChatCounts = useMemo(() => {
+        let newChats = {};
+        chats
+            .filter((item) => item.to == auth.id && item.status == "unread")
+            .forEach((chat) => {
+                if (newChats[chat.from]) newChats[chat.from] += 1;
+                else newChats[chat.from] = 1;
+            });
+        return newChats;
+    }, [chats, auth]);
+
+    const pinnedChats = useMemo(
+        () =>
+            users.filter(
+                (item) => auth.id != item.id && pinnedUsers?.includes(item.id)
+            ),
+        [users, pinnedUsers, auth]
+    );
+    const recentChats = useMemo(
+        () =>
+            users.filter(
+                (item) =>
+                    auth.id != item.id &&
+                    recentlyUsers?.includes(item.id) &&
+                    !pinnedUsers?.includes(item.id)
+            ),
+        [users, recentlyUsers, pinnedUsers, auth]
+    );
+    const suggestedUsers = useMemo(
+        () =>
+            users.filter(
+                (item) =>
+                    auth.id != item.id &&
+                    !recentlyUsers?.includes(item.id) &&
+                    !pinnedUsers?.includes(item.id)
+            ),
+        [users, recentlyUsers, pinnedUsers, auth]
+    );
 
     const handleSetSelectedUser = useCallback(
         (user) => {
@@ -49,7 +89,9 @@ const ChatSidebar = () => {
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
+                        pinned={pinnedUsers?.includes(user.id)}
                         setPin={handleSetPinUser}
+                        count={newChatCounts[user.id] || 0}
                     />
                 ))}
             </List>
@@ -64,7 +106,9 @@ const ChatSidebar = () => {
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
+                        pinned={pinnedUsers?.includes(user.id)}
                         setPin={handleSetPinUser}
+                        count={newChatCounts[user.id] || 0}
                     />
                 ))}
             </List>
@@ -79,7 +123,9 @@ const ChatSidebar = () => {
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
+                        pinned={pinnedUsers?.includes(user.id)}
                         setPin={handleSetPinUser}
+                        count={newChatCounts[user.id] || 0}
                     />
                 ))}
             </List>
@@ -89,20 +135,23 @@ const ChatSidebar = () => {
 
 export default ChatSidebar;
 
-const ChatItem = ({ user, selected, onClick, setPin }) => {
+const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
     const handleClick = useCallback(() => {
         onClick(user);
     }, [onClick, user]);
 
-    const handleClickPin = (e) => {
-        e.stopPropagation();
-        setPin(user.id, !user.pinned);
-    };
+    const handleClickPin = useCallback(
+        (e) => {
+            e.stopPropagation();
+            setPin(user.id, !pinned);
+        },
+        [setPin, user, pinned]
+    );
 
     return (
         <div
             className={clsx(
-                "flex items-center justify-between mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all",
+                "flex items-center justify-between mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all relative",
                 {
                     "bg-[#fff2]": selected?.id == user.id,
                 }
@@ -137,6 +186,11 @@ const ChatItem = ({ user, selected, onClick, setPin }) => {
             >
                 <PushPinOutlinedIcon className="!w-4 !h-4" />
             </button>
+            {count > 0 && (
+                <div className="absolute bottom-2 right-2 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-sm flex justify-center items-center">
+                    {count}
+                </div>
+            )}
         </div>
     );
 };

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->bigInteger('from');
             $table->bigInteger('to');
             $table->text('content');
-            $table->enum("status", ["unread", "read"]);
-            $table->string('emoji');
+            $table->enum("status", ["unread", "read"])->default("unread");
+            $table->string('emoji')->nullable();
             $table->bigInteger('reply')->default(0);
             $table->timestamps();
         });

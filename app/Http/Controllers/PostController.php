@@ -34,7 +34,7 @@ class PostController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
-            'content' => 'nullable|string|max:1000',
+            'content' => 'required|string|max:1000',
             'channel_id' => 'required|integer',
             'notifyEmail' => 'required|boolean',
         ]);

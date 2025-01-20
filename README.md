@@ -33,6 +33,8 @@ You can support Me On [Saweria](https://saweria.co/samsularifin05)
 
 ## What have to be changed in .env file
 
+#### [pusher](https://pusher.com/)
+
 ```
     BROADCAST_DRIVER=pusher
     QUEUE_CONNECTION=database

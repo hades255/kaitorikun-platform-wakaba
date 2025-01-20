@@ -9,7 +9,7 @@ class Channel extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'icon', 'requireApproval', 'isPublic', 'user_id'];
+    protected $fillable = ['name', 'description', 'icon', 'requireApproval', 'isPublic', 'user_id', 'community_id'];
 
     public function posts()
     {

@@ -20,8 +20,8 @@ const Notifications = () => {
             if (data && data.channel) {
                 dispatch(actionChannel.handleAddPublicChannel(data.channel));
                 if (data.name)
-                    showNotification("New Channel", {
-                        message: `${data.name} created a channel.\n${data.channel.name}`,
+                    showNotification("新しいチャンネル", {
+                        message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
                     });
             }
         };
@@ -29,8 +29,8 @@ const Notifications = () => {
             if (data && data.post) {
                 dispatch(actionChannel.handleAddPostToChannel(data.post));
                 if (data.name)
-                    showNotification("New Channel", {
-                        message: `${data.name} created a post.\n${data.post.title}`,
+                    showNotification("新しい投稿", {
+                        message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                     });
             }
         };
@@ -59,8 +59,8 @@ const Notifications = () => {
             )
                 dispatch(actionChat.handleReceiveChat(data.chat));
             if (data.name)
-                showNotification("New Channel", {
-                    message: `${data.name} send a message.`,
+                showNotification("新しいメッセージ", {
+                    message: `${data.name} さんが新しいメッセージを送信しました.`,
                 });
         };
 

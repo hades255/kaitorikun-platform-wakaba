@@ -8064,6 +8064,11 @@ loader-utils@^3.2.0:
   resolved "https://registry.npmjs.org/loader-utils/-/loader-utils-3.2.0.tgz"
   integrity sha512-HVl9ZqccQihZ7JM85dco1MvO9G+ONvxoGa9rkhzFsneGLKSUg1gJf9bWzhRhcvm2qChhWpebQhP44qxjKIUCaQ==
 
+loaders.css@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/loaders.css/-/loaders.css-0.1.2.tgz#3a9fb43726c73334a38142af9d0629019b658743"
+  integrity sha512-Rhowlq24ey1VOeor+3wYOt9+MjaxBOJm1u4KlQgNC3+0xJ0LS4wq4iG57D/BPzvuD/7HHDGQOWJ+81oR2EI9bQ==
+
 locate-path@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/locate-path/-/locate-path-2.0.0.tgz"
@@ -9856,6 +9861,14 @@ process@^0.11.10:
   resolved "https://registry.npmjs.org/process/-/process-0.11.10.tgz"
   integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
+progressbar.js@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/progressbar.js/-/progressbar.js-1.1.1.tgz#8c7dc52ce4cc8845c4f3055da75afc366a0543e9"
+  integrity sha512-FBsw3BKsUbb+hNeYfiP3xzvAAQrPi4DnGDw66bCmfuRCDLcslxyxv2GyYUdBSKFGSIBa73CUP5WMcl6F8AAXlw==
+  dependencies:
+    lodash.merge "^4.6.2"
+    shifty "^2.8.3"
+
 promise-limit@2.7.0:
   version "2.7.0"
   resolved "https://registry.npmjs.org/promise-limit/-/promise-limit-2.7.0.tgz"
@@ -9876,7 +9889,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.8.1:
+prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -10417,6 +10430,17 @@ react-app-polyfill@^3.0.0:
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
 
+react-chat-elements@^12.0.17:
+  version "12.0.17"
+  resolved "https://registry.yarnpkg.com/react-chat-elements/-/react-chat-elements-12.0.17.tgz#7d7df89e4f0a3d0904ed8fbf276fee25bf999b07"
+  integrity sha512-UR91Ub3dxwadoOUwrJWgKM1BOlpYg2O+QAC6xqnwrglXMuPNptTdTjkOnPsXHuW6JHFHCVE1bYM274Bt24S41A==
+  dependencies:
+    classnames "^2.2.5"
+    progressbar.js "^1.1.0"
+    react-icons "^4.3.1"
+    react-spinkit "^3.0.0"
+    timeago.js "^4.0.2"
+
 react-dev-utils@^12.0.1:
   version "12.0.1"
   resolved "https://registry.npmjs.org/react-dev-utils/-/react-dev-utils-12.0.1.tgz"
@@ -10478,6 +10502,11 @@ react-fullscreen-loading@^0.0.4:
     prop-types "^15.6.2"
     react "^16.4.1"
     react-dom "^16.4.1"
+
+react-icons@^4.3.1:
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.12.0.tgz#54806159a966961bfd5cdb26e492f4dafd6a8d78"
+  integrity sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==
 
 react-is@^16.13.1, react-is@^16.4.2, react-is@^16.6.0, react-is@^16.7.0:
   version "16.13.1"
@@ -10643,6 +10672,16 @@ react-select@^5.4.0:
     prop-types "^15.6.0"
     react-transition-group "^4.3.0"
     use-isomorphic-layout-effect "^1.1.2"
+
+react-spinkit@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-spinkit/-/react-spinkit-3.0.0.tgz#31fdaf4e18177766c57d1b1f3330290f8492a85a"
+  integrity sha512-RrfGRPjqxHQiy7quPqhjPynTu0zobgQaZu1QYBMpJJ6pCSRRRK16EZMaxdE6fLVYFRJWpX/eGATWLMoVFFT5uQ==
+  dependencies:
+    classnames "^2.2.3"
+    loaders.css "^0.1.2"
+    object-assign "^4.1.0"
+    prop-types "^15.5.8"
 
 react-top-loading-bar@^2.1.0:
   version "2.3.1"
@@ -11404,6 +11443,13 @@ shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.npmjs.org/shellwords/-/shellwords-0.1.1.tgz"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
+
+shifty@^2.8.3:
+  version "2.20.4"
+  resolved "https://registry.yarnpkg.com/shifty/-/shifty-2.20.4.tgz#fb2ec81697b808b250024fa9548b5b93fadd78cf"
+  integrity sha512-4Y0qRkg8ME5XN8yGNAwmFOmsIURGFKT9UQfNL6DDJQErYtN5HsjyoBuJn41ZQfTkuu2rIbRMn9qazjKsDpO2TA==
+  optionalDependencies:
+    fsevents "^2.3.2"
 
 side-channel-list@^1.0.0:
   version "1.0.0"
@@ -12204,6 +12250,11 @@ thunky@^1.0.2:
   version "1.1.0"
   resolved "https://registry.npmjs.org/thunky/-/thunky-1.1.0.tgz"
   integrity sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA==
+
+timeago.js@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/timeago.js/-/timeago.js-4.0.2.tgz#724e8c8833e3490676c7bb0a75f5daf20e558028"
+  integrity sha512-a7wPxPdVlQL7lqvitHGGRsofhdwtkoSXPGATFuSOA2i1ZNQEPLrGnj68vOp2sOJTCFAQVXPeNMX/GctBaO9L2w==
 
 timers-browserify@^2.0.4:
   version "2.0.12"

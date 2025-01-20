@@ -1,18 +1,76 @@
-import { useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
-import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Box, List, Typography } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import { getUserStatusColor } from "../../../feature/action";
+import { useAuth } from "../../../contexts/AuthContext";
+import { actionChat } from "../../../reduxStore/actions/chat_action";
+import { selectorChat } from "../../../reduxStore/selector/selectorChat";
 
 const ChatSidebar = () => {
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [suggestedUsers] = useState([
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Smith" },
-    ]);
-    const [recentChats, setRecentChats] = useState([]);
-    const [pinnedChats, setPinnedChats] = useState([]);
+    const { auth } = useAuth();
+    const dispatch = useDispatch();
+
+    const users = useSelector(selectorChat.handleGetUsers);
+    const selectedUser = useSelector(selectorChat.handleGetCurrentUser);
+    const pinnedUsers = useSelector(selectorChat.handleGetPinned);
+    const recentlyUsers = useSelector(selectorChat.handleGetRecently);
+    const chats = useSelector(selectorChat.handleGetChats);
+
+    const newChatCounts = useMemo(() => {
+        let newChats = {};
+        chats
+            .filter((item) => item.to == auth.id && item.status == "unread")
+            .forEach((chat) => {
+                if (newChats[chat.from]) newChats[chat.from] += 1;
+                else newChats[chat.from] = 1;
+            });
+        return newChats;
+    }, [chats, auth]);
+
+    const pinnedChats = useMemo(
+        () =>
+            users.filter(
+                (item) => auth.id != item.id && pinnedUsers?.includes(item.id)
+            ),
+        [users, pinnedUsers, auth]
+    );
+    const recentChats = useMemo(
+        () =>
+            users.filter(
+                (item) =>
+                    auth.id != item.id &&
+                    recentlyUsers?.includes(item.id) &&
+                    !pinnedUsers?.includes(item.id)
+            ),
+        [users, recentlyUsers, pinnedUsers, auth]
+    );
+    const suggestedUsers = useMemo(
+        () =>
+            users.filter(
+                (item) =>
+                    auth.id != item.id &&
+                    !recentlyUsers?.includes(item.id) &&
+                    !pinnedUsers?.includes(item.id)
+            ),
+        [users, recentlyUsers, pinnedUsers, auth]
+    );
+
+    const handleSetSelectedUser = useCallback(
+        (user) => {
+            dispatch(actionChat.handleSetCurrentUser(user));
+        },
+        [dispatch]
+    );
+
+    const handleSetPinUser = useCallback(
+        (userId, pinned) => {
+            dispatch(actionChat.handlePinUser({ userId, pinned }));
+        },
+        [dispatch]
+    );
 
     return (
         <Box
@@ -26,13 +84,15 @@ const ChatSidebar = () => {
             </Typography>
             <List>
                 {pinnedChats.map((user) => (
-                    <ListItem
+                    <ChatItem
                         key={user.id}
-                        onClick={() => setSelectedUser(user)}
-                        sx={{ color: "white" }}
-                    >
-                        <ListItemText primary={user.name} />
-                    </ListItem>
+                        user={user}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        pinned={pinnedUsers?.includes(user.id)}
+                        setPin={handleSetPinUser}
+                        count={newChatCounts[user.id] || 0}
+                    />
                 ))}
             </List>
 
@@ -40,18 +100,17 @@ const ChatSidebar = () => {
                 {/* Recent */}最近
             </Typography>
             <List>
-                {recentChats.map((userId) => {
-                    const user = suggestedUsers.find((u) => u.id === userId);
-                    return (
-                        <ListItem
-                            key={userId}
-                            onClick={() => setSelectedUser(user)}
-                            sx={{ color: "white" }}
-                        >
-                            <ListItemText primary={user.name} />
-                        </ListItem>
-                    );
-                })}
+                {recentChats.map((user) => (
+                    <ChatItem
+                        key={user.id}
+                        user={user}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        pinned={pinnedUsers?.includes(user.id)}
+                        setPin={handleSetPinUser}
+                        count={newChatCounts[user.id] || 0}
+                    />
+                ))}
             </List>
 
             <Typography variant="p" fontSize={12} color="white" pl={2}>
@@ -59,7 +118,15 @@ const ChatSidebar = () => {
             </Typography>
             <List>
                 {suggestedUsers.map((user) => (
-                    <ChatItem key={user.id} user={user} />
+                    <ChatItem
+                        key={user.id}
+                        user={user}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        pinned={pinnedUsers?.includes(user.id)}
+                        setPin={handleSetPinUser}
+                        count={newChatCounts[user.id] || 0}
+                    />
                 ))}
             </List>
         </Box>
@@ -68,9 +135,29 @@ const ChatSidebar = () => {
 
 export default ChatSidebar;
 
-const ChatItem = ({ user }) => {
+const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
+    const handleClick = useCallback(() => {
+        onClick(user);
+    }, [onClick, user]);
+
+    const handleClickPin = useCallback(
+        (e) => {
+            e.stopPropagation();
+            setPin(user.id, !pinned);
+        },
+        [setPin, user, pinned]
+    );
+
     return (
-        <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group">
+        <div
+            className={clsx(
+                "flex items-center justify-between mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all relative",
+                {
+                    "bg-[#fff2]": selected?.id == user.id,
+                }
+            )}
+            onClick={handleClick}
+        >
             <div className="w-full flex items-center space-x-3">
                 <div className="relative">
                     <AccountCircleOutlinedIcon className="text-gray-300 !w-8 !h-8" />
@@ -92,16 +179,18 @@ const ChatItem = ({ user }) => {
                 </div>
             </div>
             <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    // togglePinChat(user.id);
-                }}
+                onClick={handleClickPin}
                 className={`px-1 rounded-full ${
                     user.isPinned ? "text-blue-400" : "text-gray-400"
                 } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
             >
                 <PushPinOutlinedIcon className="!w-4 !h-4" />
             </button>
+            {count > 0 && (
+                <div className="absolute bottom-2 right-2 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-sm flex justify-center items-center">
+                    {count}
+                </div>
+            )}
         </div>
     );
 };

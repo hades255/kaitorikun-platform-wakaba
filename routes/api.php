@@ -5,10 +5,12 @@ use App\Http\Controllers\CustomerManage\CustomerController;
 use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,4 +50,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('postreply', [PostReplyController::class, 'store'])->name('postreply.store');
     Route::post('postreaction', [PostReactionController::class, 'store'])->name('postreaction.store');
     Route::post('postreaction/toggle', [PostReactionController::class, 'toggle'])->name('postreaction.toggle');
+
+    Route::get('chats', [ChatController::class, 'index']);
+    Route::post('chats', [ChatController::class, 'store'])->name('chats.store');
+    Route::patch('chats', [ChatController::class, 'read'])->name('chats.read');
+
+    Route::get('users', [UserController::class, 'index']);
 });

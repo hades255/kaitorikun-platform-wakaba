@@ -54,7 +54,7 @@ input.password-hide-css {
     top: 80px !important;
     height: calc(100% - 80px);
     min-height: calc(100vh - 80px) !important;
-    background-color: #313239 ;
+    background-color: #313239;
     /* min-height: auto !important; */
 }
 
@@ -90,3 +90,14 @@ input.password-hide-css {
     height: 100% !important;
 }
 
+* {
+    -webkit-overflow-scrolling: touch;
+    -webkit-scrollbar-width: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    transition: all ease-in-out;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}

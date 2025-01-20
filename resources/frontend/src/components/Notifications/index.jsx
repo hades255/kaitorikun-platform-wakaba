@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "../../contexts/AuthContext";
 import { usePusher } from "../../contexts/PusherContext";
 import { actionChannel } from "../../reduxStore";
+import { actionChat } from "../../reduxStore/actions/chat_action";
+import api from "../../api";
 
 const Notifications = () => {
     const dispatch = useDispatch();
@@ -33,11 +35,23 @@ const Notifications = () => {
                 dispatch(actionChannel.handleRemoveREACTION(data.reaction));
         };
 
+        const handleNewChat = (data) => {
+            if (
+                auth &&
+                data &&
+                data.chat &&
+                (data.chat.from == auth.id || data.chat.to == auth.id)
+            )
+                dispatch(actionChat.handleReceiveChat(data.chat));
+        };
+
         bindEvent("channel.created", handleChannelCreated);
         bindEvent("channel.post.created", handlePostCreated);
         bindEvent("channel.post.reply", handleReplyToPost);
         bindEvent("channel.post.reaction.created", handleAddReactionToPost);
         bindEvent("channel.post.reaction.deleted", handleRemoveReactFromPost);
+
+        bindEvent("channel.chat.created", handleNewChat);
 
         return () => {
             unbindEvent("channel.created");
@@ -45,11 +59,45 @@ const Notifications = () => {
             unbindEvent("channel.post.reply");
             unbindEvent("channel.post.reaction.created");
             unbindEvent("channel.post.reaction.deleted");
+
+            unbindEvent("channel.chat.created");
             if (channel) {
                 channel.unsubscribe();
             }
         };
-    }, [subscribeToChannel, bindEvent, unbindEvent]);
+    }, [dispatch, subscribeToChannel, bindEvent, unbindEvent, auth]);
+
+    useEffect(() => {
+        if (auth) {
+            //  todo    get notifications
+            const getUnreadNotifications = async () => {
+                try {
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            //  get all users
+            const getUsers = async () => {
+                try {
+                    const response = await api.get("users");
+                    dispatch(actionChat.handleSetUsers(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            //  get all chats
+            const getMyChats = async () => {
+                try {
+                    const response = await api.get("chats");
+                    dispatch(actionChat.handleSetChats(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            getUsers();
+            getMyChats();
+        }
+    }, [dispatch, auth]);
 
     return <></>;
 };

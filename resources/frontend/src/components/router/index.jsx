@@ -82,19 +82,19 @@ const MenuRoutes = [
     {
         path: "/channels",
         exact: true,
-        title: "Channels",
+        title: "チャンネル",
         component: () => <Channels />,
     },
     {
         path: "/channels/new",
         exact: true,
-        title: "New Channel",
+        title: "新しいチャンネル",
         component: () => <NewChannel />,
     },
     {
         path: "/chat",
         exact: true,
-        title: "Chat",
+        title: "チャット",
         component: () => <ChatsPage />,
     },
     /** channel&chat end */

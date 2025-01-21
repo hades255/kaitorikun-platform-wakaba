@@ -120,12 +120,12 @@ const Notifications = () => {
     useEffect(() => {
         if (auth) {
             //  todo    get notifications
-            const getUnreadNotifications = async () => {
-                try {
-                } catch (error) {
-                    console.log(error);
-                }
-            };
+            // const getUnreadNotifications = async () => {
+            //     try {
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // };
             //  get all users
             const getUsers = async () => {
                 try {

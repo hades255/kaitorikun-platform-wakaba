@@ -50,7 +50,8 @@ class ChannelController extends Controller
         $sortBy = $request->input('sort_by', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
         $posts = $channel->limitedPosts($limit, $offset, $sortBy, $sortOrder);
-        $users = $channel->users()->select('users.id', 'users.name', 'users.email')->get();
+        // $users = $channel->community->users->select('users.id', 'users.name', 'users.email')->get();
+        $users = $channel->community->users;
         // return response()->json(["chennel" => $channel, "posts" => $posts, "users" => $users]);
         return response()->json(["posts" => $posts, "users" => $users]);
     }

@@ -68,7 +68,7 @@ const chats = (state = initialState, actions) => {
                 localStorage.setItem(
                     "pinned_chat_user",
                     JSON.stringify(
-                        state.pinned.filter(
+                        state.pinned?.filter(
                             (item) => item != actions.payload.data.userId
                         )
                     )
@@ -78,7 +78,7 @@ const chats = (state = initialState, actions) => {
                 ...state,
                 pinned: actions.payload.data.pinned
                     ? [...state.pinned, actions.payload.data.userId]
-                    : state.pinned.filter(
+                    : state.pinned?.filter(
                           (item) => item != actions.payload.data.userId
                       ),
             };

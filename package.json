@@ -37,6 +37,7 @@
         "caniuse-lite": "^1.0.30001690",
         "clsx": "^2.1.1",
         "compression-webpack-plugin": "^10.0.0",
+        "date-fns": "^4.1.0",
         "emoji-picker-react": "^4.12.0",
         "moment": "^2.30.1",
         "pusher-js": "^8.4.0-rc2",

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
+import { formatDistanceToNow } from "date-fns";
 import {
     Card,
     CardContent,
@@ -23,6 +24,9 @@ const Post = ({ post, users }) => {
     const [reply, setReply] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [reactions, setReactions] = useState([]);
+    const timeAgo = formatDistanceToNow(new Date(post.updated_at), {
+        addSuffix: true,
+    });
 
     useEffect(() => {
         if (post.reactions && post.reactions.length > 0) {
@@ -136,9 +140,7 @@ const Post = ({ post, users }) => {
             <CardContent>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="h6">{post.title}</Typography>
-                    <Typography variant="subtitle1">
-                        {post.updated_at}
-                    </Typography>
+                    <Typography variant="subtitle1">{timeAgo}</Typography>
                 </Box>
                 <Typography variant="subtitle1" color="text.secondary">
                     {post.subject}
@@ -207,6 +209,9 @@ export default Post;
 
 const ReplyItem = ({ reply, users }) => {
     const user = users.find(({ id }) => id == reply.user_id);
+    const timeAgo = formatDistanceToNow(new Date(reply.updated_at), {
+        addSuffix: true,
+    });
 
     return (
         <div className="flex items-start justify-between px-3 py-2 rounded-md shadow-lg shadow-[#0008]">
@@ -226,7 +231,7 @@ const ReplyItem = ({ reply, users }) => {
                             {user ? user.name : "Unknown User"}
                         </p>
                         <p className="text-gray-500 text-xs">
-                            {reply.created_at}
+                            {timeAgo}
                         </p>
                     </div>
                     <p className="text-gray-600 text-sm truncate">

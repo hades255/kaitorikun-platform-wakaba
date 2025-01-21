@@ -21,40 +21,48 @@ const ChatSidebar = () => {
 
     const newChatCounts = useMemo(() => {
         let newChats = {};
-        chats
-            .filter((item) => item.to == auth.id && item.status == "unread")
-            .forEach((chat) => {
-                if (newChats[chat.from]) newChats[chat.from] += 1;
-                else newChats[chat.from] = 1;
-            });
+        if (chats && typeof chats === Array)
+            chats
+                .filter((item) => item.to == auth.id && item.status == "unread")
+                .forEach((chat) => {
+                    if (newChats[chat.from]) newChats[chat.from] += 1;
+                    else newChats[chat.from] = 1;
+                });
         return newChats;
     }, [chats, auth]);
 
     const pinnedChats = useMemo(
         () =>
-            users?.filter(
-                (item) => auth.id != item.id && pinnedUsers?.includes(item.id)
-            ),
+            users && typeof users === Array
+                ? users.filter(
+                      (item) =>
+                          auth.id != item.id && pinnedUsers?.includes(item.id)
+                  )
+                : [],
         [users, pinnedUsers, auth]
     );
     const recentChats = useMemo(
         () =>
-            users?.filter(
-                (item) =>
-                    auth.id != item.id &&
-                    recentlyUsers?.includes(item.id) &&
-                    !pinnedUsers?.includes(item.id)
-            ),
+            users && typeof users === Array
+                ? users.filter(
+                      (item) =>
+                          auth.id != item.id &&
+                          recentlyUsers?.includes(item.id) &&
+                          !pinnedUsers?.includes(item.id)
+                  )
+                : [],
         [users, recentlyUsers, pinnedUsers, auth]
     );
     const suggestedUsers = useMemo(
         () =>
-            users?.filter(
-                (item) =>
-                    auth.id != item.id &&
-                    !recentlyUsers?.includes(item.id) &&
-                    !pinnedUsers?.includes(item.id)
-            ),
+            users && typeof users === Array
+                ? users.filter(
+                      (item) =>
+                          auth.id != item.id &&
+                          !recentlyUsers?.includes(item.id) &&
+                          !pinnedUsers?.includes(item.id)
+                  )
+                : [],
         [users, recentlyUsers, pinnedUsers, auth]
     );
 

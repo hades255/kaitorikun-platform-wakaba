@@ -13,9 +13,9 @@ import Clock from "../../ui/clock";
 import Scrap from "../../ui/scrap";
 import SearchBar from "../../ui/searchbar";
 import IconButton from "@mui/material/IconButton";
-import RefreshIcon from '@mui/icons-material/Refresh';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import RefreshIcon from "@mui/icons-material/Refresh";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Button from "@mui/material/Button";
 
 const Top = () => {
@@ -26,20 +26,20 @@ const Top = () => {
         setTimeout(() => {
             dispatch(utilityAction.stopLoading());
             localStorage.clear();
-            window.location.reload();
+            window.location.href("/");
         }, 500);
     };
     return (
         <div className="staff-top-items">
             <div className="left">
-                <div className="title">
-                    買取くん
-                </div>
+                <div className="title">買取くん</div>
                 <div className="clock">
                     <Clock />
                 </div>
                 <div className="print">
-                    <Button variant="outlined" color="black">印刷</Button>
+                    <Button variant="outlined" color="black">
+                        印刷
+                    </Button>
                 </div>
                 <div className="arrows flex items-center">
                     <IconButton aria-label="refresh">
@@ -60,9 +60,7 @@ const Top = () => {
                 </div>
             </div>
             <div className="right">
-                <div className="user-name">
-                    {getItem("userdata").name}
-                </div>
+                <div className="user-name">{getItem("userdata").name}</div>
                 <button
                     type="button"
                     className="dropdown-item logout-btn"

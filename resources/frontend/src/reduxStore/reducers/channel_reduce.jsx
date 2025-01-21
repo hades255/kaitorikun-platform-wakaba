@@ -101,32 +101,3 @@ const channels = (state = initialState, actions) => {
 };
 
 export default channels;
-
-/**
- * 
- 
-        {
-            id: 1,
-            name: "Sports",
-            description: "blah blah blah",
-            icon: "",
-            requireApproval: false,
-            isPublic: true,
-        },
-        {
-            id: 2,
-            name: "Fruits",
-            description: "blah blah blah",
-            icon: "",
-            requireApproval: false,
-            isPublic: true,
-        },
-        {
-            id: 3,
-            name: "Weathers",
-            description: "blah blah blah",
-            icon: "",
-            requireApproval: false,
-            isPublic: true,
-        },
- */

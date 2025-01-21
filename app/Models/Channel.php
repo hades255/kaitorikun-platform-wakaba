@@ -31,14 +31,14 @@ class Channel extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function community()
+    {
+        return $this->belongsTo(Community::class);
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'channel_users');
-    }
-
-    public function invitations()
-    {
-        return $this->hasMany(Invitation::class);
     }
 
     public static function getMyChannels($userId)

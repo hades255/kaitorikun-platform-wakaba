@@ -1,9 +1,17 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import axios from "axios";
+import clsx from "clsx";
 import { List, ListItem, ListItemText, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { API_ROUTE } from "../../../config";
 import { useAuth } from "../../../contexts/AuthContext";
+import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
 import { Link, useDispatch, useSelector } from "../../../components";
 
@@ -37,14 +45,15 @@ const ChannelSidebar = () => {
     return (
         <>
             <List>
-                <Link to="/channels/new">
+                <AddNewButton />
+                <Link to="/communities/new">
                     <ListItem onClick={handleClick}>
                         <AddIcon color="!white" />
                         <ListItemText primary="チャンネルを作成" />
                         {/* <ListItemText primary="Create Channel" /> */}
                     </ListItem>
                 </Link>
-                <Link to="/channels">
+                <Link to="/communities">
                     {channels.map((item, index) => (
                         <ChannelItem
                             key={index}
@@ -112,7 +121,7 @@ const PublicChannels = ({ channel }) => {
                     公開チャンネル
                 </Typography>
                 <List>
-                    <Link to="/channels">
+                    <Link to="/communities">
                         {channels.map((item, index) => (
                             <ChannelItem
                                 key={index}
@@ -124,6 +133,95 @@ const PublicChannels = ({ channel }) => {
                 </List>
             </>
         )
+    );
+};
+
+const AddNewButton = () => {
+    const { setShowCommunityEditor, setPreSetCommunityName } = useCommunity();
+
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const handleClickOutside = (event) => {
+        if (
+            dropdownRef.current &&
+            !dropdownRef.current.contains(event.target)
+        ) {
+            setIsOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+    const handleNewCommunity = () => {
+        setPreSetCommunityName("");
+        setShowCommunityEditor(true);
+        setIsOpen(false);
+    };
+
+    return (
+        <>
+            <div className="px-4 py-2 flex justify-end">
+                <div
+                    className="relative inline-block text-left"
+                    ref={dropdownRef}
+                >
+                    <div>
+                        <button
+                            onClick={toggleDropdown}
+                            className="text-gray-200 border !border-gray-500 bg-gray-700 rounded flex justify-center items-center"
+                        >
+                            <AddIcon color="!white" />
+                        </button>
+                    </div>
+                    <div
+                        className={clsx(
+                            `origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-gray-600 ring-1 ring-black ring-opacity-5 transition-transform transform z-50`,
+                            {
+                                "scale-100 opacity-100": isOpen,
+                                "scale-95 opacity-0": !isOpen,
+                            }
+                        )}
+                        style={{ transitionDuration: "150ms" }}
+                    >
+                        <div className="py-1">
+                            <div
+                                onClick={handleNewCommunity}
+                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400 cursor-pointer"
+                            >
+                                {/* Add Community */}コミュニティを追加
+                            </div>
+                            <a
+                                href="#"
+                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400"
+                            >
+                                {/* Add Channel */}チャンネルを追加
+                            </a>
+                            <a
+                                href="#"
+                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400"
+                            >
+                                {/* Join Community */}コミュニティに参加
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 

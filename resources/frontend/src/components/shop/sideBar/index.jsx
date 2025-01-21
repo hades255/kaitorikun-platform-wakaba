@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import axios from "axios";
-import api from "../../../api";
-import { API_ROUTE } from "../../../config";
-import { actionChannel } from "../../../reduxStore";
+import clsx from "clsx";
 import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
 import menu2 from "./menu2";
@@ -22,7 +19,7 @@ const tabs = [
     },
     {
         title: "新着",
-        url: "/channels",
+        url: "/communities",
     },
     {
         title: "チャット",
@@ -33,28 +30,6 @@ const tabs = [
 const Sidebar = (props) => {
     const dispatch = useDispatch();
     const [roleMenu, setRoleMenu] = useState(menu1);
-
-    useEffect(() => {
-        const fetchChannels = async () => {
-            try {
-                const response = await api.get(`channels/getMine`);
-                dispatch(
-                    actionChannel.handleSetChannel(response.data.channels)
-                );
-                const publicChannelsResponse = await axios.get(
-                    `${API_ROUTE}channels/getPublic`
-                );
-                dispatch(
-                    actionChannel.handleSetPublicChannel(
-                        publicChannelsResponse.data.channels
-                    )
-                );
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        fetchChannels();
-    }, [dispatch]);
 
     useEffect(() => {
         let userData = getItem("userdata");
@@ -99,7 +74,11 @@ const Sidebar = (props) => {
                 </div>
             </div>
             <div className="sidebar">
-                {props.history.location.pathname === "/todo" && (
+                {props.history.location.pathname.includes("/communities") ? (
+                    <ChannelSidebar />
+                ) : props.history.location.pathname === "/chat" ? (
+                    <ChatSidebar />
+                ) : (
                     <nav className="mt-2">
                         <ul
                             className="nav nav-pills nav-sidebar flex-column"
@@ -205,13 +184,31 @@ const Sidebar = (props) => {
                         </ul>
                     </nav>
                 )}
-                {props.history.location.pathname.includes("/channels") && (
-                    <ChannelSidebar />
-                )}
-                {props.history.location.pathname === "/chat" && <ChatSidebar />}
             </div>
         </aside>
     );
 };
 
 export default withRouter(Sidebar);
+
+const TabItem = ({ tab, props }) => {
+    return (
+        <Link
+            to={tab.url}
+            className={clsx("relative", {
+                active:
+                    props.history.location.pathname.includes(tab.url) ||
+                    (tab.url == "/todo" &&
+                        !props.history.location.pathname.includes(
+                            "/communities"
+                        ) &&
+                        !props.history.location.pathname.includes("/chat")),
+            })}
+        >
+            {tab.title}
+            {/* <div className="absolute top-1 right-1 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-xs flex justify-center items-center">
+                0
+            </div> */}
+        </Link>
+    );
+};

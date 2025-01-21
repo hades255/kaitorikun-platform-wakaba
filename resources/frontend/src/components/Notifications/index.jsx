@@ -31,7 +31,7 @@ const Notifications = () => {
         };
         const handlePostCreated = (data) => {
             if (data && data.post) {
-                if (auth?.id != data.channel.user_id) {
+                if (auth?.id != data.post.user_id) {
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
                 }
                 if (data.name)

@@ -137,7 +137,7 @@ const Post = ({ post, users }) => {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="h6">{post.title}</Typography>
                     <Typography variant="subtitle1">
-                        {post.created_at}
+                        {post.updated_at}
                     </Typography>
                 </Box>
                 <Typography variant="subtitle1" color="text.secondary">

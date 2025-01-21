@@ -36,6 +36,7 @@ class PostController extends Controller
             'subject' => 'required|string|max:255',
             'content' => 'required|string|max:1000',
             'channel_id' => 'required|integer',
+            'community_id' => 'required|integer',
             'notifyEmail' => 'required|boolean',
         ]);
         $post = new Post();
@@ -44,6 +45,7 @@ class PostController extends Controller
         $post->content = $validatedData['content'];
         $post->notifyEmail = $validatedData['notifyEmail']; 
         $post->channel_id = $validatedData['channel_id'];
+        $post->community_id = $validatedData['community_id'];
         $post->user_id = Auth::id();
         if ($post->save()) {
             NewPostJob::dispatch($post, Auth::user()->name);

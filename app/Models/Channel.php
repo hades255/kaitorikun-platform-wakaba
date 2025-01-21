@@ -23,6 +23,7 @@ class Channel extends Model
             ->skip($offset)
             ->take($limit)
             ->with(['reactions', 'replies'])
+            ->orderBy('updated_at', 'desc')
             ->get();
     }
 

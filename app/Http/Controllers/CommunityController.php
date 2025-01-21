@@ -115,7 +115,7 @@ class CommunityController extends Controller
     //   get public communities
     public function getPublic()
     {
-        $communities = Community::where("isPublic", true)->with(['channels'])->get();
+        $communities = Community::where("isPublic", true)->with(['channels'])->orderBy('updated_at', 'desc')->get();
         return response()->json([
             'communities' => $communities
         ]);

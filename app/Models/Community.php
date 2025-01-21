@@ -33,13 +33,13 @@ class Community extends Model
 
     public static function getMyCommunities($userId)
     {
-        return self::where('user_id', $userId)->with(['channels'])->get();
+        return self::where('user_id', $userId)->with(['channels'])->orderBy('updated_at', 'desc')->get();
     }
 
     public static function getCommunitiesForUser($userId)
     {
         return self::whereHas('users', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->with(['channels'])->get();
+        })->with(['channels'])->orderBy('updated_at', 'desc')->get();
     }
 }

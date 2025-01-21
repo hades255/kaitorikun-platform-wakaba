@@ -2,10 +2,15 @@ import React, { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
 import { Button, Dialog, TextField } from "@mui/material";
 import api from "../../api";
-import { selectorChannel } from "../../reduxStore";
+import { actionChannel, selectorChannel } from "../../reduxStore";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCommunity } from "../../contexts/CommunityContext";
-import { PanelContent, ToastNotification, useSelector } from "../../components";
+import {
+    PanelContent,
+    ToastNotification,
+    useDispatch,
+    useSelector,
+} from "../../components";
 import CreateCommunity from "../../components/community/New";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
@@ -41,6 +46,7 @@ const preNamedCommunities = [
 // ];
 
 const Communities = () => {
+    const dispatch = useDispatch();
     const channel = useSelector(selectorChannel.handleGetChannel);
     const communities = useSelector(selectorChannel.handleGetCommunities);
     const posts = useSelector(selectorChannel.handleGetPosts);
@@ -62,12 +68,14 @@ const Communities = () => {
         (post) => {
             const createPostFunc = async () => {
                 try {
-                    // const response =
-                    await api.post("posts", {
+                    const response = await api.post("posts", {
                         ...post,
                         channel_id: channel.id,
+                        community_id: channel.community_id,
                     });
-                    // dispatch(actionChannel.handleAddPostToChannel(response.data));
+                    dispatch(
+                        actionChannel.handleAddPostToChannel(response.data)
+                    );
                     setShowPostEditor(false);
                 } catch (error) {
                     console.log(error);

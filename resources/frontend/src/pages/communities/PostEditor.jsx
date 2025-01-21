@@ -48,13 +48,6 @@ export default function PostEditor({ onPost, onClose }) {
                     onChange={(e) => setSubject(e.target.value)}
                     sx={{ mb: 2 }}
                 />
-                {/* <TextareaAutosize
-                    label="Content"
-                    value={content}
-                    onChange={setContent}
-                    style={{ width: "100%", height: "200px" }}
-                    sx={{ mb: 2 }}
-                /> */}
                 <ReactQuill
                     value={content}
                     onChange={setContent}

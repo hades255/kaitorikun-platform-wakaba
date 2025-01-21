@@ -60,7 +60,7 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 // channels: [...state.channels, data],
-                communities: state.communities.map((item) => ({
+                communities: state.communities?.map((item) => ({
                     ...item,
                     channels:
                         item.id == data.community_id

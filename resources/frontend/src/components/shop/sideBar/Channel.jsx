@@ -35,7 +35,7 @@ const ChannelSidebar = () => {
         <>
             <List>
                 <AddNewButton />
-                {communities.map((item, index) => (
+                {communities?.map((item, index) => (
                     <CommunityItem key={index} com={item} />
                 ))}
             </List>
@@ -155,7 +155,7 @@ const PublicChannels = () => {
     );
 
     return (
-        communities.length > 0 && (
+        communities?.length > 0 && (
             <>
                 <Typography variant="p" fontSize={12} color="white" pl={2}>
                     {/* Public communities */}

@@ -6,6 +6,7 @@ export const CommunityProvider = ({ children }) => {
     const [showCommunityEditor, setShowCommunityEditor] = useState(false);
     const [preSetCommunityName, setPreSetCommunityName] = useState("");
     const [showChannelEditor, setShowChannelEditor] = useState(false);
+    const [preSetCommunityId, setPreSetCommunityId] = useState(0);
 
     return (
         <CommunityContext.Provider
@@ -16,6 +17,8 @@ export const CommunityProvider = ({ children }) => {
                 setPreSetCommunityName,
                 showChannelEditor,
                 setShowChannelEditor,
+                preSetCommunityId,
+                setPreSetCommunityId,
             }}
         >
             {children}

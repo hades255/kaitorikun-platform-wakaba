@@ -13,13 +13,11 @@ import { API_ROUTE } from "../../../config";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
-import { Link, useDispatch, useSelector } from "../../../components";
+import { useDispatch, useSelector } from "../../../components";
 
 const ChannelSidebar = () => {
     const dispatch = useDispatch();
     const communities = useSelector(selectorChannel.handleGetCommunities);
-    const channels = useSelector(selectorChannel.handleGetChannels);
-    const channel = useSelector(selectorChannel.handleGetChannel);
 
     useEffect(() => {
         return () => {
@@ -33,7 +31,30 @@ const ChannelSidebar = () => {
         };
     }, [dispatch]);
 
-    const handleClick = useCallback(() => {
+    return (
+        <>
+            <List>
+                <AddNewButton />
+                {communities.map((item, index) => (
+                    <CommunityItem key={index} com={item} />
+                ))}
+            </List>
+            <PublicChannels />
+        </>
+    );
+};
+
+const CommunityItem = ({ com }) => {
+    const dispatch = useDispatch();
+    const channel = useSelector(selectorChannel.handleGetChannel);
+    const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
+    const [show, setShow] = useState(false);
+
+    const handleClick = () => {
+        setShow(!show);
+    };
+
+    const handleClickNew = useCallback(() => {
         dispatch(
             actionChannel.handleSelectChannel({
                 channel: null,
@@ -41,35 +62,9 @@ const ChannelSidebar = () => {
                 users: [],
             })
         );
-    }, [dispatch, channel]);
-
-    return (
-        <>
-            <List>
-                <AddNewButton />
-                {/* <Link to="/communities/new">
-                    <ListItem onClick={handleClick}>
-                        <AddIcon color="!white" />
-                        <ListItemText primary="チャンネルを作成" />
-                    </ListItem>
-                </Link> */}
-                <Link to="/communities">
-                    {communities.map((item, index) => (
-                        <CommunityItem key={index} com={item} />
-                    ))}
-                </Link>
-            </List>
-            <PublicChannels channel={channel} />
-        </>
-    );
-};
-
-const CommunityItem = ({ com, active }) => {
-    const [show, setShow] = useState(false);
-
-    const handleClick = () => {
-        setShow(!show);
-    };
+        setPreSetCommunityId(com.id);
+        setShowChannelEditor(true);
+    }, [dispatch, setShowChannelEditor, setPreSetCommunityId, com, channel]);
 
     return (
         <>
@@ -81,23 +76,35 @@ const CommunityItem = ({ com, active }) => {
                     cursor: "pointer",
                 }}
             >
-                <span className="border w-5 min-w-5 h-5 p-0 flex justify-center items-center rounded mr-2">
+                <span className="border w-4 min-w-4 h-4 p-0 flex justify-center items-center rounded mr-2 text-xs">
                     {show ? "-" : "+"}
                 </span>
                 <ListItemText primary={com.name} />
             </ListItem>
-            {show &&
-                com.channels?.map((item) => (
-                    <ChannelItem key={item.id} channel={item} />
-                ))}
+            {show && (
+                <>
+                    {com.channels?.map((item) => (
+                        <ChannelItem
+                            key={item.id}
+                            channel={item}
+                            active={item.id == channel?.id}
+                        />
+                    ))}
+                    <ListItem
+                        onClick={handleClickNew}
+                        sx={{ color: "white", cursor: "pointer", pl: 2 }}
+                    >
+                        <AddIcon color="!white" />
+                        <ListItemText primary="チャンネルを作成" />
+                    </ListItem>
+                </>
+            )}
         </>
     );
 };
 
-const ChannelItem = ({ channel }) => {
+const ChannelItem = ({ channel, active }) => {
     const dispatch = useDispatch();
-    const selectedChannel = useSelector(selectorChannel.handleGetChannel);
-    const active = channel?.id == selectedChannel?.id;
 
     const handleClickChannel = () => {
         const fetchPosts = async () => {
@@ -134,31 +141,29 @@ const ChannelItem = ({ channel }) => {
     );
 };
 
-const PublicChannels = ({ channel }) => {
+const PublicChannels = () => {
     const { auth } = useAuth();
-    const _channels = useSelector(selectorChannel.handleGetPublicChannels);
-    const channels = useMemo(
-        () => _channels.filter(({ user_id }) => user_id !== auth.id),
-        [auth, _channels]
+    const _communities = useSelector(
+        selectorChannel.handleGetPublicCommunities
+    );
+    const communities = useMemo(
+        () => _communities.filter(({ user_id }) => user_id !== auth.id),
+        [auth, _communities]
     );
 
     return (
-        channels.length > 0 && (
+        communities.length > 0 && (
             <>
                 <Typography variant="p" fontSize={12} color="white" pl={2}>
-                    {/* Public Channels */}
+                    {/* Public communities */}
                     公開チャンネル
                 </Typography>
                 <List>
-                    <Link to="/communities">
-                        {channels.map((item, index) => (
-                            <ChannelItem
-                                key={index}
-                                channel={item}
-                                active={channel && channel.id == item.id}
-                            />
-                        ))}
-                    </Link>
+                    {/* <Link to="/communities"> */}
+                    {communities.map((item) => (
+                        <CommunityItem key={item.id} com={item} />
+                    ))}
+                    {/* </Link> */}
                 </List>
             </>
         )
@@ -166,7 +171,12 @@ const PublicChannels = ({ channel }) => {
 };
 
 const AddNewButton = () => {
-    const { setShowCommunityEditor, setPreSetCommunityName } = useCommunity();
+    const {
+        setShowCommunityEditor,
+        setPreSetCommunityName,
+        setPreSetCommunityId,
+        setShowChannelEditor,
+    } = useCommunity();
 
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -202,6 +212,12 @@ const AddNewButton = () => {
         setIsOpen(false);
     };
 
+    const handleNewChannel = () => {
+        setPreSetCommunityId(0);
+        setShowChannelEditor(true);
+        setIsOpen(false);
+    };
+
     return (
         <>
             <div className="px-4 py-2 flex justify-end">
@@ -234,15 +250,15 @@ const AddNewButton = () => {
                             >
                                 {/* Add Community */}コミュニティを追加
                             </div>
-                            <a
-                                href="#"
-                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400"
+                            <div
+                                onClick={handleNewChannel}
+                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400 cursor-pointer"
                             >
                                 {/* Add Channel */}チャンネルを追加
-                            </a>
+                            </div>
                             <a
                                 href="#"
-                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400"
+                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400 cursor-pointer"
                             >
                                 {/* Join Community */}コミュニティに参加
                             </a>

@@ -20,7 +20,9 @@ const Notifications = () => {
 
         const handleChannelCreated = (data) => {
             if (data && data.channel) {
-                dispatch(actionChannel.handleAddPublicChannel(data.channel));
+                if (auth?.id != data.channel.user_id) {
+                    dispatch(actionChannel.handleAddChannel(data.channel));
+                }
                 if (data.name)
                     showNotification("新しいチャンネル", {
                         message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
@@ -29,7 +31,9 @@ const Notifications = () => {
         };
         const handlePostCreated = (data) => {
             if (data && data.post) {
-                dispatch(actionChannel.handleAddPostToChannel(data.post));
+                if (auth?.id != data.channel.user_id) {
+                    dispatch(actionChannel.handleAddPostToChannel(data.post));
+                }
                 if (data.name)
                     showNotification("新しい投稿", {
                         message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
@@ -53,19 +57,18 @@ const Notifications = () => {
         };
         const handleCommunityCreated = (data) => {
             if (data && data.community && data.channel) {
-                console.log(auth.id, data.community.user_id);
-                if (auth.id != data.community.user_id) {
+                if (auth?.id != data.community.user_id) {
                     dispatch(
                         actionChannel.handleAddPublicCommunity({
                             ...data.community,
                             channels: [data.channel],
                         })
                     );
-                    if (data.name)
-                        showNotification("新しいコミュニティ", {
-                            message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
-                        });
                 }
+                if (data.name)
+                    showNotification("新しいコミュニティ", {
+                        message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
+                    });
             }
         };
 

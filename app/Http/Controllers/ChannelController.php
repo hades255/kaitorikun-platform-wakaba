@@ -26,15 +26,17 @@ class ChannelController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'icon' => 'nullable|string|max:255',
+            'community_id' => 'required|integer',
         ]);
         $channel = new Channel();
         $channel->name = $validatedData['name'];
         $channel->description = $validatedData['description'];
         $channel->icon = $validatedData['icon'];
+        $channel->community_id = $validatedData['community_id'];
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             NewChannelJob::dispatch($channel, Auth::user()->name);
-            $channel->users()->attach(Auth::id());
+            // $channel->users()->attach(Auth::id());
             return response()->json(["channel" => $channel, "user" => Auth::user()], 201);
         }
         return response()->json(['error' => 'Failed to create channel'], 500);

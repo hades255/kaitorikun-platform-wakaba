@@ -9,6 +9,7 @@ import { PanelContent, ToastNotification, useSelector } from "../../components";
 import CreateCommunity from "../../components/community/New";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
+import CreateChannel from "../../components/community/NewChannel";
 
 const preNamedCommunities = [
     { title: "自分で作成", value: "" },
@@ -41,12 +42,17 @@ const preNamedCommunities = [
 
 const Communities = () => {
     const channel = useSelector(selectorChannel.handleGetChannel);
-    const channels = useSelector(selectorChannel.handleGetChannels);
+    const communities = useSelector(selectorChannel.handleGetCommunities);
     const posts = useSelector(selectorChannel.handleGetPosts);
     const users = useSelector(selectorChannel.handleGetUsers);
 
     const { auth } = useAuth();
-    const { showCommunityEditor, setShowCommunityEditor } = useCommunity();
+    const {
+        showCommunityEditor,
+        setShowCommunityEditor,
+        showChannelEditor,
+        setShowChannelEditor,
+    } = useCommunity();
 
     const [showPostEditor, setShowPostEditor] = useState(false);
     const [showInviteDialog, setShowInviteDialog] = useState(false);
@@ -166,7 +172,7 @@ const Communities = () => {
                         </div>
                     </Dialog>
                 </div>
-            ) : channels && channels.length > 0 ? (
+            ) : communities && communities.length > 0 ? (
                 <div>{/* Create new Channel */}新しいチャンネルを作成</div>
             ) : (
                 <div className="w-full flex justify-center pt-20 pb-12">
@@ -199,6 +205,14 @@ const Communities = () => {
                     onClose={() => setShowCommunityEditor(false)}
                 >
                     <CreateCommunity />
+                </Dialog>
+            )}
+            {showChannelEditor && (
+                <Dialog
+                    open={showChannelEditor}
+                    onClose={() => setShowChannelEditor(false)}
+                >
+                    <CreateChannel />
                 </Dialog>
             )}
         </PanelContent>

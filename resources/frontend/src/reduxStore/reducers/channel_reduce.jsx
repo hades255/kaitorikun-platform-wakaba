@@ -24,73 +24,75 @@ const initialState = {
     posts: [],
 };
 const channels = (state = initialState, actions) => {
+    const data = actions.payload?.data;
     switch (actions.type) {
         case SET_COMMUNITY:
             return {
                 ...state,
-                communities: actions.payload.data,
+                communities: data,
             };
         case SET_PUBLIC_COMMUNITY:
             return {
                 ...state,
-                publicCommunities: actions.payload.data,
+                publicCommunities: data,
             };
         case NEW_COMMUNITY:
             return {
                 ...state,
-                communities: [...state.communities, actions.payload.data],
+                communities: [...state.communities, data],
             };
         case NEW_PUBLIC_COMMUNITY:
             return {
                 ...state,
-                publicCommunities: [
-                    ...state.publicCommunities,
-                    actions.payload.data,
-                ],
+                publicCommunities: [...state.publicCommunities, data],
             };
         case SET_CHANNEL:
             return {
                 ...state,
-                channels: actions.payload.data,
+                channels: data,
             };
         case SET_PUBLIC_CHANNEL:
             return {
                 ...state,
-                publicChannels: actions.payload.data,
+                publicChannels: data,
             };
         case NEW_CHANNEL:
             return {
                 ...state,
-                channels: [...state.channels, actions.payload.data],
+                // channels: [...state.channels, data],
+                communities: state.communities.map((item) => ({
+                    ...item,
+                    channels:
+                        item.id == data.community_id
+                            ? [...item.channels, data]
+                            : item.channels,
+                })),
             };
         case NEW_PUBLIC_CHANNEL:
             return {
                 ...state,
-                publicChannels: [...state.publicChannels, actions.payload.data],
+                publicChannels: [...state.publicChannels, data],
             };
         case SELECT_CHANNEL:
             return {
                 ...state,
-                channel: actions.payload.data.channel,
-                users: actions.payload.data.users,
-                posts: actions.payload.data.posts,
+                channel: data.channel,
+                users: data.users,
+                posts: data.posts,
             };
         case NEW_POST:
             return {
                 ...state,
-                posts: [...state.posts, actions.payload.data],
+                posts: [...state.posts, data],
             };
         case REPLY_POST:
             return {
                 ...state,
                 posts: state.posts.map((item) =>
-                    item.id == actions.payload.data.post_id
+                    item.id == data.post_id
                         ? {
                               ...item,
-                              replies: [
-                                  ...(item.replies ?? []),
-                                  actions.payload.data,
-                              ],
+                              replies: [...(item.replies ?? []), data],
                           }
                         : item
                 ),
@@ -99,13 +101,10 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 posts: state.posts.map((item) =>
-                    item.id == actions.payload.data.post_id
+                    item.id == data.post_id
                         ? {
                               ...item,
-                              reactions: [
-                                  ...(item.reactions ?? []),
-                                  actions.payload.data,
-                              ],
+                              reactions: [...(item.reactions ?? []), data],
                           }
                         : item
                 ),
@@ -114,11 +113,11 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 posts: state.posts.map((item) =>
-                    item.id == actions.payload.data.post_id
+                    item.id == data.post_id
                         ? {
                               ...item,
                               reactions: (item.reactions ?? []).filter(
-                                  ({ id }) => id != actions.payload.data.id
+                                  ({ id }) => id != data.id
                               ),
                           }
                         : item

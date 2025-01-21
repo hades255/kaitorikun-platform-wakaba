@@ -57,19 +57,7 @@ const Sidebar = (props) => {
             <div id="sidebar_tab" className="sidebar-header pt-3">
                 <div className="tabs">
                     {tabs.map((item) => (
-                        <Link
-                            key={item.url}
-                            to={item.url}
-                            className={
-                                props.history.location.pathname.includes(
-                                    item.url
-                                )
-                                    ? "active"
-                                    : ""
-                            }
-                        >
-                            {item.title}
-                        </Link>
+                        <TabItem key={item.title} tab={item} props={props} />
                     ))}
                 </div>
             </div>

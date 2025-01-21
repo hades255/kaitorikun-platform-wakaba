@@ -40,7 +40,7 @@ const ChannelSidebar = () => {
                         <CommunityItem key={index} com={item} />
                     ))}
             </List>
-            <PublicChannels />
+            <PublicCommunities />
         </>
     );
 };
@@ -143,7 +143,7 @@ const ChannelItem = ({ channel, active }) => {
     );
 };
 
-const PublicChannels = () => {
+const PublicCommunities = () => {
     const { auth } = useAuth();
     const _communities = useSelector(
         selectorChannel.handleGetPublicCommunities
@@ -151,7 +151,7 @@ const PublicChannels = () => {
     const communities = useMemo(
         () =>
             Array.isArray(_communities)
-                ? _communities.filter(({ user_id }) => user_id !== auth.id)
+                ? _communities.filter(({ user_id }) => user_id != auth?.id)
                 : [],
         [auth, _communities]
     );

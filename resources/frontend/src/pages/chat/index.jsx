@@ -25,8 +25,8 @@ const ChatsPage = () => {
         )
             return _chats.filter(
                 ({ from, to }) =>
-                    (from == auth.id && to == selectedUser.id) ||
-                    (from == selectedUser.id && to == auth.id)
+                    (from == auth?.id && to == selectedUser.id) ||
+                    (from == selectedUser.id && to == auth?.id)
             );
         return [];
     }, [auth, selectedUser, _chats]);

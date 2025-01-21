@@ -67,6 +67,13 @@ const channels = (state = initialState, actions) => {
                             ? [...item.channels, data]
                             : item.channels,
                 })),
+                publicCommunities: state.publicCommunities?.map((item) => ({
+                    ...item,
+                    channels:
+                        item.id == data.community_id
+                            ? [...item.channels, data]
+                            : item.channels,
+                })),
             };
         case NEW_PUBLIC_CHANNEL:
             return {

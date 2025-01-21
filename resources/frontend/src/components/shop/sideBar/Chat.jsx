@@ -23,7 +23,12 @@ const ChatSidebar = () => {
         let newChats = {};
         if (Array.isArray(chats))
             chats
-                .filter((item) => item.to == auth.id && item.status == "unread")
+                .filter(
+                    (item) =>
+                        item.from !== auth?.id &&
+                        item.to == auth?.id &&
+                        item.status == "unread"
+                )
                 .forEach((chat) => {
                     if (newChats[chat.from]) newChats[chat.from] += 1;
                     else newChats[chat.from] = 1;
@@ -34,36 +39,31 @@ const ChatSidebar = () => {
     const pinnedChats = useMemo(
         () =>
             Array.isArray(users)
-                ? users.filter(
-                      (item) =>
-                          auth.id != item.id && pinnedUsers?.includes(item.id)
-                  )
+                ? users.filter((item) => pinnedUsers?.includes(item.id))
                 : [],
-        [users, pinnedUsers, auth]
+        [users, pinnedUsers]
     );
     const recentChats = useMemo(
         () =>
             Array.isArray(users)
                 ? users.filter(
                       (item) =>
-                          auth.id != item.id &&
                           recentlyUsers?.includes(item.id) &&
                           !pinnedUsers?.includes(item.id)
                   )
                 : [],
-        [users, recentlyUsers, pinnedUsers, auth]
+        [users, recentlyUsers, pinnedUsers]
     );
     const suggestedUsers = useMemo(
         () =>
             Array.isArray(users)
                 ? users.filter(
                       (item) =>
-                          auth.id != item.id &&
                           !recentlyUsers?.includes(item.id) &&
                           !pinnedUsers?.includes(item.id)
                   )
                 : [],
-        [users, recentlyUsers, pinnedUsers, auth]
+        [users, recentlyUsers, pinnedUsers]
     );
 
     const handleSetSelectedUser = useCallback(
@@ -144,6 +144,8 @@ const ChatSidebar = () => {
 export default ChatSidebar;
 
 const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
+    const { auth } = useAuth();
+
     const handleClick = useCallback(() => {
         onClick(user);
     }, [onClick, user]);
@@ -159,7 +161,7 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
     return (
         <div
             className={clsx(
-                "flex items-center justify-between mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all relative",
+                "mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all relative",
                 {
                     "bg-[#fff2]": selected?.id == user.id,
                 }
@@ -178,7 +180,10 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                 </div>
                 <div className="w-full flex flex-col">
                     <div className="flex justify-between items-center">
-                        <p className="text-gray-200">{user.name}</p>
+                        <p className="text-gray-200">
+                            {user.name}
+                            {auth?.id == user.id && "(あなた)"}
+                        </p>
                         <p className="text-gray-400 text-xs">{"10:18"}</p>
                     </div>
                     <p className="text-gray-400 text-sm truncate">
@@ -186,14 +191,16 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                     </p>
                 </div>
             </div>
-            <button
-                onClick={handleClickPin}
-                className={`px-1 rounded-full ${
-                    user.isPinned ? "text-blue-400" : "text-gray-400"
-                } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
-            >
-                <PushPinOutlinedIcon className="!w-4 !h-4" />
-            </button>
+            <div className="absolute top-0 right-2 h-full flex items-center">
+                <button
+                    onClick={handleClickPin}
+                    className={`px-1 rounded-full ${
+                        user.isPinned ? "text-blue-400" : "text-gray-400"
+                    } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
+                >
+                    <PushPinOutlinedIcon className="!w-4 !h-4" />
+                </button>
+            </div>
             {count > 0 && (
                 <div className="absolute bottom-2 right-2 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-sm flex justify-center items-center">
                     {count}

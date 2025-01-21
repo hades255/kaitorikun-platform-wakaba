@@ -568,6 +568,9 @@ video {
 .right-2 {
   right: 0.5rem;
 }
+.top-0 {
+  top: 0px;
+}
 .top-1 {
   top: 0.25rem;
 }
@@ -939,9 +942,6 @@ video {
 .text-right {
   text-align: right;
 }
-.font-sans {
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
@@ -1032,10 +1032,6 @@ video {
 .overline {
   -webkit-text-decoration-line: overline;
           text-decoration-line: overline;
-}
-.antialiased {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 .opacity-0 {
   opacity: 0;

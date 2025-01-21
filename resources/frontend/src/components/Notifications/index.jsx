@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import api from "../../api";
@@ -17,29 +17,35 @@ const Notifications = () => {
     const coms = useSelector(selectorChannel.handleGetCommunities);
     const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
-    const comIds = useMemo(() => {
+    const [comIds, setComIds] = useState([]);
+
+    useEffect(() => {
         let res = [];
-        if (Array.isArray(coms))
-            coms.forEach((element) => {
-                if (!res.includes(element.id)) res.push(element.id);
-            });
-        if (Array.isArray(pubcoms))
-            pubcoms.forEach((element) => {
-                if (!res.includes(element.id)) res.push(element.id);
-            });
-        return res;
-    }, [coms, pubcoms]);
+        coms.forEach((element) => {
+            if (!comIds.includes(Number(element.id)))
+                res.push(Number(element.id));
+        });
+        if (res.length > 0) setComIds([...comIds, ...res]);
+    }, [coms, comIds]);
 
     useEffect(() => {
-        console.log(comIds);
-    }, [comIds]);
+        let res = [];
+        pubcoms.forEach((element) => {
+            if (!comIds.includes(Number(element.id)))
+                res.push(Number(element.id));
+        });
+        if (res.length > 0) setComIds([...comIds, ...res]);
+    }, [pubcoms, comIds]);
 
     useEffect(() => {
-        console.log("channel");
         const channel = subscribeToChannel("channel");
 
         const handleChannelCreated = (data) => {
-            if (data && data.channel) {
+            if (
+                data &&
+                data.channel &&
+                comIds.includes(Number(data.channel.community_id))
+            ) {
                 if (auth?.id != data.channel.user_id) {
                     dispatch(actionChannel.handleAddChannel(data.channel));
                 }
@@ -50,7 +56,11 @@ const Notifications = () => {
             }
         };
         const handlePostCreated = (data) => {
-            if (data && data.post) {
+            if (
+                data &&
+                data.post &&
+                comIds.includes(Number(data.post.community_id))
+            ) {
                 if (auth?.id != data.post.user_id) {
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
                 }
@@ -97,7 +107,7 @@ const Notifications = () => {
                 auth &&
                 data &&
                 data.chat &&
-                (data.chat.from == auth.id || data.chat.to == auth.id)
+                (data.chat.from == auth?.id || data.chat.to == auth?.id)
             )
                 dispatch(actionChat.handleReceiveChat(data.chat));
             if (data.name)
@@ -135,6 +145,7 @@ const Notifications = () => {
         bindEvent,
         unbindEvent,
         auth,
+        comIds,
     ]);
 
     useEffect(() => {

@@ -148,9 +148,10 @@ const Communities = () => {
                         />
                     )}
 
-                    {posts.map((post) => (
-                        <Post key={post.id} post={post} users={users} />
-                    ))}
+                    {typeof posts === Array &&
+                        posts.map((post) => (
+                            <Post key={post.id} post={post} users={users} />
+                        ))}
 
                     <Dialog
                         open={showInviteDialog}

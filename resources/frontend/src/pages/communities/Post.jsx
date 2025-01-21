@@ -73,7 +73,7 @@ const Post = ({ post, users }) => {
 
     const handleNewEmojiClick = (emojiData) => {
         if (
-            post.reactions &&
+            typeof post.reactions === Array &&
             post.reactions.find(
                 (item) =>
                     item.user_id == auth.auth?.id &&
@@ -152,14 +152,15 @@ const Post = ({ post, users }) => {
                     >
                         <AddIcon />
                     </IconButton>
-                    {reactions?.map((item) => (
-                        <EmojiItem
-                            key={item.reaction}
-                            reaction={item}
-                            users={users}
-                            onClick={handleEmojiClick}
-                        />
-                    ))}
+                    {typeof reactions === Array &&
+                        reactions.map((item) => (
+                            <EmojiItem
+                                key={item.reaction}
+                                reaction={item}
+                                users={users}
+                                onClick={handleEmojiClick}
+                            />
+                        ))}
                     {showEmojiPicker && (
                         <Box sx={{ position: "absolute", zIndex: 1 }}>
                             <EmojiPicker onEmojiClick={handleNewEmojiClick} />
@@ -191,13 +192,14 @@ const Post = ({ post, users }) => {
                 )}
                 {showReplies && (
                     <div className="flex flex-col gap-2">
-                        {post.replies?.map((item) => (
-                            <ReplyItem
-                                key={item.id}
-                                reply={item}
-                                users={users}
-                            />
-                        ))}
+                        {typeof post.replies === Array &&
+                            post.replies.map((item) => (
+                                <ReplyItem
+                                    key={item.id}
+                                    reply={item}
+                                    users={users}
+                                />
+                            ))}
                     </div>
                 )}
             </CardContent>
@@ -208,7 +210,8 @@ const Post = ({ post, users }) => {
 export default Post;
 
 const ReplyItem = ({ reply, users }) => {
-    const user = users.find(({ id }) => id == reply.user_id);
+    const user =
+        typeof users === Array && users.find(({ id }) => id == reply.user_id);
     const timeAgo = formatDistanceToNow(new Date(reply.updated_at), {
         addSuffix: true,
     });
@@ -230,9 +233,7 @@ const ReplyItem = ({ reply, users }) => {
                         <p className="text-gray-700">
                             {user ? user.name : "Unknown User"}
                         </p>
-                        <p className="text-gray-500 text-xs">
-                            {timeAgo}
-                        </p>
+                        <p className="text-gray-500 text-xs">{timeAgo}</p>
                     </div>
                     <p className="text-gray-600 text-sm truncate">
                         {reply.reply}

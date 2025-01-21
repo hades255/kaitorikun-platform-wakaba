@@ -35,9 +35,10 @@ const ChannelSidebar = () => {
         <>
             <List>
                 <AddNewButton />
-                {communities.map((item, index) => (
-                    <CommunityItem key={index} com={item} />
-                ))}
+                {typeof communities === Array &&
+                    communities.map((item, index) => (
+                        <CommunityItem key={index} com={item} />
+                    ))}
             </List>
             <PublicChannels />
         </>
@@ -83,13 +84,14 @@ const CommunityItem = ({ com }) => {
             </ListItem>
             {show && (
                 <>
-                    {com.channels?.map((item) => (
-                        <ChannelItem
-                            key={item.id}
-                            channel={item}
-                            active={item.id == channel?.id}
-                        />
-                    ))}
+                    {typeof com.channels === Array &&
+                        com.channels.map((item) => (
+                            <ChannelItem
+                                key={item.id}
+                                channel={item}
+                                active={item.id == channel?.id}
+                            />
+                        ))}
                     <ListItem
                         onClick={handleClickNew}
                         sx={{ color: "white", cursor: "pointer", pl: 2 }}
@@ -148,13 +150,14 @@ const PublicChannels = () => {
     );
     const communities = useMemo(
         () =>
-            _communities && _communities.length > 0
-                ? _communities?.filter(({ user_id }) => user_id !== auth.id)
+            typeof _communities === Array && _communities.length > 0
+                ? _communities.filter(({ user_id }) => user_id !== auth.id)
                 : [],
         [auth, _communities]
     );
 
     return (
+        typeof communities === Array &&
         communities.length > 0 && (
             <>
                 <Typography variant="p" fontSize={12} color="white" pl={2}>

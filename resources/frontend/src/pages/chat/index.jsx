@@ -17,8 +17,13 @@ const ChatsPage = () => {
     const lastmessage = useRef(null);
 
     const chats = useMemo(() => {
-        if (auth && selectedUser && _chats && _chats.length > 0)
-            return _chats?.filter(
+        if (
+            auth &&
+            selectedUser &&
+            typeof _chats === Array &&
+            _chats.length > 0
+        )
+            return _chats.filter(
                 ({ from, to }) =>
                     (from == auth.id && to == selectedUser.id) ||
                     (from == selectedUser.id && to == auth.id)

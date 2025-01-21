@@ -1,14 +1,7 @@
 import { useState } from "react";
-import {
-    Link,
-    getItem,
-    React,
-    openTab,
-    useDispatch,
-    checkSidebarClass,
-    useSelector,
-} from "../../../components";
-import { selectorUtility, utilityAction } from "../../../reduxStore";
+import { withRouter } from "react-router-dom";
+import { getItem, React, useDispatch } from "../../../components";
+import { utilityAction } from "../../../reduxStore";
 import Clock from "../../ui/clock";
 import Scrap from "../../ui/scrap";
 import SearchBar from "../../ui/searchbar";
@@ -18,7 +11,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Button from "@mui/material/Button";
 
-const Top = () => {
+const Top = (props) => {
     const dispatch = useDispatch();
 
     const logout = () => {
@@ -26,7 +19,7 @@ const Top = () => {
         setTimeout(() => {
             dispatch(utilityAction.stopLoading());
             localStorage.clear();
-            window.location.href("/");
+            props.history.location.pathname = "/";
         }, 500);
     };
     return (
@@ -74,4 +67,4 @@ const Top = () => {
     );
 };
 
-export default Top;
+export default withRouter(Top);

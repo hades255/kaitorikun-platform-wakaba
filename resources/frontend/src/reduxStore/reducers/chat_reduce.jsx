@@ -22,9 +22,9 @@ const chats = (state = initialState, actions) => {
     switch (actions.type) {
         case RECEIVE_CHAT:
             let recentlyChat = [];
-            if (!state.recently.includes(actions.payload.data.from))
+            if (!state.recently?.includes(actions.payload.data.from))
                 recentlyChat.push(actions.payload.data.from);
-            if (!state.recently.includes(actions.payload.data.to))
+            if (!state.recently?.includes(actions.payload.data.to))
                 recentlyChat.push(actions.payload.data.to);
             return {
                 ...state,
@@ -34,14 +34,14 @@ const chats = (state = initialState, actions) => {
         case SET_CHATS:
             let recently = [];
             actions.payload.data.forEach((item) => {
-                if (!recently.includes(item.from)) recently.push(item.from);
-                if (!recently.includes(item.to)) recently.push(item.to);
+                if (!recently?.includes(item.from)) recently.push(item.from);
+                if (!recently?.includes(item.to)) recently.push(item.to);
             });
             return { ...state, chats: actions.payload.data, recently };
         case READ_CHATS:
             return {
                 ...state,
-                chats: state.chats.map((item) => ({
+                chats: state.chats?.map((item) => ({
                     ...item,
                     status:
                         item.from == actions.payload.data

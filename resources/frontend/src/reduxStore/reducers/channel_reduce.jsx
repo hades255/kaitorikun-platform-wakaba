@@ -60,7 +60,7 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 // channels: [...state.channels, data],
-                communities: state.communities.map((item) => ({
+                communities: state.communities?.map((item) => ({
                     ...item,
                     channels:
                         item.id == data.community_id
@@ -88,7 +88,7 @@ const channels = (state = initialState, actions) => {
         case REPLY_POST:
             return {
                 ...state,
-                posts: state.posts.map((item) =>
+                posts: state.posts?.map((item) =>
                     item.id == data.post_id
                         ? {
                               ...item,
@@ -100,7 +100,7 @@ const channels = (state = initialState, actions) => {
         case ADD_REACTION:
             return {
                 ...state,
-                posts: state.posts.map((item) =>
+                posts: state.posts?.map((item) =>
                     item.id == data.post_id
                         ? {
                               ...item,
@@ -112,7 +112,7 @@ const channels = (state = initialState, actions) => {
         case REMOVE_REACTION:
             return {
                 ...state,
-                posts: state.posts.map((item) =>
+                posts: state.posts?.map((item) =>
                     item.id == data.post_id
                         ? {
                               ...item,

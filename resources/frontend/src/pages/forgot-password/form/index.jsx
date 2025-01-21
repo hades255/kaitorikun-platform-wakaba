@@ -27,7 +27,7 @@ let FormForgotPassword = (props) => {
                 }, 500);
             }
         } catch (error) {
-            ToastNotification("error", "メール送信に失敗しました。");
+            ToastNotification("error", error.message);
         }
     };
 

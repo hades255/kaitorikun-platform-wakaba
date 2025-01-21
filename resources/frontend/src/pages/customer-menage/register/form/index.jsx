@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     React,
     Button,
@@ -21,6 +21,7 @@ import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
 import { actionTheme, utilityAction } from "../../../../reduxStore";
+import Tesseract from 'tesseract.js';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -54,7 +55,16 @@ let FormCustomerRegister = (props) => {
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
+    const [numPages, setNumPages] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
+
+    //For OCR
+    const videoRef = useRef(null);
+    const canvasRef = useRef(null);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [ocrResult, setOcrResult] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         // API Call
@@ -70,6 +80,96 @@ let FormCustomerRegister = (props) => {
 
         fetchData(); // Execute API call
     }, []); // Empty dependency array means it runs once when mounted
+
+    // Start the camera when the component mounts
+    useEffect(() => {
+        // const startCamera = async () => {
+        //     try {
+        //         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        //         if (videoRef.current) {
+        //             videoRef.current.srcObject = stream;
+        //         }
+        //     } catch (error) {
+        //         console.error("Error accessing camera: ", error);
+        //     }
+        // };
+
+        // startCamera();
+
+        // // Cleanup when the component unmounts
+        // return () => {
+        //     if (videoRef.current && videoRef.current.srcObject) {
+        //         let tracks = videoRef.current.srcObject.getTracks();
+        //         tracks.forEach((track) => track.stop());
+        //     }
+        // };
+    }, []);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageSrc(reader.result); // Display image preview
+            };
+            reader.readAsDataURL(file);
+            processOCR(file); // Process OCR when file is selected
+        }
+    };
+
+    const captureImage = () => {
+        if (videoRef.current && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const video = videoRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw the current video frame to the canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get the data URL of the image
+            const imageData = canvas.toDataURL('image/png');
+            setImageSrc(imageData);
+
+            // Perform OCR on the captured image
+            performOcr(imageData);
+        }
+    };
+
+    const processOCR = (imageFile) => {
+        setIsProcessing(true);
+        Tesseract.recognize(
+            imageFile,
+            'jpn', // Japanese language model
+            {
+                logger: (m) => console.log(m), // Progress logging
+            }
+        ).then(({ data: { text } }) => {
+            setOcrResult(text); // Set OCR result to state
+            setIsProcessing(false);
+        }).catch((error) => {
+            setOcrResult("Error during OCR processing");
+            setIsProcessing(false);
+        });
+    };
+
+    const performOcr = (imageData) => {
+        setIsProcessing(true);
+        Tesseract.recognize(
+            imageData,
+            'jpn', // Japanese language model
+            {
+                logger: (m) => console.log(m), // Logging progress
+            }
+        ).then(({ data: { text } }) => {
+            setOcrResult(text);
+            setIsProcessing(false);
+        }).catch((error) => {
+            setOcrResult("Error during OCR processing");
+            setIsProcessing(false);
+        });
+    };
 
     const handleChangeAddress1 = (e) => {
         console.log(e.target.value);
@@ -156,6 +256,10 @@ let FormCustomerRegister = (props) => {
         setOpenPdfPreview(false)
         setPreviewPdf("")
     }
+
+    const onDocumentLoadSuccess = ({ numPages }) => {
+        setNumPages(numPages);
+    };
 
     const handleZipCode = async (e) => {
         setZipCode(e);
@@ -265,7 +369,11 @@ let FormCustomerRegister = (props) => {
     };
 
     const handleCancelClick = () => {
-        window.history.back();
+        if (window.confirm("保存しますか？")) {
+            handleRegisterClick();
+        } else {
+            window.history.back();
+        }
     };
 
     return (
@@ -517,6 +625,57 @@ let FormCustomerRegister = (props) => {
                 </div>
                 <div className="col-lg-6 mt-10 col-lg-6 mt-10">
                 </div>
+                <div className='hidden'>
+                    <div>
+                        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: 'auto' }} />
+                    </div>
+
+                    <button onClick={captureImage}>Capture Image</button>
+
+                    {/* Hidden Canvas to Draw Image */}
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+                    {/* Display Captured Image */}
+                    {imageSrc && (
+                        <div>
+                            <h3>Captured Image:</h3>
+                            <img src={imageSrc} alt="Captured" style={{ maxWidth: '100%' }} />
+                        </div>
+                    )}
+
+                    {/* Display OCR Result */}
+                    {isProcessing ? (
+                        <p>Processing...</p>
+                    ) : (
+                        <div>
+                            <h3>OCR Result:</h3>
+                            <p>{ocrResult}</p>
+                        </div>
+                    )}
+                </div>
+                <div className='hidden'>
+                    <h1>OCR from Image</h1>
+
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+
+                    {/* Display Image Preview */}
+                    {imageSrc && (
+                        <div>
+                            <h3>Image Preview:</h3>
+                            <img src={imageSrc} alt="Selected" style={{ maxWidth: '100%' }} />
+                        </div>
+                    )}
+
+                    {/* Display OCR Result */}
+                    {isProcessing ? (
+                        <p>Processing...</p>
+                    ) : (
+                        <div>
+                            <h3>OCR Result:</h3>
+                            <p>{ocrResult}</p>
+                        </div>
+                    )}
+                </div>
             </div>
             <Dialog
                 open={openImagePreview}
@@ -532,9 +691,24 @@ let FormCustomerRegister = (props) => {
                 fullWidth maxWidth="md">
                 <DialogContent dividers>
                     {previewPdf && (
-                        <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
-                            onLoadError={(error) => console.error("Error loading PDF:", error)}>
-                        </Document>
+                        <div className='pdf-viewer-container'>
+                            <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
+                                onLoadError={(error) => console.error("Error loading PDF:", error)}
+                                onLoadSuccess={onDocumentLoadSuccess}>
+                                <Page pageNumber={pageNumber} />
+                            </Document>
+                            <div className='pdf-viewer-content'>
+                                <p>
+                                    合計{numPages}ページ中 {pageNumber}ページ
+                                </p>
+                                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
+                                    以前
+                                </button>
+                                <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
+                                    次へ
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>

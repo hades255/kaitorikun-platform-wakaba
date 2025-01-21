@@ -54,7 +54,7 @@ const CustomerList = (props) => {
     return (
         <PanelContent title="">
             <div className="page-title">顧客一覧</div>
-            <div className="flex-center">
+            <div className="search-container">
                 <div className="mt-10">
                     <div className="input-label text-left">店舗名</div>
                     <div className="">

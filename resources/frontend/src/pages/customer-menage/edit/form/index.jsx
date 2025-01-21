@@ -55,6 +55,8 @@ let FormCustomerEdit = (props) => {
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
+    const [numPages, setNumPages] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -147,6 +149,7 @@ let FormCustomerEdit = (props) => {
             ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
             return;
         }
+
         if (identificationType1.includes("image")) {
             handleImagePreview(identificationFile1);
         } else if (identificationType1.includes("pdf")) {
@@ -168,8 +171,12 @@ let FormCustomerEdit = (props) => {
 
     const handleImagePreview = async (file) => {
         setOpenImagePreview(true)
-        const previewImage = await previewThumbnail(file)
-        setPreviewImage(previewImage)
+        if (typeof file === "string") {
+            setPreviewImage(file)
+        } else {
+            const previewImage = await previewThumbnail(file)
+            setPreviewImage(previewImage)
+        }
     }
 
     const handleImagePreviewClose = () => {
@@ -179,16 +186,23 @@ let FormCustomerEdit = (props) => {
 
     const handlePdfPreview = async (file) => {
         setOpenPdfPreview(true)
-        const previewPdf = await file
-        console.log(URL.createObjectURL(previewPdf));
-
-        setPreviewPdf(previewPdf)
+        if (typeof file === "string") {
+            setPreviewPdf(file)
+        } else {
+            const previewPdf = await file
+            setPreviewPdf(URL.createObjectURL(previewPdf))
+            console.log(URL.createObjectURL(previewPdf));
+        }
     }
 
     const handlePdfPreviewClose = () => {
         setOpenPdfPreview(false)
         setPreviewPdf("")
     }
+
+    const onDocumentLoadSuccess = ({ numPages }) => {
+        setNumPages(numPages);
+    };
 
     const handleZipCode = async (e) => {
         setZipCode(e);
@@ -275,7 +289,7 @@ let FormCustomerEdit = (props) => {
             if (identificationId1 !== undefined && identificationType1 !== undefined) {
                 formData.append("identification_id1", identificationId1);
                 formData.append("identification_type1", identificationType1);
-                if (identificationFile1.includes('http')) {
+                if (typeof identificationFile1 === "string" && identificationFile1.includes('http')) {
                     formData.append("identification_path1", identificationFile1);
                 } else {
                     formData.append("files[]", identificationFile1);
@@ -284,7 +298,7 @@ let FormCustomerEdit = (props) => {
             if (identificationId2 !== undefined && identificationType2 !== undefined) {
                 formData.append("identification_id2", identificationId2);
                 formData.append("identification_type2", identificationType2);
-                if (identificationFile1.includes('http')) {
+                if (typeof identificationFile2 === "string" && identificationFile2.includes('http')) {
                     formData.append("identification_path2", identificationFile2);
                 } else {
                     formData.append("files[]", identificationFile2);
@@ -300,14 +314,34 @@ let FormCustomerEdit = (props) => {
             }
             dispatch(utilityAction.stopLoading());
         } catch (error) {
-            console.log(error)
             ToastNotification("error", error?.message);
             dispatch(utilityAction.stopLoading());
         }
     };
 
+    const handleDeleteClick = async () => {
+        if (window.confirm("この操作で顧客情報が削除されます。本当に削除しますか？")) {
+            try {
+                const formData = new FormData();
+                formData.append("id", customer.id);
+                let feedback = await multiPostData("customer/delete", formData)
+                if (feedback.status === 200) {
+                    setTimeout(() => {
+                        window.history.back();
+                    }, 300);
+                }
+            } catch (error) {
+                ToastNotification("error", error?.message);
+            }
+        }
+    };
+
     const handleCancelClick = () => {
-        window.history.back();
+        if (window.confirm("保存しますか？")) {
+            handleRegisterClick();
+        } else {
+            window.history.back();
+        }
     };
 
     return (
@@ -326,6 +360,15 @@ let FormCustomerEdit = (props) => {
                     loading
                     textLoading="Waiting"
                     type="submit"
+                    color="danger"
+                    title="削除する"
+                    className="w-100"
+                    onClick={handleDeleteClick}
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
                     color="secondary"
                     title="キャンセル"
                     className="w-100"
@@ -335,6 +378,12 @@ let FormCustomerEdit = (props) => {
             </div>
             <div className="row">
                 <div className="col-lg-6 col-lg-6 mt-10">
+                    <div className="flex-center mt-10 min-w-400">
+                        <div className="input-label">顧客番号</div>
+                        <div className="input-value">
+                            {customer ? customer.id : ''}
+                        </div>
+                    </div>
                     <div className="flex-center mt-10 min-w-400">
                         <div className="input-label">店舗名</div>
                         <div className="input-value">
@@ -465,7 +514,7 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <Select
-                                value={address1? address1 : 0}
+                                value={address1 ? address1 : 0}
                                 onChange={handleChangeAddress1}
                                 className="shop-select w-150"
                                 size='small'
@@ -589,9 +638,24 @@ let FormCustomerEdit = (props) => {
                 fullWidth maxWidth="md">
                 <DialogContent dividers>
                     {previewPdf && (
-                        <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
-                            onLoadError={(error) => console.error("Error loading PDF:", error)}>
-                        </Document>
+                        <div className='pdf-viewer-container'>
+                            <Document file={previewPdf ? previewPdf : null}
+                                onLoadError={(error) => console.error("Error loading PDF:", error)}
+                                onLoadSuccess={onDocumentLoadSuccess}>
+                                <Page pageNumber={pageNumber} />
+                            </Document>
+                            <div className='pdf-viewer-content'>
+                                <p>
+                                    合計{numPages}ページ中 {pageNumber}ページ
+                                </p>
+                                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
+                                    以前
+                                </button>
+                                <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
+                                    次へ
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>

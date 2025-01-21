@@ -57,31 +57,21 @@ class AuthController extends Controller
         $email = $request->get('email');
         // Generate the token
         $token = bcrypt(Str::random(60));
-        $user = User::where('email', $email); // パスワードリセットをリクエストしたユーザー
+        $user = User::where('email', $email)->first(); // パスワードリセットをリクエストしたユーザー
         $resetUrl = url('/reset-password?token=' . $token);
         $expirationTime = 60; // 分単位で有効時間を指定
 
         try {
-            Mail::send([], [], function ($message) use ($user, $resetUrl, $expirationTime) {
-                $message->to($user->email)
-                    ->subject('パスワードを忘れていますか？')
-                    ->setBody("
-                        こんにちは、{$user->name}さん
-    
-                        このメールは、あなたのアカウントのパスワードリセット要求を受け取ったため送信しています。以下のリンクをクリックして、パスワードをリセットしてください。
-    
-                        [パスワードをリセットする]({$resetUrl})
-    
-                        このリンクは {$expirationTime} 分間有効です。その後は再度リクエストが必要になります。
-    
-                        もしこのメールに心当たりがない場合は、このまま無視してください。アカウントのセキュリティは保たれています。
-    
-                        ご注意  
-                        このメールには返信しないでください。
-    
-                        " . config('app.name') . " サポートチーム", 'text/plain'); // Plain textで送信
+            $data = array(
+                'email' => $user->email,
+                'name' => $user->name,
+                'reset_url' => $resetUrl,
+                'expiration_time' => $expirationTime
+              );
+              Mail::send('email.change_password', compact('data'), function ($message) use ($data) {
+                $message->to($data['email'])->subject('パスワードを忘れていますか？');
             });
-
+    
             // Store the token in the database
             DB::table('forgot_passwords')->updateOrInsert(
                 ['email' => $email], // Match on email
@@ -91,8 +81,8 @@ class AuthController extends Controller
                     'created_at' => Carbon::now()
                 ]
             );
-        } catch (\Throwable $th) {
-            return response()->json(['message' => 'Don`t Sent mail'], 400);
+        } catch (\Throwable $error) {
+            return response()->json(['message' => $error->getMessage()], 400);
         }
         return response()->json(['message' => 'Sent mail'], 200);
     }

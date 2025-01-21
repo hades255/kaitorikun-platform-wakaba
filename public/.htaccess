@@ -19,6 +19,7 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.html [QSA,L]
     RewriteRule ^ index.php [L]
+    RewriteRule ^storage/(.*)$ /storage/$1 [L]
 
     ExpiresActive On
 

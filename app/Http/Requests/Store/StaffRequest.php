@@ -38,7 +38,7 @@ class StaffRequest extends FormRequest
                 'string',
             ],
             'email' => [ // メールアドレス
-                'nullable',
+                'required',
                 'string',
             ],
             'password' => [ // パスワード

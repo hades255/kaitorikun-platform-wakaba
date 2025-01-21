@@ -11,12 +11,10 @@ import {
 import PhoneInput from "../../../../components/PhoneInput";
 import DateInput from "../../../../components/DateInput";
 import TextInput from '../../../../components/TextInput';
-import InputLabel from '../../../../components/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
-import Checkbox from '@mui/material/Checkbox';
 import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
@@ -25,7 +23,6 @@ import { actionTheme, utilityAction } from "../../../../reduxStore";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 let FormStaffRegister = (props) => {
-    const terms = "テキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキスト テキストテキストテキストテキストテキストテキストテキストテキストテキスト テキストテキストテキストテキスト テキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキスト テキストテキストテキストテキストテキストテキストテキストテキストテキストテキスト テキストテキストテキスト"
     const [staffId, setStaffId] = useState()
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
@@ -60,12 +57,12 @@ let FormStaffRegister = (props) => {
     const [cities, setCities] = useState([])
     const [filteredCities, setFilteredCities] = useState([])
     const [guarantors, setGuarantors] = useState([])
-    const [termAgree, setTermAgree] = useState(false)
-    const [docList, setDocList] = useState([])
     const [openImagePreview, setOpenImagePreview] = useState(false)
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
+    const [numPages, setNumPages] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -216,7 +213,7 @@ let FormStaffRegister = (props) => {
         setOpenPdfPreview(true)
         const previewPdf = await file
         console.log(URL.createObjectURL(previewPdf));
-        
+
         setPreviewPdf(previewPdf)
     }
 
@@ -225,11 +222,9 @@ let FormStaffRegister = (props) => {
         setPreviewPdf("")
     }
 
-    const handleRemoveDoc = (index) => {
-        const cloneDocList = [...docList]
-        cloneDocList[index]['file'] = ""
-        setDocList(cloneDocList)
-    }
+    const onDocumentLoadSuccess = ({ numPages }) => {
+        setNumPages(numPages);
+    };
 
     const handleZipCode = async (e) => {
         setZipCode(e);
@@ -241,10 +236,10 @@ let FormStaffRegister = (props) => {
             ToastNotification("error", "スタッフIDは必須です。");
             return;
         }
-        // if (email === undefined) {
-        //     ToastNotification("error", "メールアドレスは必須です。");
-        //     return;
-        // }
+        if (email === undefined) {
+            ToastNotification("error", "メールアドレスは必須です。");
+            return;
+        }
         if (email !== undefined && !email.includes("@")) {
             ToastNotification("error", "メールアドレスの形式が無効です。");
             return;
@@ -320,18 +315,11 @@ let FormStaffRegister = (props) => {
             return;
         }
 
-        if (!termAgree) {
-            ToastNotification("error", "スタッフ規約に同意してください。");
-            return;
-        }
-
         dispatch(utilityAction.setLoading("content"));
         try {
             const formData = new FormData();
             formData.append("staff_id", staffId);
-            if (email !== undefined) {
-                formData.append("email", email);
-            }
+            formData.append("email", email);
             formData.append("password", password);
             formData.append("shop_id", shop);
             formData.append("user_type", type);
@@ -389,9 +377,9 @@ let FormStaffRegister = (props) => {
 
     return (
         <div>
-            <div className="row">
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+            <div className='staff-register-container'>
+                <div>
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">スタッフID</div>
                         <div className="input-value">
                             <TextInput
@@ -399,142 +387,42 @@ let FormStaffRegister = (props) => {
                                 name="staff_id"
                                 min="1"
                                 max="20"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 placeholder='スタッフID'
                                 isFocused={true}
                                 onChange={(e) => setStaffId(e.target.value)}
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">メールアドレス</div>
-                        <div className="input-value">
-                            <TextInput
-                                id="email"
-                                type="email"
-                                name="email"
-                                className="mt-1 block w-full"
-                                autoComplete="email"
-                                placeholder="メールアドレス"
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">パスワード</div>
-                        <div className="input-value">
-                            <TextInput
-                                id="password"
-                                type="password"
-                                name="password"
-                                className="mt-1 block w-full"
-                                autoComplete="new-password"
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                placeholder="パスワードは8文字以上"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">店舗名</div>
-                        <div className="input-value">
-                            <Select
-                                onChange={(e) => setShop(e.target.value)}
-                                displayEmpty
-                                className="shop-select"
-                                size='small'
-                            >
-                                <MenuItem disabled value="">
-                                    <span className="text-gray-500">店舗名</span>
-                                </MenuItem>
-                                {shops.map(item => (
-                                    <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">種別</div>
-                        <div className="input-value">
-                            <Select
-                                onChange={(e) => setType(e.target.value)}
-                                displayEmpty
-                                className="shop-select"
-                                size='small'
-                            >
-                                <MenuItem disabled value="">
-                                    <span className="text-gray-500">種別</span>
-                                </MenuItem>
-                                <MenuItem value={2}>マネージャー</MenuItem>
-                                <MenuItem value={3}>店長</MenuItem>
-                                <MenuItem value={4}>社員</MenuItem>
-                                <MenuItem value={5}>アルバイト</MenuItem>
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label"></div>
-                        <div className="input-value">
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
                                 id="name"
                                 type="text"
                                 name="name"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 onChange={(e) => setName(e.target.value)}
                                 required
                                 placeholder="名前"
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">カタカナ名</div>
                         <div className="input-value">
                             <TextInput
                                 id="name_kana"
                                 type="text"
                                 name="name_kana"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 onChange={(e) => setNameKana(e.target.value)}
                                 required
                                 placeholder="カタカナ名"
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">電話番号</div>
-                        <div className="input-value">
-                            <PhoneInput
-                                id="phone"
-                                name="phone"
-                                placeholder='電話番号'
-                                onChange={(e) => setPhoneNumber(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">生年月日</div>
                         <div className="input-value">
                             <DateInput
@@ -543,9 +431,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">性別</div>
                         <div className="input-value">
                             <Select
@@ -558,24 +444,21 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">郵便番号</div>
                         <div className="input-value">
                             <ZipcodeInput
+                                className='w-100-pro'
                                 onChange={(e) => handleZipCode(e)}
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress1}
-                                className="shop-select w-150"
+                                className="shop-select w-100-pro"
                                 size='small'
                             >
                                 <MenuItem disabled value="">
@@ -587,14 +470,12 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress2}
-                                className="shop-select w-150"
+                                className="shop-select w-100-pro"
                                 size='small'
                             >
                                 {filteredCities.map((item, key) => (
@@ -603,16 +484,14 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">住所詳細</div>
                         <div className="input-value">
                             <TextInput
                                 id="address3"
                                 type="text"
                                 name="address3"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 onChange={(e) => setAddress3(e.target.value)}
                                 required
                                 placeholder="住所詳細"
@@ -620,7 +499,85 @@ let FormStaffRegister = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
+                <div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">店舗名</div>
+                        <div className="input-value">
+                            <Select
+                                onChange={(e) => setShop(e.target.value)}
+                                displayEmpty
+                                className="shop-select w-100-pro"
+                                size='small'
+                            >
+                                <MenuItem disabled value="">
+                                    <span className="text-gray-500">店舗名</span>
+                                </MenuItem>
+                                {shops.map(item => (
+                                    <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">種別</div>
+                        <div className="input-value">
+                            <Select
+                                onChange={(e) => setType(e.target.value)}
+                                displayEmpty
+                                className="shop-select w-100-pro"
+                                size='small'
+                            >
+                                <MenuItem disabled value="">
+                                    <span className="text-gray-500">種別</span>
+                                </MenuItem>
+                                <MenuItem value={2}>マネージャー</MenuItem>
+                                <MenuItem value={3}>店長</MenuItem>
+                                <MenuItem value={4}>社員</MenuItem>
+                                <MenuItem value={5}>アルバイト</MenuItem>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">メールアドレス</div>
+                        <div className="input-value">
+                            <TextInput
+                                id="email"
+                                type="email"
+                                name="email"
+                                className="mt-1 block w-full w-100-pro"
+                                autoComplete="email"
+                                placeholder="メールアドレス"
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">電話番号</div>
+                        <div className="input-value">
+                            <PhoneInput
+                                id="phone"
+                                name="phone"
+                                placeholder='電話番号'
+                                className='w-100-pro'
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">パスワード</div>
+                        <div className="input-value">
+                            <TextInput
+                                id="password"
+                                type="password"
+                                name="password"
+                                className="mt-1 block w-full w-100-pro"
+                                autoComplete="new-password"
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="パスワードは8文字以上"
+                            />
+                        </div>
+                    </div>
                     <div className="flex-base min-w-400">
                         <div className="input-label">本人確認書類</div>
                         <div className="input-value">
@@ -669,9 +626,7 @@ let FormStaffRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -692,9 +647,7 @@ let FormStaffRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-20">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">連帯保証人</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -711,34 +664,18 @@ let FormStaffRegister = (props) => {
                                             <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                         ))}
                                     </Select>
-                                    <div className="flex-center image-show-btn" onClick={handleContractBtn}>契約書画像</div>
+                                    <div className="flex-center image-show-btn" onClick={handleContractBtn}>誓約書画像</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='staff-policy-title'>
-                <div className="input-label mt-10 ">スタッフ規約</div>
-                <textarea
-                    value={terms}
-                    rows={10}
-                    variant="outlined"
-                    className='staff-policy rounded w-full border-gray-300 hover:border-sky-600'
-                    readOnly
-                />
-                <div className="flex justify-center items-center">
-                    <Checkbox
-                        id="termAgree"
-                        checked={termAgree}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                        onChange={(e) => setTermAgree(e.target.checked)}
-                    />
-                    <InputLabel htmlFor="termAgree" value="規約に同意して、" />
-                </div>
-            </div>
 
-            <div className='flex-center'>
+            <div className='flex-center'
+                style={{
+                    marginTop: '50px',
+                }}>
                 <Button
                     loading
                     textLoading="Waiting"
@@ -773,9 +710,24 @@ let FormStaffRegister = (props) => {
                 fullWidth maxWidth="md">
                 <DialogContent dividers>
                     {previewPdf && (
-                        <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
-                        onLoadError={(error) => console.error("Error loading PDF:", error)}>
-                        </Document>
+                        <div className='pdf-viewer-container'>
+                            <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
+                                onLoadError={(error) => console.error("Error loading PDF:", error)}
+                                onLoadSuccess={onDocumentLoadSuccess}>
+                                <Page pageNumber={pageNumber} />
+                            </Document>
+                            <div className='pdf-viewer-content'>
+                                <p>
+                                    合計{numPages}ページ中 {pageNumber}ページ
+                                </p>
+                                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
+                                    以前
+                                </button>
+                                <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
+                                    次へ
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>

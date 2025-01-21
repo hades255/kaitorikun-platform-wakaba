@@ -10,7 +10,7 @@
     {{-- <meta http-equiv="Cache-control" content="public"> --}}
     <link href={{ mix('css/app.css') }} rel="stylesheet">
     <link href={{ mix('css/tailwind.css') }} rel="stylesheet">
-    <title>laravel-react-admin-lte</title>
+    <title>WAKABA</title>
 </head>
 
 <body id="body" class="sidebar-mini">

@@ -26,8 +26,6 @@ class ChannelController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'icon' => 'nullable|string|max:255',
-            'requireApproval' => 'required|boolean',
-            'isPublic' => 'required|boolean',
         ]);
         $channel = new Channel();
         $channel->name = $validatedData['name'];
@@ -100,30 +98,5 @@ class ChannelController extends Controller
         return response()->json([
             'channels' => $joinedChannels
         ]);
-    }
-
-    public function sendInvitation(Request $request)
-    {
-        $validatedData = $request->validate([
-            'email' => 'required|email|max:255',
-            'channel_id' => 'required|integer',
-        ]);
-        $userId = Auth::id();
-        $email = $validatedData["email"];
-        $receiver = User::where("email", $email)->first();
-        if ($receiver) {
-            $token = hash("sha256", $email);
-            $invitation = new Invitation();
-            $invitation->sender_id = $userId;
-            $invitation->channel_id = $validatedData["channel_id"];
-            $invitation->receiver_id = $receiver->id;
-            $invitation->token = $token;
-            if ($invitation->save()) {
-                //  todo    send mail to the receiver
-                return response()->json($invitation, 201);
-            }
-            return response()->json(['error' => 'Failed to send invitation'], 500);
-        }
-        return response()->json(['error' => 'user not found'], 404);
     }
 }

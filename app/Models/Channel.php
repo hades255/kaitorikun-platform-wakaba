@@ -36,11 +36,6 @@ class Channel extends Model
         return $this->belongsToMany(User::class, 'channel_users');
     }
 
-    public function invitations()
-    {
-        return $this->hasMany(Invitation::class);
-    }
-
     public static function getMyChannels($userId)
     {
         return self::where('user_id', $userId)->get();

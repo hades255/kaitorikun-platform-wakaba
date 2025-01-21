@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { Box, Button, Typography, Dialog, TextField } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Dialog, TextField } from "@mui/material";
 import api from "../../api";
 import { selectorChannel } from "../../reduxStore";
 import { useAuth } from "../../contexts/AuthContext";
@@ -9,6 +9,7 @@ import PostEditor from "./PostEditor";
 
 const Channels = () => {
     const channel = useSelector(selectorChannel.handleGetChannel);
+    const channels = useSelector(selectorChannel.handleGetChannels);
     const posts = useSelector(selectorChannel.handleGetPosts);
     const users = useSelector(selectorChannel.handleGetUsers);
 
@@ -44,9 +45,9 @@ const Channels = () => {
             console.log(inviteEmail);
             const inviteFunc = async () => {
                 try {
-                    const response = await api.post("channels/sendinvite", {
+                    const response = await api.post("invitations", {
                         email: inviteEmail,
-                        channel_id: channel.id,
+                        community_id: channel.id,
                     });
                     console.log(response);
                     ToastNotification("success", "招待が正常に送信されました");
@@ -66,15 +67,17 @@ const Channels = () => {
         [auth, channel, inviteEmail]
     );
 
+    useEffect(() => setShowPostEditor(false), [channel]);
+
     return (
         <PanelContent
             headerContent
             title={channel ? channel.name : "チャンネル"}
         >
             {channel ? (
-                <Box>
+                <div>
                     {!showPostEditor && (
-                        <Box sx={{ mb: 2 }}>
+                        <div className="mb-2">
                             <Button
                                 variant="contained"
                                 onClick={() => setShowPostEditor(true)}
@@ -88,7 +91,7 @@ const Channels = () => {
                             >
                                 {/* Invite People */}人を招待
                             </Button>
-                        </Box>
+                        </div>
                     )}
 
                     {showPostEditor && (
@@ -106,11 +109,11 @@ const Channels = () => {
                         open={showInviteDialog}
                         onClose={() => setShowInviteDialog(false)}
                     >
-                        <Box sx={{ p: 2 }}>
+                        <div className="p-2">
                             <form onSubmit={handleSubmitInvitation}>
-                                <Typography variant="h6">
+                                <div className="text-lg">
                                     {/* Invite People */}人を招待
-                                </Typography>
+                                </div>
                                 <TextField
                                     fullWidth
                                     // label="Email"
@@ -127,11 +130,26 @@ const Channels = () => {
                                     {/* Send Invite */}招待を送信
                                 </Button>
                             </form>
-                        </Box>
+                        </div>
                     </Dialog>
-                </Box>
+                </div>
+            ) : channels && channels.length > 0 ? (
+                <div className="w-full flex justify-center pt-20 pb-12">
+                    <div className="flex flex-col gap-4">
+                        <div className="text-xl">
+                            {/* Build your community */}コミュニティを構築する
+                        </div>
+                        <div className="">
+                            {/* Plan community events, engage in discussions, and
+                            create a sage space to collaborate. */}
+                            コミュニティ
+                            イベントを計画し、ディスカッションに参加し、コラボレーションのための賢明なスペースを作成します。
+                        </div>
+                        <div className="flex gap-2"></div>
+                    </div>
+                </div>
             ) : (
-                <Box>{/* Create new Channel */}新しいチャンネルを作成</Box>
+                <div>{/* Create new Channel */}新しいチャンネルを作成</div>
             )}
         </PanelContent>
     );

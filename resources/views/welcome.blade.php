@@ -4,6 +4,7 @@
 <head>
     <?= header('Cache-Control: max-age=86400') ?>
     <meta charset="utf-8">
+    <link rel="icon" href="/assets/sp_logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="base_url" content="{{ url('') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">

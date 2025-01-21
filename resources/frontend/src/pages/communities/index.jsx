@@ -148,7 +148,7 @@ const Communities = () => {
                         />
                     )}
 
-                    {typeof posts === Array &&
+                    {Array.isArray(posts) &&
                         posts.map((post) => (
                             <Post key={post.id} post={post} users={users} />
                         ))}

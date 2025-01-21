@@ -35,7 +35,7 @@ const ChannelSidebar = () => {
         <>
             <List>
                 <AddNewButton />
-                {typeof communities === Array &&
+                {Array.isArray(communities) &&
                     communities.map((item, index) => (
                         <CommunityItem key={index} com={item} />
                     ))}
@@ -84,7 +84,7 @@ const CommunityItem = ({ com }) => {
             </ListItem>
             {show && (
                 <>
-                    {typeof com.channels === Array &&
+                    {Array.isArray(com.channels) &&
                         com.channels.map((item) => (
                             <ChannelItem
                                 key={item.id}
@@ -150,14 +150,14 @@ const PublicChannels = () => {
     );
     const communities = useMemo(
         () =>
-            typeof _communities === Array && _communities.length > 0
+            Array.isArray(_communities)
                 ? _communities.filter(({ user_id }) => user_id !== auth.id)
                 : [],
         [auth, _communities]
     );
 
     return (
-        typeof communities === Array &&
+        Array.isArray(communities) &&
         communities.length > 0 && (
             <>
                 <Typography variant="p" fontSize={12} color="white" pl={2}>

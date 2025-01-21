@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import api from "../../api";
 import { API_ROUTE } from "../../config";
 import { useAuth } from "../../contexts/AuthContext";
 import { usePusher } from "../../contexts/PusherContext";
 import { useNotification } from "../../contexts/NotificationContext";
-import { actionChannel } from "../../reduxStore";
+import { actionChannel, selectorChannel } from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 
 const Notifications = () => {
@@ -14,8 +14,28 @@ const Notifications = () => {
     const { auth } = useAuth();
     const { showNotification } = useNotification();
     const { subscribeToChannel, bindEvent, unbindEvent } = usePusher();
+    const coms = useSelector(selectorChannel.handleGetCommunities);
+    const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
+
+    const comIds = useMemo(() => {
+        let res = [];
+        if (Array.isArray(coms))
+            coms.forEach((element) => {
+                if (!res.includes(element.id)) res.push(element.id);
+            });
+        if (Array.isArray(pubcoms))
+            pubcoms.forEach((element) => {
+                if (!res.includes(element.id)) res.push(element.id);
+            });
+        return res;
+    }, [coms, pubcoms]);
 
     useEffect(() => {
+        console.log(comIds);
+    }, [comIds]);
+
+    useEffect(() => {
+        console.log("channel");
         const channel = subscribeToChannel("channel");
 
         const handleChannelCreated = (data) => {

@@ -21,7 +21,7 @@ const ChatSidebar = () => {
 
     const newChatCounts = useMemo(() => {
         let newChats = {};
-        if (chats && typeof chats === Array)
+        if (Array.isArray(chats))
             chats
                 .filter((item) => item.to == auth.id && item.status == "unread")
                 .forEach((chat) => {
@@ -33,7 +33,7 @@ const ChatSidebar = () => {
 
     const pinnedChats = useMemo(
         () =>
-            users && typeof users === Array
+            Array.isArray(users)
                 ? users.filter(
                       (item) =>
                           auth.id != item.id && pinnedUsers?.includes(item.id)
@@ -43,7 +43,7 @@ const ChatSidebar = () => {
     );
     const recentChats = useMemo(
         () =>
-            users && typeof users === Array
+            Array.isArray(users)
                 ? users.filter(
                       (item) =>
                           auth.id != item.id &&
@@ -55,7 +55,7 @@ const ChatSidebar = () => {
     );
     const suggestedUsers = useMemo(
         () =>
-            users && typeof users === Array
+            Array.isArray(users)
                 ? users.filter(
                       (item) =>
                           auth.id != item.id &&

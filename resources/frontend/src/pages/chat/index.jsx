@@ -20,7 +20,7 @@ const ChatsPage = () => {
         if (
             auth &&
             selectedUser &&
-            typeof _chats === Array &&
+            Array.isArray(_chats) &&
             _chats.length > 0
         )
             return _chats.filter(

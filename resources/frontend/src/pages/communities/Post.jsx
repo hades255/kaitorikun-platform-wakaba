@@ -73,7 +73,7 @@ const Post = ({ post, users }) => {
 
     const handleNewEmojiClick = (emojiData) => {
         if (
-            typeof post.reactions === Array &&
+            Array.isArray(post.reactions) &&
             post.reactions.find(
                 (item) =>
                     item.user_id == auth.auth?.id &&
@@ -152,7 +152,7 @@ const Post = ({ post, users }) => {
                     >
                         <AddIcon />
                     </IconButton>
-                    {typeof reactions === Array &&
+                    {Array.isArray(reactions) &&
                         reactions.map((item) => (
                             <EmojiItem
                                 key={item.reaction}
@@ -192,7 +192,7 @@ const Post = ({ post, users }) => {
                 )}
                 {showReplies && (
                     <div className="flex flex-col gap-2">
-                        {typeof post.replies === Array &&
+                        {Array.isArray(post.replies) &&
                             post.replies.map((item) => (
                                 <ReplyItem
                                     key={item.id}
@@ -211,7 +211,7 @@ export default Post;
 
 const ReplyItem = ({ reply, users }) => {
     const user =
-        typeof users === Array && users.find(({ id }) => id == reply.user_id);
+        Array.isArray(users) && users.find(({ id }) => id == reply.user_id);
     const timeAgo = formatDistanceToNow(new Date(reply.updated_at), {
         addSuffix: true,
     });

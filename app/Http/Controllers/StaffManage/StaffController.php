@@ -12,6 +12,7 @@ use App\Models\Shop;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 
 class StaffController extends Controller
 {
@@ -84,7 +85,6 @@ class StaffController extends Controller
 
         // バリデーションされたデータを取得
         $validatedData = $request->validated();
-        $validatedData['password'] = Crypt::encrypt($validatedData['password']);
         $uploadedFilePaths = array();
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
@@ -148,21 +148,16 @@ class StaffController extends Controller
         }
 
         $checkUser = User::where('email', $validatedData['staff_id'])->first();
-        if (!isset($checkUser) && isset($validatedData["email"])) {
-            $staff = Staff::where('email', $validatedData['email'])->first();
-            if (isset($staff)) {
-                $checkUser = User::where('email', $validatedData["email"])->first();
-            }
-        }
+
         // 更新
         if (isset($checkUser)) {
+            $checkUser->email = $validatedData['email'];
+            $checkUser->password = Crypt::encrypt($validatedData['password']);
+            $checkUser->save();
+
             $staff = Staff::where('staff_id', $validatedData['staff_id'])->first();
-            if (isset($validatedData['email'])) {
-                $staff->email = $validatedData['email'];
-                $checkUser->email = $validatedData['email'];
-                $checkUser->save();
-            }
-            $staff->password = $validatedData['password'];
+            $staff->email = $validatedData['email'];
+            $staff->password = Crypt::encrypt($validatedData['password']);
             $staff->shop_id = $validatedData['shop_id'];
             $staff->user_type = $validatedData['user_type'];
             $staff->name = $validatedData['name'];
@@ -201,7 +196,7 @@ class StaffController extends Controller
             $user = new User();
             $user->name = $validatedData['name'];
             $user->email = $validatedData['staff_id'];
-            $user->password = $validatedData['password'];
+            $user->password = Crypt::encrypt($validatedData['password']);
             $user->role = $validatedData['user_type'] + 1;
             $user->save();
 
@@ -213,7 +208,7 @@ class StaffController extends Controller
                 $user->email = $validatedData['email'];
                 $user->save();
             }
-            $staff->password = $validatedData['password'];
+            $staff->password = Crypt::encrypt($validatedData['password']);
             $staff->shop_id = $validatedData['shop_id'];
             $staff->user_type = $validatedData['user_type'];
             $staff->name = $validatedData['name'];
@@ -248,10 +243,25 @@ class StaffController extends Controller
             $staff->guarantor_id = $validatedData['guarantor_id'];
             $staff->save();
         }
+        $this->sendStaffMail($validatedData);
 
         return response()->json(['message' => 'OK'], 200);
     }
 
+    private function sendStaffMail ($staff) {
+        try {
+            $data = array(
+                'email' => $staff['email'],
+                'name' => $staff['name'],
+                'staff_id' => $staff['staff_id'],
+                'password' => $staff['password']
+              );
+              Mail::send('email.staff_register_end', compact('data'), function ($message) use ($data) {
+                $message->to($data['email'])->subject($data['name'] . '樣スタッフ登録が完了しました。');
+            });
+        } catch (\Throwable $error) {
+        }
+    }
     /**
      * スタッフ退会API
      *

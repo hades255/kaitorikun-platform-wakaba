@@ -40,7 +40,7 @@ return new class extends Migration
             $table->string('working_history_path')->nullable();
             $table->unsignedInteger('guarantor_id')->nullable()->comment('連帯保証人');
             $table->string('contract_type')->nullable();
-            $table->string('contract_path')->nullable()->comment('契約書画像');
+            $table->string('contract_path')->nullable()->comment('誓約書画像');
             $table->timestamps();
             $table->softDeletes();
         });

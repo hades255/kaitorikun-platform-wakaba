@@ -106,7 +106,7 @@ const TableMaster = (props) => {
     };
 
     const screen = calculateWindowSize();
-    const pageSizeOptions = [10, 20, 30, 40];
+    const pageSizeOptions = [5, 10, 20, 30, 40];
 
     return (
         <div className="row">

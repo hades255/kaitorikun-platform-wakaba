@@ -50719,6 +50719,34 @@ input.password-hide-css {
   cursor: pointer;
 }
 
+@media (min-width: 1500px) {
+  .staff-register-container {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+  }
+  .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+}
+@media (max-width: 1500px) {
+  .staff-register-container {
+    display: flex;
+    justify-content: center;
+    gap: 0px;
+    flex-direction: column;
+  }
+  .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-direction: column;
+  }
+}
 .customer-business {
   width: 100%;
   height: 100px;
@@ -50742,4 +50770,26 @@ input.password-hide-css {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   padding: 0;
+}
+
+.pdf-viewer-container {
+  position: relative;
+}
+
+.pdf-viewer-content {
+  position: absolute;
+  top: -15px;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.hidden {
+  display: hidden;
+}
+
+.w-100-pro {
+  width: 100% !important;
 }

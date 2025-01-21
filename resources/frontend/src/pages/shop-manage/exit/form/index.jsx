@@ -46,6 +46,8 @@ let FormStaffExit = (props) => {
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
+    const [numPages, setNumPages] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -196,6 +198,10 @@ let FormStaffExit = (props) => {
         setPreviewPdf("")
     }
 
+    const onDocumentLoadSuccess = ({ numPages }) => {
+        setNumPages(numPages);
+    };
+
     const handleRegisterClick = async () => {
         dispatch(utilityAction.setLoading("content"));
         if (window.confirm("この操作でスタッフが削除されます。本当に削除しますか？")) {
@@ -223,11 +229,6 @@ let FormStaffExit = (props) => {
         window.history.back();
     };
 
-    const onDocumentLoadSuccess = () => {
-        console.log("success!!");
-        
-    };
-
     const logout = () => {
         dispatch(utilityAction.setLoading("content"));
         setTimeout(() => {
@@ -239,9 +240,9 @@ let FormStaffExit = (props) => {
 
     return (
         <div>
-            <div className="row">
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+            <div className='staff-register-container'>
+                <div>
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">スタッフID</div>
                         <div className="input-value">
                             <TextInput
@@ -251,64 +252,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">メールアドレス</div>
-                        <div className="input-value">
-                            <TextInput
-                                value={email}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">パスワード</div>
-                        <div className="input-value">
-                            <TextInput
-                                value={""}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">店舗名</div>
-                        <div className="input-value">
-                            <TextInput
-                                value={shop}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">種別</div>
-                        <div className="input-value">
-                            <TextInput
-                                value={type}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label"></div>
-                        <div className="input-value">
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
@@ -318,9 +262,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">カタカナ名</div>
                         <div className="input-value">
                             <TextInput
@@ -330,21 +272,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
-                        <div className="input-label">電話番号</div>
-                        <div className="input-value">
-                            <TextInput
-                                value={phoneNumber}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">生年月日</div>
                         <div className="input-value">
                             <TextInput
@@ -354,9 +282,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">性別</div>
                         <div className="input-value">
                             <TextInput
@@ -366,9 +292,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">郵便番号</div>
                         <div className="input-value">
                             <TextInput
@@ -378,9 +302,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <TextInput
@@ -390,9 +312,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <TextInput
@@ -402,9 +322,7 @@ let FormStaffExit = (props) => {
                             />
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">住所詳細</div>
                         <div className="input-value">
                             <TextInput
@@ -415,8 +333,58 @@ let FormStaffExit = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-base min-w-400">
+                <div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">店舗名</div>
+                        <div className="input-value">
+                            <TextInput
+                                value={shop}
+                                className="mt-1 block w-full"
+                                readOnly
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">種別</div>
+                        <div className="input-value">
+                            <TextInput
+                                value={type}
+                                className="mt-1 block w-full"
+                                readOnly
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">メールアドレス</div>
+                        <div className="input-value">
+                            <TextInput
+                                value={email}
+                                className="mt-1 block w-full"
+                                readOnly
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">電話番号</div>
+                        <div className="input-value">
+                            <TextInput
+                                value={phoneNumber}
+                                className="mt-1 block w-full"
+                                readOnly
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
+                        <div className="input-label">パスワード</div>
+                        <div className="input-value">
+                            <TextInput
+                                value={""}
+                                className="mt-1 block w-full"
+                                readOnly
+                            />
+                        </div>
+                    </div>
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">本人確認書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -433,9 +401,7 @@ let FormStaffExit = (props) => {
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-10">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -448,9 +414,7 @@ let FormStaffExit = (props) => {
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="col-lg-4 mt-10 col-lg-4 mt-20">
-                    <div className="flex-center min-w-400">
+                    <div className="flex-center min-w-400 mt-10">
                         <div className="input-label">連帯保証人</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -460,15 +424,17 @@ let FormStaffExit = (props) => {
                                         className="mt-1 block w-full"
                                         readOnly
                                     />
-                                    <div className="flex-center image-show-btn" onClick={handleContractBtn}>契約書画像</div>
+                                    <div className="flex-center image-show-btn" onClick={handleContractBtn}>誓約書画像</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div className='flex-center mt-20'>
+            <div className='flex-center'
+                style={{
+                    marginTop: '50px',
+                }}>
                 <Button
                     loading
                     textLoading="Waiting"
@@ -503,10 +469,24 @@ let FormStaffExit = (props) => {
                 fullWidth>
                 <DialogContent dividers>
                     {previewPdf && (
-                        <Document file={previewPdf}
-                            onLoadSuccess={onDocumentLoadSuccess}
-                            onLoadError={(error) => console.error("Error loading document:", error)}>
-                        </Document>
+                        <div className='pdf-viewer-container'>
+                            <Document file={previewPdf ? previewPdf : null}
+                                onLoadError={(error) => console.error("Error loading PDF:", error)}
+                                onLoadSuccess={onDocumentLoadSuccess}>
+                                <Page pageNumber={pageNumber} />
+                            </Document>
+                            <div className='pdf-viewer-content'>
+                                <p>
+                                    合計{numPages}ページ中 {pageNumber}ページ
+                                </p>
+                                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
+                                    以前
+                                </button>
+                                <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
+                                    次へ
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>

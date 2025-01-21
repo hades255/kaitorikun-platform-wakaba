@@ -147,7 +147,7 @@ const PublicChannels = () => {
         selectorChannel.handleGetPublicCommunities
     );
     const communities = useMemo(
-        () => _communities.filter(({ user_id }) => user_id !== auth.id),
+        () => _communities?.filter(({ user_id }) => user_id !== auth.id),
         [auth, _communities]
     );
 

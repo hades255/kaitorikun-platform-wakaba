@@ -32,14 +32,14 @@ const ChatSidebar = () => {
 
     const pinnedChats = useMemo(
         () =>
-            users.filter(
+            users?.filter(
                 (item) => auth.id != item.id && pinnedUsers?.includes(item.id)
             ),
         [users, pinnedUsers, auth]
     );
     const recentChats = useMemo(
         () =>
-            users.filter(
+            users?.filter(
                 (item) =>
                     auth.id != item.id &&
                     recentlyUsers?.includes(item.id) &&
@@ -49,7 +49,7 @@ const ChatSidebar = () => {
     );
     const suggestedUsers = useMemo(
         () =>
-            users.filter(
+            users?.filter(
                 (item) =>
                     auth.id != item.id &&
                     !recentlyUsers?.includes(item.id) &&

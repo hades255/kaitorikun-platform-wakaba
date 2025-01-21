@@ -6,6 +6,7 @@ use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use App\Http\Controllers\PostReplyController;
@@ -36,14 +37,17 @@ Route::post('/customer/register', [CustomerController::class, 'createOrUpdate'])
 Route::post('/customer/list', [CustomerController::class, 'index']);
 Route::post('/customer/delete', [CustomerController::class, 'destroy']);
 
-Route::get('channels/getPublic', [ChannelController::class, 'getPublic'])->name('channels.getPublic');
-Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');;
+Route::get('communities/public', [CommunityController::class, 'getPublic'])->name('communities.getPublic');
+Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('communities', [CommunityController::class, 'store'])->name('communities.store');
+    Route::get('communities/mine', [CommunityController::class, 'getMine'])->name('communities.getMine');
+    Route::get('communities/joined', [CommunityController::class, 'getWorking'])->name('communities.getWorking');
+
+    Route::post('invitations', [InvitationController::class, 'store'])->name('invitations.store');
+
     Route::post('channels', [ChannelController::class, 'store'])->name('channels.store');
-    Route::get('channels/getMine', [ChannelController::class, 'getMine'])->name('channels.getMine');
-    Route::get('channels/getWorking', [ChannelController::class, 'getWorking'])->name('channels.getWorking');
-    Route::post('invitations', [ChannelController::class, 'sendInvitation'])->name('channels.sendInvitation');
 
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
 

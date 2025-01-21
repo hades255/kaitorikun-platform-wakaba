@@ -11,21 +11,6 @@ class Community extends Model
 
     protected $fillable = ['name', 'description', 'icon', 'requireApproval', 'isPublic', 'user_id'];
 
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
-
-    public function limitedPosts($limit = 10, $offset = 0, $sortBy = 'created_at', $sortOrder = 'desc')
-    {
-        return $this->posts()
-            ->orderBy($sortBy, $sortOrder)
-            ->skip($offset)
-            ->take($limit)
-            ->with(['reactions', 'replies'])
-            ->get();
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -33,7 +18,12 @@ class Community extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'channel_users');
+        return $this->belongsToMany(User::class, 'community_users');
+    }
+
+    public function channels()
+    {
+        return $this->hasMany(Channel::class);
     }
 
     public function invitations()
@@ -41,15 +31,15 @@ class Community extends Model
         return $this->hasMany(Invitation::class);
     }
 
-    public static function getMyChannels($userId)
+    public static function getMyCommunities($userId)
     {
-        return self::where('user_id', $userId)->get();
+        return self::where('user_id', $userId)->with(['channels'])->get();
     }
 
-    public static function getChannelsForUser($userId)
+    public static function getCommunitiesForUser($userId)
     {
         return self::whereHas('users', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->get();
+        })->with(['channels'])->get();
     }
 }

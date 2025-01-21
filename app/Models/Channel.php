@@ -31,6 +31,11 @@ class Channel extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function community()
+    {
+        return $this->belongsTo(Community::class);
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'channel_users');

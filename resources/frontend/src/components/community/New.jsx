@@ -16,9 +16,9 @@ import { useDispatch } from "..";
 const CreateCommunity = () => {
     const dispatch = useDispatch();
 
-    const { preSetCommunityName } = useCommunity();
+    const { preSetCommunityName, setShowCommunityEditor } = useCommunity();
 
-    const [channelData, setChannelData] = useState({
+    const [comData, setComData] = useState({
         name: preSetCommunityName,
         description: "",
         icon: "",
@@ -30,17 +30,18 @@ const CreateCommunity = () => {
         e.preventDefault();
         const saveChannel = async () => {
             try {
-                const response = await api.post("channels", channelData);
-                dispatch(actionChannel.handleAddChannel(response.data.channel));
-                setTimeout(() => {
-                    dispatch(
-                        actionChannel.handleSelectChannel({
-                            channel: response.data.channel,
-                            posts: [],
-                            users: [response.data.user],
-                        })
-                    );
-                }, 300);
+                const response = await api.post("communities", comData);
+                dispatch(actionChannel.handleAddChannel(response.data.community));
+                setShowCommunityEditor(false);
+                // setTimeout(() => {
+                //     dispatch(
+                //         actionChannel.handleSelectChannel({
+                //             channel: response.data.channel,
+                //             posts: [],
+                //             users: [response.data.user],
+                //         })
+                //     );
+                // }, 300);
             } catch (error) {
                 console.log(error);
             }
@@ -51,18 +52,18 @@ const CreateCommunity = () => {
     return (
         <Paper sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
             <Typography variant="h5" sx={{ mb: 3 }}>
-                {/* Create New Channel */}新しいチャンネルを作成
+                {/* Create New community */}新しいコミュニティを作る
             </Typography>
 
             <form onSubmit={handleSubmit}>
                 <TextField
                     fullWidth
-                    label="チャンネル名"
-                    // label="Channel Name"
-                    value={channelData.name}
+                    label="コミュニティ名"
+                    // label="community Name"
+                    value={comData.name}
                     onChange={(e) =>
-                        setChannelData({
-                            ...channelData,
+                        setComData({
+                            ...comData,
                             name: e.target.value,
                         })
                     }
@@ -71,12 +72,12 @@ const CreateCommunity = () => {
                 />
                 <TextField
                     fullWidth
-                    // label="Channel Icon URL"
-                    label="チャンネルアイコン URL"
-                    value={channelData.icon}
+                    // label="community Icon URL"
+                    label="コミュニティアイコン URL"
+                    value={comData.icon}
                     onChange={(e) =>
-                        setChannelData({
-                            ...channelData,
+                        setComData({
+                            ...comData,
                             icon: e.target.value,
                         })
                     }
@@ -88,10 +89,10 @@ const CreateCommunity = () => {
                     rows={4}
                     label="説明"
                     // label="Description"
-                    value={channelData.description}
+                    value={comData.description}
                     onChange={(e) =>
-                        setChannelData({
-                            ...channelData,
+                        setComData({
+                            ...comData,
                             description: e.target.value,
                         })
                     }
@@ -100,10 +101,10 @@ const CreateCommunity = () => {
                 <FormControlLabel
                     control={
                         <Switch
-                            checked={channelData.requireApproval}
+                            checked={comData.requireApproval}
                             onChange={(e) =>
-                                setChannelData({
-                                    ...channelData,
+                                setComData({
+                                    ...comData,
                                     requireApproval: e.target.checked,
                                 })
                             }
@@ -116,24 +117,27 @@ const CreateCommunity = () => {
                 <FormControlLabel
                     control={
                         <Switch
-                            checked={channelData.isPublic}
+                            checked={comData.isPublic}
                             onChange={(e) =>
-                                setChannelData({
-                                    ...channelData,
+                                setComData({
+                                    ...comData,
                                     isPublic: e.target.checked,
                                 })
                             }
                         />
                     }
-                    label="公開チャンネル"
-                    // label="Public channel"
+                    label="公開コミュニティ"
+                    // label="Public community"
                     sx={{ mb: 2 }}
                 />
                 <Box sx={{ display: "flex", gap: 2 }}>
                     <Button variant="contained" type="submit">
-                        {/* Create Channel */}チャンネルを作成
+                        {/* Create community */}コミュニティを作成
                     </Button>
-                    <Button variant="outlined" onClick={() => {}}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setShowCommunityEditor(false)}
+                    >
                         {/* Cancel */}キャンセル
                     </Button>
                 </Box>

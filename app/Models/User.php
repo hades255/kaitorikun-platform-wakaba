@@ -36,4 +36,8 @@ class User extends Authenticatable
     public function channels() {
         return $this->belongsToMany(Channel::class, 'channel_users');
     }
+
+    public function communities() {
+        return $this->belongsToMany(Community::class, 'community_users');
+    }
 }

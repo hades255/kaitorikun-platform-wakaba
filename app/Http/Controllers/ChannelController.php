@@ -31,13 +31,9 @@ class ChannelController extends Controller
         $channel->name = $validatedData['name'];
         $channel->description = $validatedData['description'];
         $channel->icon = $validatedData['icon'];
-        $channel->requireApproval = $validatedData['requireApproval'];
-        $channel->isPublic = $validatedData['isPublic'];
         $channel->user_id = Auth::id();
         if ($channel->save()) {
-            if ($channel->isPublic) {   //  broadcase public channel
-                NewChannelJob::dispatch($channel, Auth::user()->name);
-            }
+            NewChannelJob::dispatch($channel, Auth::user()->name);
             $channel->users()->attach(Auth::id());
             return response()->json(["channel" => $channel, "user" => Auth::user()], 201);
         }
@@ -69,34 +65,5 @@ class ChannelController extends Controller
     {
         // Delete the channel 
         // ...
-    }
-
-    //   get public channels
-    public function getPublic()
-    {
-        $channels = Channel::where("isPublic", true)->get();
-        return response()->json([
-            'channels' => $channels
-        ]);
-    }
-
-    //  get channels I created
-    public function getMine()
-    {
-        $userId = Auth::id();
-        $createdChannels = Channel::getMyChannels($userId);
-        return response()->json([
-            'channels' => $createdChannels
-        ]);
-    }
-
-    //  get channels I take part in
-    public function getWorking()
-    {
-        $userId = Auth::id();
-        $joinedChannels = Channel::getChannelsForUser($userId);
-        return response()->json([
-            'channels' => $joinedChannels
-        ]);
     }
 }

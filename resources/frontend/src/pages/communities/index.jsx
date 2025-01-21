@@ -167,6 +167,8 @@ const Communities = () => {
                     </Dialog>
                 </div>
             ) : channels && channels.length > 0 ? (
+                <div>{/* Create new Channel */}新しいチャンネルを作成</div>
+            ) : (
                 <div className="w-full flex justify-center pt-20 pb-12">
                     <div className="flex flex-col gap-4">
                         <div className="text-xl">
@@ -190,8 +192,6 @@ const Communities = () => {
                         </div>
                     </div>
                 </div>
-            ) : (
-                <div>{/* Create new Channel */}新しいチャンネルを作成</div>
             )}
             {showCommunityEditor && (
                 <Dialog

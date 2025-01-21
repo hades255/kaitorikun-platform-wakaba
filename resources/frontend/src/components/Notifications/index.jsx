@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 import api from "../../api";
+import { API_ROUTE } from "../../config";
 import { useAuth } from "../../contexts/AuthContext";
 import { usePusher } from "../../contexts/PusherContext";
 import { useNotification } from "../../contexts/NotificationContext";
@@ -120,10 +122,41 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
+            const getMineCommunities = async () => {
+                try {
+                    const response = await api.get(`communities/mine`);
+                    dispatch(
+                        actionChannel.handleSetChannel(
+                            response.data.communities
+                        )
+                    );
+                } catch (error) {
+                    console.log(error);
+                }
+            };
             getUsers();
             getMyChats();
+            getMineCommunities();
         }
-    }, [dispatch, showNotification, auth]);
+    }, [dispatch, auth]);
+
+    useEffect(() => {
+        const fetchPublicCommunities = async () => {
+            try {
+                const response = await axios.get(
+                    `${API_ROUTE}communities/public`
+                );
+                dispatch(
+                    actionChannel.handleSetPublicChannel(
+                        response.data.communities
+                    )
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        fetchPublicCommunities();
+    }, [dispatch]);
 
     return <></>;
 };

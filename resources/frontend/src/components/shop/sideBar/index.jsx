@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import clsx from "clsx";
-import axios from "axios";
-import api from "../../../api";
-import { API_ROUTE } from "../../../config";
-import { actionChannel } from "../../../reduxStore";
 import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
 import menu2 from "./menu2";
@@ -34,28 +30,6 @@ const tabs = [
 const Sidebar = (props) => {
     const dispatch = useDispatch();
     const [roleMenu, setRoleMenu] = useState(menu1);
-
-    useEffect(() => {
-        const fetchChannels = async () => {
-            try {
-                const response = await api.get(`channels/getMine`);
-                dispatch(
-                    actionChannel.handleSetChannel(response.data.channels)
-                );
-                const publicChannelsResponse = await axios.get(
-                    `${API_ROUTE}channels/getPublic`
-                );
-                dispatch(
-                    actionChannel.handleSetPublicChannel(
-                        publicChannelsResponse.data.channels
-                    )
-                );
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        fetchChannels();
-    }, [dispatch]);
 
     useEffect(() => {
         let userData = getItem("userdata");

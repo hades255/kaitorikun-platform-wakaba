@@ -73,12 +73,19 @@ const Communities = () => {
                         channel_id: channel.id,
                         community_id: channel.community_id,
                     });
+                    ToastNotification("success", "投稿が正常に作成されました");
                     dispatch(
                         actionChannel.handleAddPostToChannel(response.data)
                     );
                     setShowPostEditor(false);
                 } catch (error) {
                     console.log(error);
+                    ToastNotification(
+                        "warning",
+                        error.response?.status == 401
+                            ? "まずはログインしてください"
+                            : "サーバーエラー"
+                    );
                 }
             };
             createPostFunc();

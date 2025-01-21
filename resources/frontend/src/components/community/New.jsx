@@ -11,7 +11,7 @@ import {
 import api from "../../api";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel } from "../../reduxStore";
-import { useDispatch } from "..";
+import { ToastNotification, useDispatch } from "..";
 
 const CreateCommunity = () => {
     const dispatch = useDispatch();
@@ -31,6 +31,10 @@ const CreateCommunity = () => {
         const saveChannel = async () => {
             try {
                 const response = await api.post("communities", comData);
+                ToastNotification(
+                    "success",
+                    "コミュニティが正常に作成されました"
+                );
                 dispatch(
                     actionChannel.handleAddCommunity({
                         ...response.data.community,
@@ -49,6 +53,12 @@ const CreateCommunity = () => {
                 // }, 300);
             } catch (error) {
                 console.log(error);
+                ToastNotification(
+                    "warning",
+                    error.response?.status == 401
+                        ? "まずはログインしてください"
+                        : "サーバーエラー"
+                );
             }
         };
         saveChannel();

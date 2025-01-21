@@ -3,7 +3,7 @@ import { Box, TextField, Button, Typography, Paper } from "@mui/material";
 import api from "../../api";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
-import { useDispatch, useSelector } from "..";
+import { ToastNotification, useDispatch, useSelector } from "..";
 
 const CreateChannel = () => {
     const { preSetCommunityId, setShowChannelEditor, preSetCommunityName } =
@@ -41,10 +41,20 @@ const CreateChannel = () => {
         const saveChannel = async () => {
             try {
                 const response = await api.post("channels", comData);
+                ToastNotification(
+                    "success",
+                    "チャンネルが正常に作成されました"
+                );
                 dispatch(actionChannel.handleAddChannel(response.data.channel));
                 setShowChannelEditor(false);
             } catch (error) {
                 console.log(error);
+                ToastNotification(
+                    "warning",
+                    error.response?.status == 401
+                        ? "まずはログインしてください"
+                        : "サーバーエラー"
+                );
             }
         };
         saveChannel();

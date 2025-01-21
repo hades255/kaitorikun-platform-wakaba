@@ -7,6 +7,10 @@ export const NEW_POST = "NEW_POST";
 export const REPLY_POST = "REPLY_POST";
 export const ADD_REACTION = "ADD_REACTION";
 export const REMOVE_REACTION = "REMOVE_REACTION";
+export const SET_COMMUNITY = "SET_COMMUNITY";
+export const SET_PUBLIC_COMMUNITY = "SET_PUBLIC_COMMUNITY";
+export const NEW_COMMUNITY = "NEW_COMMUNITY";
+export const NEW_PUBLIC_COMMUNITY = "NEW_PUBLIC_COMMUNITY";
 
 export const handler = (data, action) => (dispatch) => {
     dispatch({
@@ -27,6 +31,11 @@ const handleReplyPost = (data) => handler(data, REPLY_POST);
 const handleAddREACTION = (data) => handler(data, ADD_REACTION);
 const handleRemoveREACTION = (data) => handler(data, REMOVE_REACTION);
 
+const handleSetCommunity = (data) => handler(data, SET_COMMUNITY);
+const handleSetPublicCommunity = (data) => handler(data, SET_PUBLIC_COMMUNITY);
+const handleAddCommunity = (data) => handler(data, NEW_COMMUNITY);
+const handleAddPublicCommunity = (data) => handler(data, NEW_PUBLIC_COMMUNITY);
+
 const actionChannel = {
     handleSetChannel,
     handleSetPublicChannel,
@@ -37,5 +46,9 @@ const actionChannel = {
     handleReplyPost,
     handleAddREACTION,
     handleRemoveREACTION,
+    handleSetCommunity,
+    handleSetPublicCommunity,
+    handleAddCommunity,
+    handleAddPublicCommunity,
 };
 export { actionChannel };

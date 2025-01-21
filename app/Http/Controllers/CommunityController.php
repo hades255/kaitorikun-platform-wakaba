@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NewCommunityJob;
 use App\Models\Channel;
 use App\Models\Community;
 use Illuminate\Http\Request;
@@ -50,22 +51,23 @@ class CommunityController extends Controller
                 $community->user_id = Auth::id();
                 $community->save();
 
-                if ($community->isPublic) { //  todo    broadcast
-                    // NewChannelJob::dispatch($community, Auth::user()->name);
-                }
-
                 $channel = new Channel();
                 $channel->name = "全般";
                 $channel->description = 'コミュニティのデフォルト チャンネル';
                 $channel->user_id = Auth::id();
+                $channel->community_id = $community->id;
                 $channel->save();
+
+                if ($community->isPublic) {
+                    NewCommunityJob::dispatch($community, $channel, Auth::user()->name);
+                }
 
                 $community->users()->attach(Auth::id());
 
-                return $community;
+                return ["community" => $community, "channel" => $channel];
             });
 
-            return response()->json(["community" => $result, "user" => Auth::user()], 201);
+            return response()->json($result, 201);
         } catch (\Throwable $th) {
             return response()->json(['error' => 'Failed to create community', "message" => $th->getMessage()], 500);
         }
@@ -74,9 +76,16 @@ class CommunityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id, Request $request)
+    public function show(Community $community, Request $request)
     {
-        //
+        // $limit = $request->input('limit', 10);
+        // $offset = $request->input('offset', 0);
+        // $sortBy = $request->input('sort_by', 'created_at');
+        // $sortOrder = $request->input('sort_order', 'desc');
+        // $posts = $community->limitedPosts($limit, $offset, $sortBy, $sortOrder);
+        // $users = $community->users()->select('users.id', 'users.name', 'users.email')->get();
+        // // return response()->json(["chennel" => $channel, "posts" => $posts, "users" => $users]);
+        // return response()->json(["posts" => $posts, "users" => $users]);
     }
 
     /**

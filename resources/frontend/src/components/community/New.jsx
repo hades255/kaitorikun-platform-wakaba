@@ -31,7 +31,12 @@ const CreateCommunity = () => {
         const saveChannel = async () => {
             try {
                 const response = await api.post("communities", comData);
-                dispatch(actionChannel.handleAddChannel(response.data.community));
+                dispatch(
+                    actionChannel.handleAddCommunity({
+                        ...response.data.community,
+                        channels: [response.data.channel],
+                    })
+                );
                 setShowCommunityEditor(false);
                 // setTimeout(() => {
                 //     dispatch(

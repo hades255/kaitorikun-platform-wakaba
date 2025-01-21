@@ -51,6 +51,23 @@ const Notifications = () => {
                 dispatch(actionChannel.handleRemoveREACTION(data.reaction));
             }
         };
+        const handleCommunityCreated = (data) => {
+            if (data && data.community && data.channel) {
+                console.log(auth.id, data.community.user_id);
+                if (auth.id != data.community.user_id) {
+                    dispatch(
+                        actionChannel.handleAddPublicCommunity({
+                            ...data.community,
+                            channels: [data.channel],
+                        })
+                    );
+                    if (data.name)
+                        showNotification("新しいコミュニティ", {
+                            message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
+                        });
+                }
+            }
+        };
 
         const handleNewChat = (data) => {
             if (
@@ -66,6 +83,7 @@ const Notifications = () => {
                 });
         };
 
+        bindEvent("channel.community.created", handleCommunityCreated);
         bindEvent("channel.created", handleChannelCreated);
         bindEvent("channel.post.created", handlePostCreated);
         bindEvent("channel.post.reply", handleReplyToPost);
@@ -75,6 +93,7 @@ const Notifications = () => {
         bindEvent("channel.chat.created", handleNewChat);
 
         return () => {
+            unbindEvent("channel.community.created");
             unbindEvent("channel.created");
             unbindEvent("channel.post.created");
             unbindEvent("channel.post.reply");
@@ -126,7 +145,7 @@ const Notifications = () => {
                 try {
                     const response = await api.get(`communities/mine`);
                     dispatch(
-                        actionChannel.handleSetChannel(
+                        actionChannel.handleSetCommunity(
                             response.data.communities
                         )
                     );
@@ -147,7 +166,7 @@ const Notifications = () => {
                     `${API_ROUTE}communities/public`
                 );
                 dispatch(
-                    actionChannel.handleSetPublicChannel(
+                    actionChannel.handleSetPublicCommunity(
                         response.data.communities
                     )
                 );

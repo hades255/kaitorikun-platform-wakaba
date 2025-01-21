@@ -1,16 +1,22 @@
 import {
     ADD_REACTION,
     NEW_CHANNEL,
+    NEW_COMMUNITY,
     NEW_POST,
     NEW_PUBLIC_CHANNEL,
+    NEW_PUBLIC_COMMUNITY,
     REMOVE_REACTION,
     REPLY_POST,
     SELECT_CHANNEL,
     SET_CHANNEL,
+    SET_COMMUNITY,
     SET_PUBLIC_CHANNEL,
+    SET_PUBLIC_COMMUNITY,
 } from "../actions/channel_action";
 
 const initialState = {
+    communities: [],
+    publicCommunities: [],
     channels: [],
     publicChannels: [],
     channel: null,
@@ -19,6 +25,29 @@ const initialState = {
 };
 const channels = (state = initialState, actions) => {
     switch (actions.type) {
+        case SET_COMMUNITY:
+            return {
+                ...state,
+                communities: actions.payload.data,
+            };
+        case SET_PUBLIC_COMMUNITY:
+            return {
+                ...state,
+                publicCommunities: actions.payload.data,
+            };
+        case NEW_COMMUNITY:
+            return {
+                ...state,
+                communities: [...state.communities, actions.payload.data],
+            };
+        case NEW_PUBLIC_COMMUNITY:
+            return {
+                ...state,
+                publicCommunities: [
+                    ...state.publicCommunities,
+                    actions.payload.data,
+                ],
+            };
         case SET_CHANNEL:
             return {
                 ...state,

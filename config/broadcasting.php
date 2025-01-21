@@ -67,6 +67,11 @@ return [
             'driver' => 'null',
         ],
 
+        'socketio' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+        ],
+
     ],
 
 ];

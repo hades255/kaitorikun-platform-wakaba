@@ -17,6 +17,7 @@ import { Link, useDispatch, useSelector } from "../../../components";
 
 const ChannelSidebar = () => {
     const dispatch = useDispatch();
+    const communities = useSelector(selectorChannel.handleGetCommunities);
     const channels = useSelector(selectorChannel.handleGetChannels);
     const channel = useSelector(selectorChannel.handleGetChannel);
 
@@ -46,20 +47,15 @@ const ChannelSidebar = () => {
         <>
             <List>
                 <AddNewButton />
-                <Link to="/communities/new">
+                {/* <Link to="/communities/new">
                     <ListItem onClick={handleClick}>
                         <AddIcon color="!white" />
                         <ListItemText primary="チャンネルを作成" />
-                        {/* <ListItemText primary="Create Channel" /> */}
                     </ListItem>
-                </Link>
+                </Link> */}
                 <Link to="/communities">
-                    {channels.map((item, index) => (
-                        <ChannelItem
-                            key={index}
-                            channel={item}
-                            active={channel && channel.id == item.id}
-                        />
+                    {communities.map((item, index) => (
+                        <CommunityItem key={index} com={item} />
                     ))}
                 </Link>
             </List>
@@ -68,8 +64,40 @@ const ChannelSidebar = () => {
     );
 };
 
-const ChannelItem = ({ channel, active }) => {
+const CommunityItem = ({ com, active }) => {
+    const [show, setShow] = useState(false);
+
+    const handleClick = () => {
+        setShow(!show);
+    };
+
+    return (
+        <>
+            <ListItem
+                onClick={handleClick}
+                sx={{
+                    bgcolor: "#0000",
+                    color: "white",
+                    cursor: "pointer",
+                }}
+            >
+                <span className="border w-5 min-w-5 h-5 p-0 flex justify-center items-center rounded mr-2">
+                    {show ? "-" : "+"}
+                </span>
+                <ListItemText primary={com.name} />
+            </ListItem>
+            {show &&
+                com.channels?.map((item) => (
+                    <ChannelItem key={item.id} channel={item} />
+                ))}
+        </>
+    );
+};
+
+const ChannelItem = ({ channel }) => {
     const dispatch = useDispatch();
+    const selectedChannel = useSelector(selectorChannel.handleGetChannel);
+    const active = channel?.id == selectedChannel?.id;
 
     const handleClickChannel = () => {
         const fetchPosts = async () => {
@@ -95,6 +123,7 @@ const ChannelItem = ({ channel, active }) => {
         <ListItem
             onClick={handleClickChannel}
             sx={{
+                pl: 6,
                 bgcolor: active ? "#fff2" : "#0000",
                 color: "white",
                 cursor: "pointer",
@@ -192,8 +221,8 @@ const AddNewButton = () => {
                         className={clsx(
                             `origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-gray-600 ring-1 ring-black ring-opacity-5 transition-transform transform z-50`,
                             {
-                                "scale-100 opacity-100": isOpen,
-                                "scale-95 opacity-0": !isOpen,
+                                "scale-100 opacity-100 visible": isOpen,
+                                "scale-95 opacity-0 invisible": !isOpen,
                             }
                         )}
                         style={{ transitionDuration: "150ms" }}

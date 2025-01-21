@@ -37,14 +37,14 @@ const ChannelSidebar = () => {
     return (
         <>
             <List>
-                <Link to="/channels/new">
+                <Link to="/communities/new">
                     <ListItem onClick={handleClick}>
                         <AddIcon color="!white" />
                         <ListItemText primary="チャンネルを作成" />
                         {/* <ListItemText primary="Create Channel" /> */}
                     </ListItem>
                 </Link>
-                <Link to="/channels">
+                <Link to="/communities">
                     {channels.map((item, index) => (
                         <ChannelItem
                             key={index}
@@ -112,7 +112,7 @@ const PublicChannels = ({ channel }) => {
                     公開チャンネル
                 </Typography>
                 <List>
-                    <Link to="/channels">
+                    <Link to="/communities">
                         {channels.map((item, index) => (
                             <ChannelItem
                                 key={index}

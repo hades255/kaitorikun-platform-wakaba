@@ -23,7 +23,7 @@ const tabs = [
     },
     {
         title: "新着",
-        url: "/channels",
+        url: "/communities",
     },
     {
         title: "チャット",
@@ -194,7 +194,7 @@ const Sidebar = (props) => {
                         </ul>
                     </nav>
                 )}
-                {props.history.location.pathname.includes("/channels") && (
+                {props.history.location.pathname.includes("/communities") && (
                     <ChannelSidebar />
                 )}
                 {props.history.location.pathname === "/chat" && <ChatSidebar />}

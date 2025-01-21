@@ -7,8 +7,7 @@ import CustomerList from "../../pages/customer-menage/list";
 import CustomerEdit from "../../pages/customer-menage/edit";
 import StaffExit from "../../pages/shop-manage/exit";
 import ResetPassword from "../../pages/reset-password";
-import Channels from "../../pages/channels";
-import NewChannel from "../../pages/channels/New";
+import Communities from "../../pages/communities";
 import ChatsPage from "../../pages/chat";
 
 const MenuRoutes = [
@@ -80,16 +79,10 @@ const MenuRoutes = [
     },
     /** channel&chat start */
     {
-        path: "/channels",
+        path: "/communities",
         exact: true,
         title: "チャンネル",
-        component: () => <Channels />,
-    },
-    {
-        path: "/channels/new",
-        exact: true,
-        title: "新しいチャンネル",
-        component: () => <NewChannel />,
+        component: () => <Communities />,
     },
     {
         path: "/chat",

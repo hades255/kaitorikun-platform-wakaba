@@ -62,7 +62,11 @@ const Sidebar = (props) => {
                 </div>
             </div>
             <div className="sidebar">
-                {props.history.location.pathname === "/todo" && (
+                {props.history.location.pathname.includes("/communities") ? (
+                    <ChannelSidebar />
+                ) : props.history.location.pathname === "/chat" ? (
+                    <ChatSidebar />
+                ) : (
                     <nav className="mt-2">
                         <ul
                             className="nav nav-pills nav-sidebar flex-column"
@@ -168,10 +172,6 @@ const Sidebar = (props) => {
                         </ul>
                     </nav>
                 )}
-                {props.history.location.pathname.includes("/communities") && (
-                    <ChannelSidebar />
-                )}
-                {props.history.location.pathname === "/chat" && <ChatSidebar />}
             </div>
         </aside>
     );
@@ -183,12 +183,15 @@ const TabItem = ({ tab, props }) => {
     return (
         <Link
             to={tab.url}
-            className={clsx(
-                "relative",
-                props.history.location.pathname.includes(tab.url)
-                    ? "active"
-                    : ""
-            )}
+            className={clsx("relative", {
+                active:
+                    props.history.location.pathname.includes(tab.url) ||
+                    (tab.url == "/todo" &&
+                        !props.history.location.pathname.includes(
+                            "/communities"
+                        ) &&
+                        !props.history.location.pathname.includes("/chat")),
+            })}
         >
             {tab.title}
             {/* <div className="absolute top-1 right-1 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-xs flex justify-center items-center">

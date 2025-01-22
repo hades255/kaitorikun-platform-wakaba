@@ -17,9 +17,10 @@ pass : 123456
 5. setting .env untuk konek ke database
 6. php artisan migrate
 7. php artisan db:seed
-8. php artisan serve
-9. npm run watch
-10. php artisan queue:work
+8. `php artisan serve`
+9. `npm run watch`
+10. `php artisan queue:work`
+11. `php artisan reverb:start --debug`
 
 ## Note Jika Ingin Mengosongkan database
 
@@ -43,4 +44,10 @@ You can support Me On [Saweria](https://saweria.co/samsularifin05)
     PUSHER_APP_KEY=
     PUSHER_APP_SECRET=
     PUSHER_APP_CLUSTER=
+```
+
+#### before start using socket, install reverb with this command
+
+```
+    composer require laravel/reverb
 ```

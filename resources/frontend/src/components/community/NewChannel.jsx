@@ -4,8 +4,10 @@ import api from "../../api";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { ToastNotification, useDispatch, useSelector } from "..";
+import { makeStyles, useTheme } from "@mui/styles";
 
 const CreateChannel = () => {
+    const classes = useStyles();
     const { preSetCommunityId, setShowChannelEditor, preSetCommunityName } =
         useCommunity();
     const dispatch = useDispatch();
@@ -66,11 +68,13 @@ const CreateChannel = () => {
                 新しいチャンネルを作成する
             </Typography>
 
-            <form onSubmit={handleSubmit}>
-                <div className="flex items-center gap-4 mb-2">
-                    <span className="text-gray-800 w-24">コミュニティ</span>
+            <form onSubmit={handleSubmit} className={classes.formContainer}>
+                {/* <div className="flex items-center gap-4 mb-2"> */}
+                <div className={classes.formGroup}>
+                    {/* <span className="text-gray-800 w-24">コミュニティ</span> */}
+                    <span className={classes.label}>コミュニティ</span>
                     <select
-                        className="min-w-24 rounded border p-2 text-gray-800"
+                        // className="min-w-24 rounded border p-2 text-gray-800"
                         value={comData.community_id}
                         onChange={(e) =>
                             setComData({
@@ -79,8 +83,9 @@ const CreateChannel = () => {
                             })
                         }
                         disabled={preSetCommunityId > 0}
+                        className={classes.select}
                     >
-                        {coms.map((item) => (
+                        {coms?.map((item) => (
                             <option key={item.id} value={item.id}>
                                 {item.name}
                             </option>
@@ -132,3 +137,31 @@ const CreateChannel = () => {
 };
 
 export default CreateChannel;
+
+// Define the styles using makeStyles
+const useStyles = makeStyles((theme) => ({
+    formContainer: {
+        display: "flex",
+        flexDirection: "column",
+    },
+    formGroup: {
+        display: "flex",
+        alignItems: "center",
+        gap: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+    },
+    label: {
+        color: theme.palette.text.primary,
+        minWidth: theme.spacing(24),
+    },
+    select: {
+        minWidth: theme.spacing(24),
+        borderRadius: theme.shape.borderRadius,
+        padding: theme.spacing(1),
+        color: theme.palette.text.primary,
+    },
+    buttonContainer: {
+        display: "flex",
+        gap: theme.spacing(2),
+    },
+}));  

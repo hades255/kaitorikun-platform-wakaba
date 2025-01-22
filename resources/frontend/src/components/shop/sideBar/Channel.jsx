@@ -16,8 +16,26 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
 import { useDispatch, useSelector } from "../../../components";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    border: `1px solid red`, // Border using theme color
+    width: "16px", // Tailwind w-4
+    height: "16px", // Tailwind h-4
+    minWidth: "16px", // Tailwind min-w-4
+    padding: "0", // Tailwind p-0
+    display: "flex", // Tailwind flex
+    justifyContent: "center", // Tailwind justify-center
+    alignItems: "center", // Tailwind items-center
+    borderRadius: "50%", // Tailwind rounded
+    marginRight: "8px", // Tailwind mr-2 (theme spacing is 8px * multiplier)
+    fontSize: "12px", // Tailwind text-xs
+  },
+}));
 
 const ChannelSidebar = () => {
+    const classes = useStyles();
     const dispatch = useDispatch();
     const communities = useSelector(selectorChannel.handleGetCommunities);
 
@@ -48,6 +66,7 @@ const ChannelSidebar = () => {
 };
 
 const CommunityItem = ({ com }) => {
+    const classes = useStyles();
     const dispatch = useDispatch();
     const channel = useSelector(selectorChannel.handleGetChannel);
     const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
@@ -79,7 +98,7 @@ const CommunityItem = ({ com }) => {
                     cursor: "pointer",
                 }}
             >
-                <Box border="ActiveBorder" display="flex" alignItems="center" justifyContent="center" p={2} className="border w-4 min-w-4 h-4 p-0 flex justify-center items-center rounded mr-2 text-xs">
+                <Box border="ActiveBorder" display="flex" alignItems="center" justifyContent="center" p={2} className={classes.root}>
                     {!show ? <AddIcon color="!white" /> : <RemoveIcon color="!white" />}
                 </Box>
                 <ListItemText primary={com.name} />

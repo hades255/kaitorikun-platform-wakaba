@@ -28,6 +28,8 @@ export default function PostEditor({ onPost, onClose }) {
         });
     };
 
+    console.log(content)
+
     return (
         <Box sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
             <form onSubmit={handlePost}>
@@ -50,7 +52,9 @@ export default function PostEditor({ onPost, onClose }) {
                 />
                 <ReactQuill
                     value={content}
-                    onChange={setContent}
+                    onChange={(e)=>{
+                        setContent(e)
+                    }}
                     style={{ height: "200px", marginBottom: "50px" }}
                 />
                 <FormControlLabel

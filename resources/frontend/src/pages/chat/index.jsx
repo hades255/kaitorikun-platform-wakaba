@@ -25,7 +25,7 @@ const ChatsPage = () => {
             Array.isArray(_chats) &&
             _chats.length > 0
         )
-            return _chats.filter(
+            return _chats?.filter(
                 ({ from, to }) =>
                     (from == auth?.id && to == selectedUser.id) ||
                     (from == selectedUser.id && to == auth?.id)

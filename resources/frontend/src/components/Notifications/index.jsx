@@ -21,7 +21,7 @@ const Notifications = () => {
 
     useEffect(() => {
         let res = [];
-        coms.forEach((element) => {
+        coms?.forEach((element) => {
             if (!comIds.includes(Number(element.id)))
                 res.push(Number(element.id));
         });
@@ -30,7 +30,7 @@ const Notifications = () => {
 
     useEffect(() => {
         let res = [];
-        pubcoms.forEach((element) => {
+        pubcoms?.forEach((element) => {
             if (!comIds.includes(Number(element.id)))
                 res.push(Number(element.id));
         });

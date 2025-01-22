@@ -35,7 +35,7 @@ const Sidebar = (props) => {
         let userData = getItem("userdata");
         if (userData.role <= 2) {
             let newMenu = [];
-            menu1.forEach((element) => {
+            menu1?.forEach((element) => {
                 if (element.title != "退会") {
                     newMenu.push(element);
                 }
@@ -43,7 +43,7 @@ const Sidebar = (props) => {
             setRoleMenu(newMenu);
         } else {
             let newMenu = [];
-            menu1.forEach((element) => {
+            menu1?.forEach((element) => {
                 if (element.title != "スタッフ登録") {
                     newMenu.push(element);
                 }

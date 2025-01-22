@@ -44,3 +44,9 @@ You can support Me On [Saweria](https://saweria.co/samsularifin05)
     PUSHER_APP_SECRET=
     PUSHER_APP_CLUSTER=
 ```
+
+#### before start using socket, install reverb with this command
+
+```
+    composer require laravel/reverb
+```

@@ -10,103 +10,6 @@ import { actionChat } from "../../../reduxStore/actions/chat_action";
 import { selectorChat } from "../../../reduxStore/selector/selectorChat";
 import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles((theme) => ({
-    boxContainer: {
-        marginBottom: "4px",
-        padding: "8px 12px",
-        borderRadius: "6px",
-        cursor: "pointer",
-        position: "relative",
-        transition: "all 0.3s ease",
-        "&:hover": {
-            backgroundColor: "#4B5563", // Tailwind gray-700
-        },
-    },
-    container: {
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        position: "relative",
-    },
-    iconWrapper: {
-        position: "relative",
-    },
-    icon: {
-        color: "grey",
-        width: "32px",
-        height: "32px",
-    },
-    statusDot: {
-        width: "12px",
-        height: "12px",
-        borderRadius: "50%",
-        position: "absolute",
-        bottom: -2,
-        right: -2,
-    },
-    detailsContainer: {
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-    },
-    detailsHeader: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    userName: {
-        color: "#e5e7eb",
-    },
-    userTime: {
-        color: "#9ca3af",
-        fontSize: "12px",
-        lineHeight: "16px"
-    },
-    lastMessage: {
-        color: "#9ca3af",
-        fontSize: "14px",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-    },
-    pinWrapper: {
-        position: "absolute",
-        top: 0,
-        right: "16px",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-    },
-    pinButton: {
-        padding: "4px",
-        borderRadius: "50%",
-        color: (props) =>
-          props.isPinned ? "#111827" : "#9ca3af",
-        opacity: 0,
-        "&:hover": {
-          backgroundColor: "#4b5563",
-        },
-        "&:hover + &": {
-          opacity: 1,
-        },
-    },
-    notification: {
-        position: "absolute",
-        bottom: "8px",
-        right: "8px",
-        width: "16px",
-        minWidth: "16px",
-        height: "16px",
-        borderRadius: "50%",
-        backgroundColor: "#dc2626",
-        color: "white",
-        fontSize: "12px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-}));
 
 const ChatSidebar = () => {
     const classes = useStyles();
@@ -311,31 +214,133 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                 </div>
             )} */}
             <div className={classes.container} onClick={handleClick}>
-      <div className={classes.iconWrapper}>
-        <AccountCircleOutlinedIcon className={classes.icon} />
-        <div
-          className={`${classes.statusDot} ${getUserStatusColor("online")}`}
-        />
-      </div>
-      <div className={classes.detailsContainer}>
-        <div className={classes.detailsHeader}>
-          <p className={classes.userName}>
-            {user.name}
-            {auth?.id === user.id && "(あなた)"}
-          </p>
-          <p className={classes.userTime}>{"10:18"}</p>
-        </div>
-        <p className={classes.lastMessage}>{"lastMessage"}</p>
-      </div>
-      <div className={classes.pinWrapper}>
-        <button onClick={handleClickPin} className={classes.pinButton}>
-          <PushPinOutlinedIcon fontSize="small" />
-        </button>
-      </div>
-      {count > 0 && (
-        <div className={classes.notification}>{count}</div>
-      )}
-    </div>
+                <div className={classes.iconWrapper}>
+                    <AccountCircleOutlinedIcon className={classes.icon} />
+                    <div
+                    className={`${classes.statusDot} ${getUserStatusColor("online")}`}
+                    />
+                </div>
+                <div className={classes.detailsContainer}>
+                    <div className={classes.detailsHeader}>
+                    <p className={classes.userName}>
+                        {user.name}
+                        {auth?.id === user.id && "(あなた)"}
+                    </p>
+                    <p className={classes.userTime}>{"10:18"}</p>
+                    </div>
+                    <p className={classes.lastMessage}>{"lastMessage"}</p>
+                </div>
+                <div className={classes.pinWrapper}>
+                    <button onClick={handleClickPin} className={classes.pinButton}>
+                    <PushPinOutlinedIcon fontSize="small" />
+                    </button>
+                </div>
+                {count > 0 && (
+                    <div className={classes.notification}>{count}</div>
+                )}
+            </div>
         </Box>
     );
 };
+
+
+const useStyles = makeStyles((theme) => ({
+    boxContainer: {
+        marginBottom: "4px",
+        padding: "8px 12px",
+        borderRadius: "6px",
+        cursor: "pointer",
+        position: "relative",
+        transition: "all 0.3s ease",
+        "&:hover": {
+            backgroundColor: "#4B5563", 
+        },
+    },
+    selected: {
+        backgroundColor: "#fff2", 
+    },
+    container: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        position: "relative",
+    },
+    iconWrapper: {
+        position: "relative",
+    },
+    icon: {
+        color: "grey",
+        width: "32px",
+        height: "32px",
+    },
+    statusDot: {
+        width: "12px",
+        height: "12px",
+        borderRadius: "50%",
+        position: "absolute",
+        bottom: -2,
+        right: -2,
+    },
+    detailsContainer: {
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+    },
+    detailsHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    userName: {
+        color: "#e5e7eb",
+    },
+    userTime: {
+        color: "#9ca3af",
+        fontSize: "12px",
+        lineHeight: "16px"
+    },
+    lastMessage: {
+        color: "#9ca3af",
+        fontSize: "14px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+    },
+    pinWrapper: {
+        position: "absolute",
+        top: 0,
+        right: "16px",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+    },
+    pinButton: {
+        padding: "4px",
+        borderRadius: "50%",
+        color: (props) =>
+          props.isPinned ? "#111827" : "#9ca3af",
+        opacity: 0,
+        "&:hover": {
+          backgroundColor: "#4b5563",
+        },
+        "&:hover + &": {
+          opacity: 1,
+        },
+    },
+    notification: {
+        position: "absolute",
+        bottom: "8px",
+        right: "8px",
+        width: "16px",
+        minWidth: "16px",
+        height: "16px",
+        borderRadius: "50%",
+        backgroundColor: "#dc2626",
+        color: "white",
+        fontSize: "12px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+}));

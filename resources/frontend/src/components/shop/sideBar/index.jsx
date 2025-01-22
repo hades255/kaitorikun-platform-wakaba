@@ -11,6 +11,8 @@ import menu6 from "./menu6";
 import ChatSidebar from "./Chat";
 import ChannelSidebar from "./Channel";
 import SidebarNavList from "./SidebarNavList";
+import { Box } from "@mui/material";
+import { useNotification } from "../../../contexts/NotificationContext";
 
 const tabs = [
     {
@@ -180,10 +182,31 @@ const Sidebar = (props) => {
 export default withRouter(Sidebar);
 
 const TabItem = ({ tab, props }) => {
+    const { unreadTab, updateUnreadTab } = useNotification();
+
+    const handleClick = () => {
+        if (
+            !props.history.location.pathname.includes("/communities") &&
+            !props.history.location.pathname.includes("/chat")
+        )
+            return;
+        updateUnreadTab(
+            [
+                props.history.location.pathname.includes("/communities")
+                    ? "com"
+                    : props.history.location.pathname.includes("/chat")
+                    ? "chat"
+                    : "todo",
+            ],
+            false
+        );
+    };
+
     return (
         <Link
+            onClick={handleClick}
             to={tab.url}
-            className={clsx("relative", {
+            className={clsx({
                 active:
                     props.history.location.pathname.includes(tab.url) ||
                     (tab.url == "/todo" &&
@@ -192,11 +215,33 @@ const TabItem = ({ tab, props }) => {
                         ) &&
                         !props.history.location.pathname.includes("/chat")),
             })}
+            style={{
+                position: "relative",
+            }}
         >
             {tab.title}
             {/* <div className="absolute top-1 right-1 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-xs flex justify-center items-center">
                 0
             </div> */}
+            {((!props.history.location.pathname.includes("/communities") &&
+                tab.url == "/communities" &&
+                unreadTab?.com) ||
+                (!props.history.location.pathname.includes("/chat") &&
+                    tab.url == "/chat" &&
+                    unreadTab?.chat)) && (
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: 4,
+                        right: 4,
+                        width: 16,
+                        minWidth: 16,
+                        height: 16,
+                        borderRadius: 16,
+                        bgcolor: "#F00C",
+                    }}
+                ></Box>
+            )}
         </Link>
     );
 };

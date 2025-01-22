@@ -10,7 +10,6 @@ import { actionChat } from "../../../reduxStore/actions/chat_action";
 import { selectorChat } from "../../../reduxStore/selector/selectorChat";
 import { makeStyles } from "@mui/styles";
 
-
 const ChatSidebar = () => {
     const classes = useStyles();
     const { auth } = useAuth();
@@ -217,22 +216,27 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                 <div className={classes.iconWrapper}>
                     <AccountCircleOutlinedIcon className={classes.icon} />
                     <div
-                    className={`${classes.statusDot} ${getUserStatusColor("online")}`}
+                        className={`${classes.statusDot} ${getUserStatusColor(
+                            "online"
+                        )}`}
                     />
                 </div>
                 <div className={classes.detailsContainer}>
                     <div className={classes.detailsHeader}>
-                    <p className={classes.userName}>
-                        {user.name}
-                        {auth?.id === user.id && "(あなた)"}
-                    </p>
-                    <p className={classes.userTime}>{"10:18"}</p>
+                        <p className={classes.userName}>
+                            {user.name}
+                            {auth?.id === user.id && "(あなた)"}
+                        </p>
+                        <p className={classes.userTime}>{"10:18"}</p>
                     </div>
                     <p className={classes.lastMessage}>{"lastMessage"}</p>
                 </div>
                 <div className={classes.pinWrapper}>
-                    <button onClick={handleClickPin} className={classes.pinButton}>
-                    <PushPinOutlinedIcon fontSize="small" />
+                    <button
+                        onClick={handleClickPin}
+                        className={classes.pinButton}
+                    >
+                        <PushPinOutlinedIcon fontSize="small" color="white" />
                     </button>
                 </div>
                 {count > 0 && (
@@ -243,7 +247,6 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
     );
 };
 
-
 const useStyles = makeStyles((theme) => ({
     boxContainer: {
         marginBottom: "4px",
@@ -253,11 +256,11 @@ const useStyles = makeStyles((theme) => ({
         position: "relative",
         transition: "all 0.3s ease",
         "&:hover": {
-            backgroundColor: "#4B5563", 
+            backgroundColor: "#4B5563",
         },
     },
     selected: {
-        backgroundColor: "#fff2", 
+        backgroundColor: "#fff2",
     },
     container: {
         width: "100%",
@@ -298,7 +301,7 @@ const useStyles = makeStyles((theme) => ({
     userTime: {
         color: "#9ca3af",
         fontSize: "12px",
-        lineHeight: "16px"
+        lineHeight: "16px",
     },
     lastMessage: {
         color: "#9ca3af",
@@ -318,14 +321,13 @@ const useStyles = makeStyles((theme) => ({
     pinButton: {
         padding: "4px",
         borderRadius: "50%",
-        color: (props) =>
-          props.isPinned ? "#111827" : "#9ca3af",
+        color: (props) => (props.isPinned ? "#111827" : "#9ca3af"),
         opacity: 0,
         "&:hover": {
-          backgroundColor: "#4b5563",
+            backgroundColor: "#4b5563",
         },
         "&:hover + &": {
-          opacity: 1,
+            opacity: 1,
         },
     },
     notification: {

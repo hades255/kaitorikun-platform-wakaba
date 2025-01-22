@@ -22,6 +22,12 @@ pass : 123456
 10. `php artisan queue:work`
 11. `php artisan reverb:start --debug`
 
+finally run the server with this one command
+
+```
+    php artisan app:start-server
+```
+
 ## Note Jika Ingin Mengosongkan database
 
 php artisan migrate:rollback

@@ -40,7 +40,7 @@ const Content = (props) => {
                         />
                     ))
                 )} */}
-                {MenuRoutes.map((route, index) => (
+                {MenuRoutes?.map((route, index) => (
                     <Route
                         key={index}
                         exact={route.exact}

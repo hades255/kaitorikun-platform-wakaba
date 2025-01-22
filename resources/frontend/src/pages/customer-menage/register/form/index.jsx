@@ -413,7 +413,7 @@ let FormCustomerRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">店舗名</span>
                                 </MenuItem>
-                                {shops.map(item => (
+                                {shops?.map(item => (
                                     <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -529,7 +529,7 @@ let FormCustomerRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">都道府県</span>
                                 </MenuItem>
-                                {prefectures.map((item, key) => (
+                                {prefectures?.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -543,7 +543,7 @@ let FormCustomerRegister = (props) => {
                                 className="shop-select w-150"
                                 size='small'
                             >
-                                {filteredCities.map((item, key) => (
+                                {filteredCities?.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                 ))}
                             </Select>

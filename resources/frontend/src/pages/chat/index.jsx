@@ -96,7 +96,7 @@ const ChatsPage = () => {
                 {selectedUser ? (
                     <>
                         <Box className={classes.chatWrapper}>
-                            {chats.map((msg, index) => (
+                            {chats?.map((msg, index) => (
                                 <ChatItem
                                     key={index}
                                     chat={msg}

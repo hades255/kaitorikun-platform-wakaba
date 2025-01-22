@@ -159,7 +159,7 @@ const Communities = () => {
                     )}
 
                     {Array.isArray(posts) &&
-                        posts.map((post) => (
+                        posts?.map((post) => (
                             <Post key={post.id} post={post} users={users} />
                         ))}
 
@@ -207,7 +207,7 @@ const Communities = () => {
                         </Box>
                         <Box className="flex justify-center">
                             <Box display="flex" alignItems="center" justifyContent="center" gap={1} flexWrap="wrap" width="100%" sx={{maxWidth: "768px"}}>
-                                {preNamedCommunities.map((item, index) => (
+                                {preNamedCommunities?.map((item, index) => (
                                     <PreNamedItems
                                         key={index}
                                         community={item}

@@ -153,7 +153,7 @@ const Post = ({ post, users }) => {
                         <AddIcon />
                     </IconButton>
                     {Array.isArray(reactions) &&
-                        reactions.map((item) => (
+                        reactions?.map((item) => (
                             <EmojiItem
                                 key={item.reaction}
                                 reaction={item}
@@ -193,7 +193,7 @@ const Post = ({ post, users }) => {
                 {showReplies && (
                     <div className="flex flex-col gap-2">
                         {Array.isArray(post.replies) &&
-                            post.replies.map((item) => (
+                            post.replies?.map((item) => (
                                 <ReplyItem
                                     key={item.id}
                                     reply={item}

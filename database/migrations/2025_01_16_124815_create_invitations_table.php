@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('channel_id')->constrained()->onDelete('cascade');
+            $table->foreignId('channel_id');
             $table->foreignId('sender_id');
             $table->foreignId('receiver_id');
             $table->timestamps();

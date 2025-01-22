@@ -4,16 +4,15 @@ import axios from "axios";
 import api from "../../api";
 import { API_ROUTE } from "../../config";
 import { useAuth } from "../../contexts/AuthContext";
-import { usePusher } from "../../contexts/PusherContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";
+import myEcho from "../helper/Echo";
 
 const Notifications = () => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
     const { showNotification } = useNotification();
-    const { subscribeToChannel, bindEvent, unbindEvent } = usePusher();
     const coms = useSelector(selectorChannel.handleGetCommunities);
     const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
@@ -21,7 +20,7 @@ const Notifications = () => {
 
     useEffect(() => {
         let res = [];
-        coms.forEach((element) => {
+        coms?.forEach((element) => {
             if (!comIds.includes(Number(element.id)))
                 res.push(Number(element.id));
         });
@@ -30,7 +29,7 @@ const Notifications = () => {
 
     useEffect(() => {
         let res = [];
-        pubcoms.forEach((element) => {
+        pubcoms?.forEach((element) => {
             if (!comIds.includes(Number(element.id)))
                 res.push(Number(element.id));
         });
@@ -38,7 +37,11 @@ const Notifications = () => {
     }, [pubcoms, comIds]);
 
     useEffect(() => {
-        const channel = subscribeToChannel("channel");
+        myEcho();
+    }, []);
+
+    useEffect(() => {
+        const channel = window.Echo.channel("channel");
 
         const handleChannelCreated = (data) => {
             if (
@@ -116,37 +119,34 @@ const Notifications = () => {
                 });
         };
 
-        bindEvent("channel.community.created", handleCommunityCreated);
-        bindEvent("channel.created", handleChannelCreated);
-        bindEvent("channel.post.created", handlePostCreated);
-        bindEvent("channel.post.reply", handleReplyToPost);
-        bindEvent("channel.post.reaction.created", handleAddReactionToPost);
-        bindEvent("channel.post.reaction.deleted", handleRemoveReactFromPost);
+        channel.listen(".channel.community.created", handleCommunityCreated);
+        channel.listen(".channel.created", handleChannelCreated);
+        channel.listen(".channel.post.created", handlePostCreated);
+        channel.listen(".channel.post.reply", handleReplyToPost);
+        channel.listen(
+            ".channel.post.reaction.created",
+            handleAddReactionToPost
+        );
+        channel.listen(
+            ".channel.post.reaction.deleted",
+            handleRemoveReactFromPost
+        );
 
-        bindEvent("channel.chat.created", handleNewChat);
+        channel.listen(".channel.chat.created", handleNewChat);
 
         return () => {
-            unbindEvent("channel.community.created");
-            unbindEvent("channel.created");
-            unbindEvent("channel.post.created");
-            unbindEvent("channel.post.reply");
-            unbindEvent("channel.post.reaction.created");
-            unbindEvent("channel.post.reaction.deleted");
-
-            unbindEvent("channel.chat.created");
             if (channel) {
-                channel.unsubscribe();
+                channel.stopListening(".channel.community.created");
+                channel.stopListening(".channel.created");
+                channel.stopListening(".channel.post.created");
+                channel.stopListening(".channel.post.reply");
+                channel.stopListening(".channel.post.reaction.created");
+                channel.stopListening(".channel.post.reaction.deleted");
+
+                channel.stopListening(".channel.chat.created");
             }
         };
-    }, [
-        dispatch,
-        showNotification,
-        subscribeToChannel,
-        bindEvent,
-        unbindEvent,
-        auth,
-        comIds,
-    ]);
+    }, [dispatch, showNotification, auth, comIds]);
 
     useEffect(() => {
         if (auth) {

@@ -1,18 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "react-chat-elements";
 import "react-chat-elements/dist/main.css";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Box } from "@mui/material";
 import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 import { PanelContent, useDispatch, useSelector } from "../../components";
+import { makeStyles, useTheme } from "@mui/styles";
 
 const ChatsPage = () => {
     const { auth } = useAuth();
     const dispatch = useDispatch();
     const selectedUser = useSelector(selectorChat.handleGetCurrentUser);
     const _chats = useSelector(selectorChat.handleGetChats);
+    const classes = useStyles();
 
     const lastmessage = useRef(null);
 
@@ -90,10 +92,10 @@ const ChatsPage = () => {
             // title="Messages"
             title="メッセージ"
         >
-            <div className="p-2 h-[calc(100vh_-_200px)] container max-w-[768px]">
+            <Box className={classes.container} p={4}>
                 {selectedUser ? (
                     <>
-                        <div className="h-[calc(100%_-_80px)] max-h-[calc(100%_-_80px)] overflow-y-scroll">
+                        <Box className={classes.chatWrapper}>
                             {chats.map((msg, index) => (
                                 <ChatItem
                                     key={index}
@@ -101,10 +103,10 @@ const ChatsPage = () => {
                                     selectedUser={selectedUser}
                                 />
                             ))}
-                            <div ref={lastmessage}></div>
-                        </div>
+                            <Box ref={lastmessage}></Box>
+                        </Box>
                         <form onSubmit={handleSubmit}>
-                            <div className="flex mt-2">
+                            <Box display="flex" marginTop={4}>
                                 <TextField
                                     fullWidth
                                     value={message}
@@ -116,16 +118,16 @@ const ChatsPage = () => {
                                 <Button variant="contained" type="submit">
                                     {/* Send */}送信
                                 </Button>
-                            </div>
+                            </Box>
                         </form>
                     </>
                 ) : (
-                    <div className="flex h-full justify-center items-center">
+                    <Box display="flex" width="100%" justifyContent="center" alignItems="center">
                         {/* Select a user to start chatting */}
                         チャットを開始するユーザーを選択
-                    </div>
+                    </Box>
                 )}
-            </div>
+            </Box>
         </PanelContent>
     );
 };
@@ -141,3 +143,17 @@ const ChatItem = ({ chat, selectedUser }) => {
         />
     );
 };
+
+const useStyles = makeStyles((theme) => ({
+    container: {
+        height: "calc(100vh - 200px)",
+        maxWidth: "768px",
+        marginLeft: "auto",
+        marginRight: "auto",
+    },
+    chatWrapper: {
+        height: "calc(100% - 80px)",
+        maxHeight: "calc(100% - 80px)",
+        overflowY: "scroll", 
+    }
+  }));

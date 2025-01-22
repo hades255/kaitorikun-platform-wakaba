@@ -145,7 +145,7 @@ const CreateCommunity = () => {
                     // label="Public community"
                     sx={{ mb: 2 }}
                 />
-                <Box sx={{ display: "flex", gap: 2 }}>
+                <Box display="flex" sx={{ gap: 2 }}>
                     <Button variant="contained" type="submit">
                         {/* Create community */}コミュニティを作成
                     </Button>

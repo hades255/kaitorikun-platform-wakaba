@@ -31,6 +31,7 @@
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^6.2.1",
         "@mui/material": "^6.3.1",
+        "@mui/styles": "^6.4.1",
         "antd": "^5.15.3",
         "autoprefixer": "^10.4.20",
         "axios": "^0.27.2",

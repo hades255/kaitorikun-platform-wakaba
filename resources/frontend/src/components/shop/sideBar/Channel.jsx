@@ -7,8 +7,10 @@ import React, {
 } from "react";
 import axios from "axios";
 import clsx from "clsx";
-import { List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Box, IconButton, List, ListItem, ListItemText, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
+import { Remove as RemoveIcon } from "@mui/icons-material";
+import { Button, Menu, MenuItem } from "@mui/material";
 import { API_ROUTE } from "../../../config";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useCommunity } from "../../../contexts/CommunityContext";
@@ -77,9 +79,9 @@ const CommunityItem = ({ com }) => {
                     cursor: "pointer",
                 }}
             >
-                <span className="border w-4 min-w-4 h-4 p-0 flex justify-center items-center rounded mr-2 text-xs">
-                    {show ? "-" : "+"}
-                </span>
+                <Box border="ActiveBorder" display="flex" alignItems="center" justifyContent="center" p={2} className="border w-4 min-w-4 h-4 p-0 flex justify-center items-center rounded mr-2 text-xs">
+                    {!show ? <AddIcon color="!white" /> : <RemoveIcon color="!white" />}
+                </Box>
                 <ListItemText primary={com.name} />
             </ListItem>
             {show && (
@@ -187,10 +189,6 @@ const AddNewButton = () => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
     const handleClickOutside = (event) => {
         if (
             dropdownRef.current &&
@@ -224,55 +222,41 @@ const AddNewButton = () => {
         setIsOpen(false);
     };
 
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
     return (
-        <>
-            <div className="px-4 py-2 flex justify-end">
-                <div
-                    className="relative inline-block text-left"
-                    ref={dropdownRef}
-                >
-                    <div>
-                        <button
-                            onClick={toggleDropdown}
-                            className="text-gray-200 border !border-gray-500 bg-gray-700 rounded flex justify-center items-center"
-                        >
-                            <AddIcon color="!white" />
-                        </button>
-                    </div>
-                    <div
-                        className={clsx(
-                            `origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-gray-600 ring-1 ring-black ring-opacity-5 transition-transform transform z-50`,
-                            {
-                                "scale-100 opacity-100 visible": isOpen,
-                                "scale-95 opacity-0 invisible": !isOpen,
-                            }
-                        )}
-                        style={{ transitionDuration: "150ms" }}
-                    >
-                        <div className="py-1">
-                            <div
-                                onClick={handleNewCommunity}
-                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400 cursor-pointer"
-                            >
-                                {/* Add Community */}コミュニティを追加
-                            </div>
-                            <div
-                                onClick={handleNewChannel}
-                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400 cursor-pointer"
-                            >
-                                {/* Add Channel */}チャンネルを追加
-                            </div>
-                            <a
-                                href="#"
-                                className="block px-4 py-2 text-sm text-white hover:bg-gray-400 cursor-pointer"
-                            >
-                                {/* Join Community */}コミュニティに参加
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
+        <Box display="flex" justifyContent="flex-end" paddingX={2} paddingY={1}>
+            <IconButton
+                id="basic-button"
+                aria-controls={open ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={handleClick}
+                sx={{color: "white"}}
+            >
+                <AddIcon color="!white" />
+            </IconButton>
+            <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                'aria-labelledby': 'basic-button',
+                }}
+            >
+                <MenuItem onClick={handleNewCommunity}>{/* Add Community */}コミュニティを追加</MenuItem>
+                <MenuItem onClick={handleNewChannel}>{/* Add Channel */}チャンネルを追加</MenuItem>
+                <MenuItem onClick={handleClose}>{/* Join Community */}コミュニティに参加</MenuItem>
+            </Menu>
+        </Box>
     );
 };
 

@@ -15,6 +15,9 @@ import CreateCommunity from "../../components/community/New";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
 import CreateChannel from "../../components/community/NewChannel";
+import { Box } from "@mui/material";
+import { Typography } from "antd";
+import { makeStyles, useTheme } from "@mui/styles";
 
 const preNamedCommunities = [
     { title: "自分で作成", value: "" },
@@ -191,29 +194,29 @@ const Communities = () => {
             ) : communities && communities.length > 0 ? (
                 <div>{/* Create new Channel */}新しいチャンネルを作成</div>
             ) : (
-                <div className="w-full flex justify-center pt-20 pb-12">
-                    <div className="flex flex-col gap-4">
-                        <div className="text-xl">
+                <Box display="flex" justifyContent="center" width="100%" paddingTop={5} pb={3}>
+                    <Box display="flex" flexDirection="column" gap={2}>
+                        <Typography className="text-xl">
                             {/* Build your community */}コミュニティを構築する
-                        </div>
-                        <div className="">
+                        </Typography>
+                        <Box className="">
                             {/* Plan community events, engage in discussions, and
                             create a sage space to collaborate. */}
                             コミュニティ
                             イベントを計画し、ディスカッションに参加し、コラボレーションのための賢明なスペースを作成します。
-                        </div>
-                        <div className="flex justify-center">
-                            <div className="w-full max-w-[768px] flex gap-2 justify-center items-center flex-wrap">
+                        </Box>
+                        <Box className="flex justify-center">
+                            <Box display="flex" alignItems="center" justifyContent="center" gap={1} flexWrap="wrap" width="100%" sx={{maxWidth: "768px"}}>
                                 {preNamedCommunities.map((item, index) => (
                                     <PreNamedItems
                                         key={index}
                                         community={item}
                                     />
                                 ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            </Box>
+                        </Box>
+                    </Box>
+                </Box>
             )}
             {showCommunityEditor && (
                 <Dialog
@@ -239,6 +242,7 @@ export default Communities;
 
 const PreNamedItems = ({ community }) => {
     const { setShowCommunityEditor, setPreSetCommunityName } = useCommunity();
+    const classes = useStyles();
 
     const handleClick = () => {
         setPreSetCommunityName(community.value);
@@ -246,10 +250,10 @@ const PreNamedItems = ({ community }) => {
     };
 
     return (
-        <div
+        <Box
             onClick={handleClick}
             className={clsx(
-                "px-4 py-1 rounded-full border text-white font-semibold cursor-pointer transition-all",
+                classes.preNamesItem,
                 {
                     "bg-[#313239] hover:bg-[#212229]": community.value,
                     "bg-[#5a65ba] hover:bg-[#4a55aa]": !community.value,
@@ -257,6 +261,21 @@ const PreNamedItems = ({ community }) => {
             )}
         >
             {community.title}
-        </div>
+        </Box>
     );
 };
+
+const useStyles = makeStyles((theme) => ({
+    preNamesItem: {
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+        paddingTop: "0.25rem",
+        paddingBottom: "0.25rem",
+        borderRadius: "999px",
+        border: "1px solid transparent",
+        color: "white",
+        fontWeight: 600,
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+    },
+  }));

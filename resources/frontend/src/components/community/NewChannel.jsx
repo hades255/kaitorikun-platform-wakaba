@@ -115,7 +115,7 @@ const CreateChannel = () => {
                     }
                     sx={{ mb: 2 }}
                 />
-                <Box sx={{ display: "flex", gap: 2 }}>
+                <Box display="flex" sx={{ gap: 2 }}>
                     <Button variant="contained" type="submit">
                         {/* Create community */}チャンネルを作成
                     </Button>

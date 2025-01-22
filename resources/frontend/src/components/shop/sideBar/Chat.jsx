@@ -8,6 +8,7 @@ import { getUserStatusColor } from "../../../feature/action";
 import { useAuth } from "../../../contexts/AuthContext";
 import { actionChat } from "../../../reduxStore/actions/chat_action";
 import { selectorChat } from "../../../reduxStore/selector/selectorChat";
+import { Box } from "@mui/material";
 
 const ChatSidebar = () => {
     const { auth } = useAuth();
@@ -159,7 +160,7 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
     );
 
     return (
-        <div
+        <Box
             className={clsx(
                 "mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all relative",
                 {
@@ -206,6 +207,6 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                     {count}
                 </div>
             )}
-        </div>
+        </Box>
     );
 };

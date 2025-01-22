@@ -1,9 +1,10 @@
 import { React } from "../../components";
 import HeaderContent from "./headerContent";
+import { Box } from "@mui/material";
 
 const PanelContent = (props) => {
     return (
-        <div className="content-wrapper h-full flex flex-col">
+        <Box display="flex" flexDirection="column" height="100%" className="content-wrapper">
             {props.headerContent && (
                 <HeaderContent
                     title={props.title}
@@ -11,10 +12,10 @@ const PanelContent = (props) => {
                     submenu={props.submenu}
                 />
             )}
-            <section className="content grow">
-                <div className="container-fluid h-full">{props.children}</div>
+            <section style={{flexGrow: 1}} className="content">
+                <Box height="100%" className="container-fluid">{props.children}</Box>
             </section>
-        </div>
+        </Box>
     );
 };
 

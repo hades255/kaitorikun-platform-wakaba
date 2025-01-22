@@ -31,7 +31,7 @@ const Post = ({ post, users }) => {
     useEffect(() => {
         if (post.reactions && post.reactions.length > 0) {
             let res = {};
-            post.reactions.forEach((item) => {
+            post.reactions?.forEach((item) => {
                 if (res[item.reaction]) {
                     res[item.reaction] = {
                         mine:

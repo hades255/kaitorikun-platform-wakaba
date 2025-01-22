@@ -4,7 +4,6 @@ import {
     TableMaster,
     Row,
     Col,
-    useDispatch,
 } from "../../../../components";
 const CustomerTable = (props) => {
     const columns = [

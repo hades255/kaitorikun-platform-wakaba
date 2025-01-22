@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     React,
     Button,
     multiPostData,
     previewThumbnail,
-    postData,
+    getData,
     ToastNotification,
     useDispatch
 } from "../../../../components";
@@ -21,11 +21,12 @@ import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
 import { actionTheme, utilityAction } from "../../../../reduxStore";
+import Tesseract from 'tesseract.js';
+import TableCustomerVisitShop from '../table';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-let FormCustomerEdit = (props) => {
-    const [customer, setCustomer] = useState()
+let FormCustomerRegister = (props) => {
     const [shop, setShop] = useState()
     const [type, setType] = useState()
     const [name, setName] = useState()
@@ -59,55 +60,120 @@ let FormCustomerEdit = (props) => {
     const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
 
+    //For OCR
+    const videoRef = useRef(null);
+    const canvasRef = useRef(null);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [ocrResult, setOcrResult] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
+
     useEffect(() => {
+        // API Call
         const fetchData = async () => {
-            let result = await postData("customer/list", {
-                id: props.customerId
-            })
+            let result = await getData("datas")
             if (result.status === 200) {
                 let data = result.data;
                 setPrefectures(data.prefectures);
                 setCities(data.cities);
                 setShops(data.shops);
-                setCustomer(data.customer);
-                setShop(data.customer.shop_id);
-                setType(data.customer.type);
-                setName(data.customer.name);
-                setNameKana(data.customer.name_kana);
-                setPhoneNumber1(data.customer.phone_number1);
-                setPhoneNumber2(data.customer.phone_number2);
-                setBirthday(data.customer.birthday);
-                setGender(data.customer.gender);
-                setZipCode(data.customer.zipcode);
-                setAddress1(data.customer.address1);
-                setAddress2(data.customer.address2);
-                setAddress3(data.customer.address3);
-                setNote(data.customer.note);
-                let newCities = [];
-                data.cities.forEach(element => {
-                    if (element.prefecture_id == data.customer.address1) {
-                        newCities.push(element);
-                    }
-                });
-                setFilteredCities(newCities);
-                if (data.customer.identification_id1) {
-                    setIdentificationId1(data.customer.identification_id1);
-                    setIdentificationType1(data.customer.identification_type1);
-                    setIdentificationFile1(data.customer.identification_path1);
-                }
-                if (data.customer.identification_id2) {
-                    setIsVisible(true);
-                    setIdentificationId2(data.customer.identification_id2);
-                    setIdentificationType2(data.customer.identification_type2);
-                    setIdentificationFile2(data.customer.identification_path2);
-                }
             }
         };
 
         fetchData(); // Execute API call
     }, []); // Empty dependency array means it runs once when mounted
 
+    // Start the camera when the component mounts
+    useEffect(() => {
+        // const startCamera = async () => {
+        //     try {
+        //         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        //         if (videoRef.current) {
+        //             videoRef.current.srcObject = stream;
+        //         }
+        //     } catch (error) {
+        //         console.error("Error accessing camera: ", error);
+        //     }
+        // };
+
+        // startCamera();
+
+        // // Cleanup when the component unmounts
+        // return () => {
+        //     if (videoRef.current && videoRef.current.srcObject) {
+        //         let tracks = videoRef.current.srcObject.getTracks();
+        //         tracks.forEach((track) => track.stop());
+        //     }
+        // };
+    }, []);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageSrc(reader.result); // Display image preview
+            };
+            reader.readAsDataURL(file);
+            processOCR(file); // Process OCR when file is selected
+        }
+    };
+
+    const captureImage = () => {
+        if (videoRef.current && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const video = videoRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw the current video frame to the canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get the data URL of the image
+            const imageData = canvas.toDataURL('image/png');
+            setImageSrc(imageData);
+
+            // Perform OCR on the captured image
+            performOcr(imageData);
+        }
+    };
+
+    const processOCR = (imageFile) => {
+        setIsProcessing(true);
+        Tesseract.recognize(
+            imageFile,
+            'jpn', // Japanese language model
+            {
+                logger: (m) => console.log(m), // Progress logging
+            }
+        ).then(({ data: { text } }) => {
+            setOcrResult(text); // Set OCR result to state
+            setIsProcessing(false);
+        }).catch((error) => {
+            setOcrResult("Error during OCR processing");
+            setIsProcessing(false);
+        });
+    };
+
+    const performOcr = (imageData) => {
+        setIsProcessing(true);
+        Tesseract.recognize(
+            imageData,
+            'jpn', // Japanese language model
+            {
+                logger: (m) => console.log(m), // Logging progress
+            }
+        ).then(({ data: { text } }) => {
+            setOcrResult(text);
+            setIsProcessing(false);
+        }).catch((error) => {
+            setOcrResult("Error during OCR processing");
+            setIsProcessing(false);
+        });
+    };
+
     const handleChangeAddress1 = (e) => {
+        console.log(e.target.value);
         let selectedPrefectureId = e.target.value;
         setAddress1(selectedPrefectureId);
         let newCities = [];
@@ -149,7 +215,6 @@ let FormCustomerEdit = (props) => {
             ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
             return;
         }
-
         if (identificationType1.includes("image")) {
             handleImagePreview(identificationFile1);
         } else if (identificationType1.includes("pdf")) {
@@ -171,12 +236,8 @@ let FormCustomerEdit = (props) => {
 
     const handleImagePreview = async (file) => {
         setOpenImagePreview(true)
-        if (typeof file === "string") {
-            setPreviewImage(file)
-        } else {
-            const previewImage = await previewThumbnail(file)
-            setPreviewImage(previewImage)
-        }
+        const previewImage = await previewThumbnail(file)
+        setPreviewImage(previewImage)
     }
 
     const handleImagePreviewClose = () => {
@@ -186,13 +247,10 @@ let FormCustomerEdit = (props) => {
 
     const handlePdfPreview = async (file) => {
         setOpenPdfPreview(true)
-        if (typeof file === "string") {
-            setPreviewPdf(file)
-        } else {
-            const previewPdf = await file
-            setPreviewPdf(URL.createObjectURL(previewPdf))
-            console.log(URL.createObjectURL(previewPdf));
-        }
+        const previewPdf = await file
+        console.log(URL.createObjectURL(previewPdf));
+
+        setPreviewPdf(previewPdf)
     }
 
     const handlePdfPreviewClose = () => {
@@ -273,7 +331,6 @@ let FormCustomerEdit = (props) => {
         dispatch(utilityAction.setLoading("content"));
         try {
             const formData = new FormData();
-            formData.append("id", customer.id);
             formData.append("shop_id", shop);
             formData.append("type", type);
             formData.append("name", name);
@@ -289,20 +346,12 @@ let FormCustomerEdit = (props) => {
             if (identificationId1 !== undefined && identificationType1 !== undefined) {
                 formData.append("identification_id1", identificationId1);
                 formData.append("identification_type1", identificationType1);
-                if (typeof identificationFile1 === "string" && identificationFile1.includes('http')) {
-                    formData.append("identification_path1", identificationFile1);
-                } else {
-                    formData.append("files[]", identificationFile1);
-                }
+                formData.append("files[]", identificationFile1);
             }
             if (identificationId2 !== undefined && identificationType2 !== undefined) {
                 formData.append("identification_id2", identificationId2);
                 formData.append("identification_type2", identificationType2);
-                if (typeof identificationFile2 === "string" && identificationFile2.includes('http')) {
-                    formData.append("identification_path2", identificationFile2);
-                } else {
-                    formData.append("files[]", identificationFile2);
-                }
+                formData.append("files[]", identificationFile2);
             }
             formData.append("note", note);
 
@@ -314,25 +363,9 @@ let FormCustomerEdit = (props) => {
             }
             dispatch(utilityAction.stopLoading());
         } catch (error) {
+            console.log(error)
             ToastNotification("error", error?.message);
             dispatch(utilityAction.stopLoading());
-        }
-    };
-
-    const handleDeleteClick = async () => {
-        if (window.confirm("この操作で顧客情報が削除されます。本当に削除しますか？")) {
-            try {
-                const formData = new FormData();
-                formData.append("id", customer.id);
-                let feedback = await multiPostData("customer/delete", formData)
-                if (feedback.status === 200) {
-                    setTimeout(() => {
-                        window.history.back();
-                    }, 300);
-                }
-            } catch (error) {
-                ToastNotification("error", error?.message);
-            }
         }
     };
 
@@ -352,18 +385,9 @@ let FormCustomerEdit = (props) => {
                     textLoading="Waiting"
                     type="submit"
                     color="primary"
-                    title="更新する"
+                    title="登録する"
                     className="w-100"
                     onClick={handleRegisterClick}
-                />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="danger"
-                    title="削除する"
-                    className="w-100"
-                    onClick={handleDeleteClick}
                 />
                 <Button
                     loading
@@ -376,19 +400,12 @@ let FormCustomerEdit = (props) => {
                 />
 
             </div>
-            <div className="row">
-                <div className="col-lg-6 col-lg-6 mt-10">
-                    <div className="flex-center mt-10 min-w-400">
-                        <div className="input-label">顧客番号</div>
-                        <div className="input-value">
-                            {customer ? customer.id : ''}
-                        </div>
-                    </div>
+            <div className='customer-register-container'>
+                <div>
                     <div className="flex-center mt-10 min-w-400">
                         <div className="input-label">店舗名</div>
                         <div className="input-value">
                             <Select
-                                value={shop ? shop : 0}
                                 onChange={(e) => setShop(e.target.value)}
                                 displayEmpty
                                 className="shop-select"
@@ -397,7 +414,7 @@ let FormCustomerEdit = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">店舗名</span>
                                 </MenuItem>
-                                {shops?.map(item => (
+                                {shops.map(item => (
                                     <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -407,7 +424,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">種別</div>
                         <div className="input-value">
                             <Select
-                                value={type ? type : 0}
                                 onChange={(e) => setType(e.target.value)}
                                 displayEmpty
                                 className="shop-select"
@@ -429,7 +445,6 @@ let FormCustomerEdit = (props) => {
                             <TextInput
                                 id="name"
                                 type="text"
-                                value={name ? name : ""}
                                 name="name"
                                 className="mt-1 block w-full"
                                 onChange={(e) => setName(e.target.value)}
@@ -443,7 +458,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-value">
                             <TextInput
                                 id="name_kana"
-                                value={nameKana ? nameKana : ""}
                                 type="text"
                                 name="name_kana"
                                 className="mt-1 block w-full"
@@ -458,7 +472,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
-                                value={phoneNumber1 ? phoneNumber1 : ""}
                                 name="phone"
                                 placeholder='電話番号'
                                 onChange={(e) => setPhoneNumber1(e.target.value)}
@@ -470,7 +483,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
-                                value={phoneNumber2 ? phoneNumber2 : ""}
                                 name="phone"
                                 placeholder='電話番号'
                                 onChange={(e) => setPhoneNumber2(e.target.value)}
@@ -481,7 +493,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">生年月日</div>
                         <div className="input-value">
                             <DateInput
-                                value={birthday ? birthday : 0}
                                 className="shop-select w-100"
                                 onChange={(e) => setBirthday(e)}
                             />
@@ -491,7 +502,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">性別</div>
                         <div className="input-value">
                             <Select
-                                value={gender ? gender : 0}
                                 onChange={(e) => setGender(e.target.value)}
                                 className="shop-select w-100"
                                 size='small'
@@ -505,7 +515,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">郵便番号</div>
                         <div className="input-value">
                             <ZipcodeInput
-                                value={customer ? customer.zipcode : ""}
                                 onChange={(e) => handleZipCode(e)}
                             />
                         </div>
@@ -514,7 +523,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <Select
-                                value={address1 ? address1 : 0}
                                 onChange={handleChangeAddress1}
                                 className="shop-select w-150"
                                 size='small'
@@ -522,7 +530,7 @@ let FormCustomerEdit = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">都道府県</span>
                                 </MenuItem>
-                                {prefectures?.map((item, key) => (
+                                {prefectures.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -532,12 +540,11 @@ let FormCustomerEdit = (props) => {
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <Select
-                                value={address2 ? address2 : 0}
                                 onChange={handleChangeAddress2}
                                 className="shop-select w-150"
                                 size='small'
                             >
-                                {filteredCities?.map((item, key) => (
+                                {filteredCities.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -548,7 +555,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-value">
                             <TextInput
                                 id="address3"
-                                value={address3 ? address3 : ""}
                                 type="text"
                                 name="address3"
                                 className="mt-1 block w-full"
@@ -568,7 +574,6 @@ let FormCustomerEdit = (props) => {
                                 <div>
                                     <div className='flex-center'>
                                         <Select
-                                            value={identificationId1 ? identificationId1 : 0}
                                             onChange={(e) => setIdentificationId1(e.target.value)}
                                             className="shop-select w-150"
                                             size='small'
@@ -587,7 +592,6 @@ let FormCustomerEdit = (props) => {
                                     {isVisible && (
                                         <div className='flex-center'>
                                             <Select
-                                                value={identificationId2 ? identificationId2 : 0}
                                                 onChange={(e) => setIdentificationId2(e.target.value)}
                                                 className="shop-select w-150"
                                                 size='small'
@@ -613,7 +617,6 @@ let FormCustomerEdit = (props) => {
                         <div className="input-value">
                             <textarea
                                 rows={10}
-                                value={note ? note : ""}
                                 variant="outlined"
                                 className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
                                 onChange={(e) => setNote(e.target.value)}
@@ -621,9 +624,61 @@ let FormCustomerEdit = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-lg-6 mt-10 col-lg-6 mt-10">
+                <div>
+                </div>
+                <div className='hidden'>
+                    <div>
+                        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: 'auto' }} />
+                    </div>
+
+                    <button onClick={captureImage}>Capture Image</button>
+
+                    {/* Hidden Canvas to Draw Image */}
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+                    {/* Display Captured Image */}
+                    {imageSrc && (
+                        <div>
+                            <h3>Captured Image:</h3>
+                            <img src={imageSrc} alt="Captured" style={{ maxWidth: '100%' }} />
+                        </div>
+                    )}
+
+                    {/* Display OCR Result */}
+                    {isProcessing ? (
+                        <p>Processing...</p>
+                    ) : (
+                        <div>
+                            <h3>OCR Result:</h3>
+                            <p>{ocrResult}</p>
+                        </div>
+                    )}
+                </div>
+                <div className='hidden'>
+                    <h1>OCR from Image</h1>
+
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+
+                    {/* Display Image Preview */}
+                    {imageSrc && (
+                        <div>
+                            <h3>Image Preview:</h3>
+                            <img src={imageSrc} alt="Selected" style={{ maxWidth: '100%' }} />
+                        </div>
+                    )}
+
+                    {/* Display OCR Result */}
+                    {isProcessing ? (
+                        <p>Processing...</p>
+                    ) : (
+                        <div>
+                            <h3>OCR Result:</h3>
+                            <p>{ocrResult}</p>
+                        </div>
+                    )}
                 </div>
             </div>
+            <TableCustomerVisitShop />
             <Dialog
                 open={openImagePreview}
                 onClose={() => handleImagePreviewClose()}
@@ -639,7 +694,7 @@ let FormCustomerEdit = (props) => {
                 <DialogContent dividers>
                     {previewPdf && (
                         <div className='pdf-viewer-container'>
-                            <Document file={previewPdf ? previewPdf : null}
+                            <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
                                 onLoadError={(error) => console.error("Error loading PDF:", error)}
                                 onLoadSuccess={onDocumentLoadSuccess}>
                                 <Page pageNumber={pageNumber} />
@@ -662,4 +717,4 @@ let FormCustomerEdit = (props) => {
         </div>
     );
 };
-export default FormCustomerEdit;
+export default FormCustomerRegister;

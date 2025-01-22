@@ -45,7 +45,7 @@ export default function StaffDashboard({ auth }) {
             >
                 <div className="news-info p-4">
                     <div className='news-list overflow-auto h-full'>
-                        {range?.map((item, key) => (
+                        {range.map((item, key) => (
                             <NewsItem data={item} />
                         ))}
                     </div>

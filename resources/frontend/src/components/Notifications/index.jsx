@@ -21,7 +21,7 @@ const Notifications = () => {
 
     useEffect(() => {
         let res = [];
-        coms.forEach((element) => {
+        coms?.forEach((element) => {
             if (!comIds.includes(Number(element.id)))
                 res.push(Number(element.id));
         });
@@ -30,7 +30,7 @@ const Notifications = () => {
 
     useEffect(() => {
         let res = [];
-        pubcoms.forEach((element) => {
+        pubcoms?.forEach((element) => {
             if (!comIds.includes(Number(element.id)))
                 res.push(Number(element.id));
         });
@@ -44,7 +44,7 @@ const Notifications = () => {
             if (
                 data &&
                 data.channel &&
-                comIds.includes(Number(data.channel.community_id))
+                comIds?.includes(Number(data.channel.community_id))
             ) {
                 if (auth?.id != data.channel.user_id) {
                     dispatch(actionChannel.handleAddChannel(data.channel));
@@ -59,7 +59,7 @@ const Notifications = () => {
             if (
                 data &&
                 data.post &&
-                comIds.includes(Number(data.post.community_id))
+                comIds?.includes(Number(data.post.community_id))
             ) {
                 if (auth?.id != data.post.user_id) {
                     dispatch(actionChannel.handleAddPostToChannel(data.post));

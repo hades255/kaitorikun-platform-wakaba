@@ -110,13 +110,15 @@ const Notifications = () => {
                 auth &&
                 data &&
                 data.chat &&
-                (data.chat.from == auth?.id || data.chat.to == auth?.id)
-            )
+                data.chat.to == auth?.id &&
+                data.chat.from != auth?.id
+            ) {
                 dispatch(actionChat.handleReceiveChat(data.chat));
-            if (data.name)
-                showNotification("新しいメッセージ", {
-                    message: `${data.name} さんが新しいメッセージを送信しました.`,
-                });
+                if (data.name)
+                    showNotification("新しいメッセージ", {
+                        message: `${data.name} さんが新しいメッセージを送信しました.`,
+                    });
+            }
         };
 
         channel.listen(".channel.community.created", handleCommunityCreated);

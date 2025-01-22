@@ -8,6 +8,7 @@ import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 import { PanelContent, useDispatch, useSelector } from "../../components";
 import { makeStyles, useTheme } from "@mui/styles";
+import { AnimTypingIcon } from "../../assets/loader";
 
 const ChatsPage = () => {
     const { auth } = useAuth();
@@ -17,14 +18,10 @@ const ChatsPage = () => {
     const classes = useStyles();
 
     const lastmessage = useRef(null);
+    const [sending, setSending] = useState(false);
 
     const chats = useMemo(() => {
-        if (
-            auth &&
-            selectedUser &&
-            Array.isArray(_chats) &&
-            _chats.length > 0
-        )
+        if (auth && selectedUser && Array.isArray(_chats) && _chats.length > 0)
             return _chats?.filter(
                 ({ from, to }) =>
                     (from == auth?.id && to == selectedUser.id) ||
@@ -37,6 +34,7 @@ const ChatsPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setSending(true);
         if (message.trim() && selectedUser) {
             const newMessage = {
                 content: message,
@@ -47,8 +45,10 @@ const ChatsPage = () => {
             };
             const sendMsgFunc = async () => {
                 try {
-                    await api.post("chats", newMessage);
+                    const response = await api.post("chats", newMessage);
+                    dispatch(actionChat.handleReceiveChat(response.data.chat));
                     setMessage("");
+                    setSending(false);
                 } catch (error) {
                     console.log(error);
                 }
@@ -84,7 +84,7 @@ const ChatsPage = () => {
                 }
             }
         }
-    }, [handleReadChat, chats, selectedUser]);
+    }, [handleReadChat, chats, selectedUser, sending]);
 
     return (
         <PanelContent
@@ -103,6 +103,16 @@ const ChatsPage = () => {
                                     selectedUser={selectedUser}
                                 />
                             ))}
+                            {sending && (
+                                <Box
+                                    display={"flex"}
+                                    justifyContent={"end"}
+                                    px={4}
+                                    py={2}
+                                >
+                                    <AnimTypingIcon />
+                                </Box>
+                            )}
                             <Box ref={lastmessage}></Box>
                         </Box>
                         <form onSubmit={handleSubmit}>
@@ -122,7 +132,12 @@ const ChatsPage = () => {
                         </form>
                     </>
                 ) : (
-                    <Box display="flex" width="100%" justifyContent="center" alignItems="center">
+                    <Box
+                        display="flex"
+                        width="100%"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
                         {/* Select a user to start chatting */}
                         チャットを開始するユーザーを選択
                     </Box>
@@ -137,7 +152,7 @@ export default ChatsPage;
 const ChatItem = ({ chat, selectedUser }) => {
     return (
         <MessageBox
-            position={chat.from === selectedUser.id ? "left" : "right"}
+            position={chat.to === selectedUser.id ? "right" : "left"}
             type={"text"}
             text={chat.content}
         />
@@ -154,6 +169,6 @@ const useStyles = makeStyles((theme) => ({
     chatWrapper: {
         height: "calc(100% - 80px)",
         maxHeight: "calc(100% - 80px)",
-        overflowY: "scroll", 
-    }
-  }));
+        overflowY: "scroll",
+    },
+}));

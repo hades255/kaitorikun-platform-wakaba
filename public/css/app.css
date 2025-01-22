@@ -50736,6 +50736,11 @@ input.password-hide-css {
     justify-content: center;
     gap: 100px;
   }
+  .customer-register-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 100px;
+  }
   .search-container {
     display: flex;
     justify-content: center;
@@ -50747,6 +50752,12 @@ input.password-hide-css {
   .staff-register-container {
     display: flex;
     justify-content: center;
+    gap: 0px;
+    flex-direction: column;
+  }
+  .customer-register-container {
+    display: flex;
+    justify-content: flex-start;
     gap: 0px;
     flex-direction: column;
   }

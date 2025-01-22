@@ -6,6 +6,34 @@ import { actionChannel, selectorChannel } from "../../reduxStore";
 import { ToastNotification, useDispatch, useSelector } from "..";
 import { makeStyles, useTheme } from "@mui/styles";
 
+// Define the styles using makeStyles
+const useStyles = makeStyles((theme) => ({
+    formContainer: {
+        display: "flex",
+        flexDirection: "column",
+    },
+    formGroup: {
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+        marginBottom: "16px",
+    },
+    label: {
+        color: "#1f2937",
+        minWidth: "96px",
+    },
+    select: {
+        minWidth: "96px",
+        borderRadius: "4px",
+        padding: "4px",
+        color: "#1f2937",
+    },
+    buttonContainer: {
+        display: "flex",
+        gap: "8px",
+    },
+}));  
+
 const CreateChannel = () => {
     const classes = useStyles();
     const { preSetCommunityId, setShowChannelEditor, preSetCommunityName } =
@@ -137,31 +165,3 @@ const CreateChannel = () => {
 };
 
 export default CreateChannel;
-
-// Define the styles using makeStyles
-const useStyles = makeStyles((theme) => ({
-    formContainer: {
-        display: "flex",
-        flexDirection: "column",
-    },
-    formGroup: {
-        display: "flex",
-        alignItems: "center",
-        gap: theme.spacing(2),
-        marginBottom: theme.spacing(2),
-    },
-    label: {
-        color: theme.palette.text.primary,
-        minWidth: theme.spacing(24),
-    },
-    select: {
-        minWidth: theme.spacing(24),
-        borderRadius: theme.shape.borderRadius,
-        padding: theme.spacing(1),
-        color: theme.palette.text.primary,
-    },
-    buttonContainer: {
-        display: "flex",
-        gap: theme.spacing(2),
-    },
-}));  

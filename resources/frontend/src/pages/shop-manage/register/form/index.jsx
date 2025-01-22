@@ -464,7 +464,7 @@ let FormStaffRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">都道府県</span>
                                 </MenuItem>
-                                {prefectures?.map((item, key) => (
+                                {prefectures.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -478,7 +478,7 @@ let FormStaffRegister = (props) => {
                                 className="shop-select w-100-pro"
                                 size='small'
                             >
-                                {filteredCities?.map((item, key) => (
+                                {filteredCities.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -512,7 +512,7 @@ let FormStaffRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">店舗名</span>
                                 </MenuItem>
-                                {shops?.map(item => (
+                                {shops.map(item => (
                                     <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
                                 ))}
                             </Select>
@@ -660,7 +660,7 @@ let FormStaffRegister = (props) => {
                                         <MenuItem disabled value="">
                                             <span className="text-gray-500">連帯保証人</span>
                                         </MenuItem>
-                                        {guarantors?.map((item, key) => (
+                                        {guarantors.map((item, key) => (
                                             <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
                                         ))}
                                     </Select>

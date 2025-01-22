@@ -8,7 +8,6 @@ import { getUserStatusColor } from "../../../feature/action";
 import { useAuth } from "../../../contexts/AuthContext";
 import { actionChat } from "../../../reduxStore/actions/chat_action";
 import { selectorChat } from "../../../reduxStore/selector/selectorChat";
-import { Box } from "@mui/material";
 
 const ChatSidebar = () => {
     const { auth } = useAuth();

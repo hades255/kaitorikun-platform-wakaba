@@ -12,6 +12,8 @@ use App\Http\Controllers\PostReactionController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\UserController;
+use App\Mail\CommunityInvitationEmail;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +25,13 @@ use App\Http\Controllers\UserController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/send-email', function () {
+    Mail::to('montgasam@gmail.com')->send(new CommunityInvitationEmail());
+
+    return response()->json(["msg" => 'Email sent successfully!']);
+});
+
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'sendForgotPasswordEmail']);

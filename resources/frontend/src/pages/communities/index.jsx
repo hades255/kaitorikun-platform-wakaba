@@ -252,13 +252,9 @@ const PreNamedItems = ({ community }) => {
     return (
         <Box
             onClick={handleClick}
-            className={clsx(
-                classes.preNamesItem,
-                {
-                    "bg-[#313239] hover:bg-[#212229]": community.value,
-                    "bg-[#5a65ba] hover:bg-[#4a55aa]": !community.value,
-                }
-            )}
+            className={`${classes.preNamesItem} ${
+                community.value ? classes.active : classes.inactive
+              }`}
         >
             {community.title}
         </Box>
@@ -278,4 +274,16 @@ const useStyles = makeStyles((theme) => ({
         cursor: "pointer",
         transition: "all 0.3s ease",
     },
-  }));
+    active: {
+        backgroundColor: '#313239',
+        '&:hover': {
+          backgroundColor: '#212229',
+        },
+      },
+      inactive: {
+        backgroundColor: '#5a65ba',
+        '&:hover': {
+          backgroundColor: '#4a55aa',
+        },
+      },
+}));

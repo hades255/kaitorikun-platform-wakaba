@@ -6,6 +6,7 @@ export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
     const [permission, setPermission] = useState(Notification.permission);
+    const [unreadTab, setUnreadTab] = useState({ com: false, chat: false });
 
     const requestNotificationPermission = () => {
         if ("Notification" in window) {
@@ -29,9 +30,18 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
+    const updateUnreadTab = (key, value) => {
+        setUnreadTab({ ...unreadTab, [key]: value });
+    };
+
     return (
         <NotificationContext.Provider
-            value={{ requestNotificationPermission, showNotification }}
+            value={{
+                requestNotificationPermission,
+                showNotification,
+                unreadTab,
+                updateUnreadTab,
+            }}
         >
             {children}
         </NotificationContext.Provider>

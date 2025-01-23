@@ -12,7 +12,7 @@ import myEcho from "../helper/Echo";
 const Notifications = () => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
-    const { showNotification } = useNotification();
+    const { unreadTab, updateUnreadTab, showNotification } = useNotification();
     const coms = useSelector(selectorChannel.handleGetCommunities);
     const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
@@ -50,12 +50,13 @@ const Notifications = () => {
                 comIds?.includes(Number(data.channel.community_id))
             ) {
                 if (auth?.id != data.channel.user_id) {
+                    updateUnreadTab("com", true);
                     dispatch(actionChannel.handleAddChannel(data.channel));
+                    if (data.name)
+                        showNotification("新しいチャンネル", {
+                            message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
+                        });
                 }
-                if (data.name)
-                    showNotification("新しいチャンネル", {
-                        message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
-                    });
             }
         };
         const handlePostCreated = (data) => {
@@ -65,43 +66,48 @@ const Notifications = () => {
                 comIds?.includes(Number(data.post.community_id))
             ) {
                 if (auth?.id != data.post.user_id) {
+                    updateUnreadTab("com", true);
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
+                    if (data.name)
+                        showNotification("新しい投稿", {
+                            message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
+                        });
                 }
-                if (data.name)
-                    showNotification("新しい投稿", {
-                        message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
-                    });
             }
         };
         const handleReplyToPost = (data) => {
             if (data && data.reply) {
+                updateUnreadTab("com", true);
                 dispatch(actionChannel.handleReplyPost(data.reply));
             }
         };
         const handleAddReactionToPost = (data) => {
             if (data && data.reaction) {
+                updateUnreadTab("com", true);
                 dispatch(actionChannel.handleAddREACTION(data.reaction));
             }
         };
         const handleRemoveReactFromPost = (data) => {
             if (data && data.reaction) {
+                updateUnreadTab("com", true);
                 dispatch(actionChannel.handleRemoveREACTION(data.reaction));
             }
         };
         const handleCommunityCreated = (data) => {
             if (data && data.community && data.channel) {
                 if (auth?.id != data.community.user_id) {
+                    updateUnreadTab("com", true);
                     dispatch(
                         actionChannel.handleAddPublicCommunity({
                             ...data.community,
                             channels: [data.channel],
                         })
                     );
+                    if (data.name)
+                        showNotification("新しいコミュニティ", {
+                            message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
+                        });
                 }
-                if (data.name)
-                    showNotification("新しいコミュニティ", {
-                        message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
-                    });
             }
         };
 
@@ -110,13 +116,16 @@ const Notifications = () => {
                 auth &&
                 data &&
                 data.chat &&
-                (data.chat.from == auth?.id || data.chat.to == auth?.id)
-            )
+                data.chat.to == auth?.id &&
+                data.chat.from != auth?.id
+            ) {
                 dispatch(actionChat.handleReceiveChat(data.chat));
-            if (data.name)
-                showNotification("新しいメッセージ", {
-                    message: `${data.name} さんが新しいメッセージを送信しました.`,
-                });
+                updateUnreadTab("chat", true);
+                if (data.name)
+                    showNotification("新しいメッセージ", {
+                        message: `${data.name} さんが新しいメッセージを送信しました.`,
+                    });
+            }
         };
 
         channel.listen(".channel.community.created", handleCommunityCreated);
@@ -146,7 +155,7 @@ const Notifications = () => {
                 channel.stopListening(".channel.chat.created");
             }
         };
-    }, [dispatch, showNotification, auth, comIds]);
+    }, [dispatch, showNotification, updateUnreadTab, auth, comIds]);
 
     useEffect(() => {
         if (auth) {

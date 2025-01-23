@@ -44,10 +44,10 @@ const CreateChannel = () => {
 
     const coms = useMemo(() => {
         let res = {};
-        _coms.forEach((item) => {
+        _coms?.forEach((item) => {
             if (!res[item.id]) res[item.id] = item.name;
         });
-        _pcoms.forEach((item) => {
+        _pcoms?.forEach((item) => {
             if (!res[item.id]) res[item.id] = item.name;
         });
         let _res = [];

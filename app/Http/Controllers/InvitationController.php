@@ -6,6 +6,7 @@ use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class InvitationController extends Controller
 {
@@ -45,7 +46,17 @@ class InvitationController extends Controller
             $invitation->receiver_id = $receiver->id;
             $invitation->token = $token;
             if ($invitation->save()) {
-                //  todo    send mail to the receiver
+                $data = array(
+                    'email' => $email,
+                    'name' => $receiver->name,
+                    'token' => $token,
+                    'contact' => env('MAIL_FROM_ADDRESS', ''),
+                    'social' => '/',
+                    'url' => url('/join-community?token=' . $token)
+                );
+                Mail::send('email.community_invitation', compact('data'), function ($message) use ($data) {
+                    $message->to($data['email'])->subject('コミュニティに参加しましょう');
+                });
                 return response()->json($invitation, 201);
             }
             return response()->json(['error' => 'Failed to send invitation'], 500);

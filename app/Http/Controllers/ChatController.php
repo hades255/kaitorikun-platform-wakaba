@@ -16,8 +16,11 @@ class ChatController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $chats = Chat::where('from', $userId)
-            ->orWhere('to', $userId)
+        $chats = Chat::where(function ($query) use ($userId) {
+            $query->where('from', $userId)
+                ->orWhere('to', $userId);
+        })
+            ->where('deleted', '!=', $userId)
             ->with(['fromUser', 'toUser'])
             ->get();
         return response()->json($chats);
@@ -49,12 +52,34 @@ class ChatController extends Controller
         $chat->status = $validatedData['status'];
         $chat->reply = $validatedData['reply'];
         $chat->emoji = $validatedData['emoji'];
+        $chat->type = 'txt';
         $chat->from = Auth::id();
         if ($chat->save()) {
             NewChatJob::dispatch($chat, Auth::user()->name);
             return response()->json(["chat" => $chat], 201);
         }
         return response()->json(['error' => 'Failed to create chat'], 500);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store_files(Request $request)
+    {
+        $items = $request->input('chats');
+        $createdChats = [];
+        foreach ($items as $item) {
+            $chat = Chat::create([
+                "to" => $item['to'],
+                "content" => $item['content'],
+                "type" => $item['type'],
+                "other" => json_encode($item['other']),
+                "from" =>  Auth::id(),
+            ]);
+            $createdChats[] = $chat;
+            NewChatJob::dispatch($chat, Auth::user()->name);
+        }
+        return response()->json(["chats" => $createdChats], 201);
     }
 
     /**
@@ -84,9 +109,15 @@ class ChatController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Chat $chat)
     {
-        //
+        if ($chat->deleted == 0) {
+            $chat->deleted = Auth::id();
+            $chat->save();
+        } else {
+            $chat->delete();
+        }
+        return response()->noContent();
     }
 
     public function read(Request $request)

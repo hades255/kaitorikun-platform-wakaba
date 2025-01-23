@@ -1,5 +1,6 @@
 import {
     ADD_USER,
+    DELETE_CHATS,
     PIN_USER,
     READ_CHATS,
     RECEIVE_CHAT,
@@ -51,6 +52,13 @@ const chats = (state = initialState, actions) => {
             };
         case SET_USERS:
             return { ...state, users: actions.payload.data };
+        case DELETE_CHATS:
+            return {
+                ...state,
+                chats: state.chats?.filter(
+                    (item) => item.id !== actions.payload.data
+                ),
+            };
         case ADD_USER:
             return { ...state };
         case SET_USER_STATUS:

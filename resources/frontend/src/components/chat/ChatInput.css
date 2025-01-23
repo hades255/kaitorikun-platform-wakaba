@@ -1,0 +1,62 @@
+.selected-files {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+}
+
+.file-item {
+    display: inline-block;
+    margin: 5px;
+    position: relative;
+}
+
+.file-name {
+    background: white;
+    padding: 5px 30px 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+.media-preview {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.remove-file {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+}
+
+.file-input {
+    display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    .file-name {
+        background: #333;
+        color: #fff;
+    }
+}

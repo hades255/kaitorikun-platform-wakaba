@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "react-chat-elements";
+import { Box } from "@mui/material";
 import "react-chat-elements/dist/main.css";
-import { TextField, Button, Box } from "@mui/material";
 import api from "../../api";
+import { makeStyles } from "@mui/styles";
+import { AnimTypingIcon } from "../../assets/loader";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";
+import ChatInput from "../../components/chat/ChatInput";
 import { PanelContent, useDispatch, useSelector } from "../../components";
-import { makeStyles, useTheme } from "@mui/styles";
-import { AnimTypingIcon } from "../../assets/loader";
+import { PUBLIC_HOST } from "../../config";
 
 const ChatsPage = () => {
     const { auth } = useAuth();
@@ -29,33 +31,6 @@ const ChatsPage = () => {
             );
         return [];
     }, [auth, selectedUser, _chats]);
-
-    const [message, setMessage] = useState("");
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSending(true);
-        if (message.trim() && selectedUser) {
-            const newMessage = {
-                content: message,
-                to: selectedUser.id,
-                status: "unread",
-                reply: 0,
-                emoji: "",
-            };
-            const sendMsgFunc = async () => {
-                try {
-                    const response = await api.post("chats", newMessage);
-                    dispatch(actionChat.handleReceiveChat(response.data.chat));
-                    setMessage("");
-                    setSending(false);
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-            sendMsgFunc();
-        }
-    };
 
     const handleReadChat = useCallback(
         async (userId) => {
@@ -92,7 +67,7 @@ const ChatsPage = () => {
             // title="Messages"
             title="メッセージ"
         >
-            <Box className={classes.container} p={4}>
+            <Box className={classes.container} pb={4}>
                 {selectedUser ? (
                     <>
                         <Box className={classes.chatWrapper}>
@@ -115,21 +90,11 @@ const ChatsPage = () => {
                             )}
                             <Box ref={lastmessage}></Box>
                         </Box>
-                        <form onSubmit={handleSubmit}>
-                            <Box display="flex" marginTop={4}>
-                                <TextField
-                                    fullWidth
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    // placeholder="Type a message..."
-                                    placeholder="メッセージを入力..."
-                                    sx={{ mr: 1 }}
-                                />
-                                <Button variant="contained" type="submit">
-                                    {/* Send */}送信
-                                </Button>
-                            </Box>
-                        </form>
+                        <ChatInput
+                            sending={sending}
+                            setSending={setSending}
+                            selectedUser={selectedUser}
+                        />
                     </>
                 ) : (
                     <Box
@@ -150,11 +115,70 @@ const ChatsPage = () => {
 export default ChatsPage;
 
 const ChatItem = ({ chat, selectedUser }) => {
+    const dispatch = useDispatch();
+
+    const type = chat.type.startsWith("video/")
+        ? "video"
+        : chat.type.startsWith("image/")
+        ? "photo"
+        : chat.type.startsWith("audio/")
+        ? "audio"
+        : chat.type == "txt"
+        ? "text"
+        : "file";
+
+    const data = chat.other
+        ? {
+              uri: PUBLIC_HOST + "/storage/" + JSON.parse(chat.other)?.path,
+              videoURL:
+                  PUBLIC_HOST + "/storage/" + JSON.parse(chat.other)?.path,
+              audioURL:
+                  PUBLIC_HOST + "/storage/" + JSON.parse(chat.other)?.path,
+              audioType: chat.type,
+              size: JSON.parse(chat.other)?.size,
+              status: {
+                  click: true,
+                  loading: 0,
+                  download: true,
+                  autoDownload: true,
+              },
+          }
+        : null;
+
+    const handleClickRemove = useCallback(() => {
+        const removefunc = async () => {
+            try {
+                await api.delete("chats/" + chat.id);
+                dispatch(actionChat.handleDeleteChats(chat.id));
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        removefunc();
+    }, [dispatch, chat]);
+
     return (
         <MessageBox
+            id={chat.id}
             position={chat.to === selectedUser.id ? "right" : "left"}
-            type={"text"}
+            type={type}
+            // title={chat.content}
             text={chat.content}
+            date={chat.created_at}
+            data={data}
+            // replyButton={true}
+            removeButton={true}
+            // onClick={(e) => {
+            //     console.log(e);
+            // }}
+            // onDownload={(e) => {
+            //     console.log(e);
+            // }}
+            // onReplyClick={(e) => {
+            //     console.log(e);
+            // }}
+            onRemoveMessageClick={handleClickRemove}
+            status={chat.status == "read" ? "read" : "sent"}
         />
     );
 };

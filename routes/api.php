@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use App\Http\Controllers\PostReplyController;
@@ -32,6 +33,7 @@ Route::get('/send-email', function () {
     return response()->json(["msg" => 'Email sent successfully!']);
 });
 
+Route::post("/upload", [FileUploadController::class, 'update']);
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'sendForgotPasswordEmail']);
@@ -66,7 +68,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('chats', [ChatController::class, 'index']);
     Route::post('chats', [ChatController::class, 'store'])->name('chats.store');
+    Route::post('chats/files', [ChatController::class, 'store_files'])->name('chats.store_files');
     Route::patch('chats', [ChatController::class, 'read'])->name('chats.read');
+    Route::delete('chats/{chat}', [ChatController::class, 'destroy'])->name('chats.destroy');
 
     Route::get('users', [UserController::class, 'index']);
 });

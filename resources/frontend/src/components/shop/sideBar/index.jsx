@@ -72,7 +72,9 @@ const Sidebar = (props) => {
                     <ChannelSidebar />
                 ) : props.history.location.pathname === "/chat" ? (
                     <ChatSidebar />
-                ) : (
+                ) : props.history.location.pathname === '/calendar' 
+                    ? <></> 
+                    : (
                     <nav className="mt-2">
                         <ul
                             className="nav nav-pills nav-sidebar flex-column"
@@ -191,7 +193,8 @@ const TabItem = ({ tab, props }) => {
     const handleClick = () => {
         if (
             !props.history.location.pathname.includes("/communities") &&
-            !props.history.location.pathname.includes("/chat")
+            !props.history.location.pathname.includes("/chat") && 
+            !props.history.location.pathname.includes("/calendar")
         )
             return;
         updateUnreadTab(

@@ -5,6 +5,7 @@ import { makeStyles } from '@mui/styles';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { WeekPicker } from './week-picker';
+import { DatePicker } from './date-picker';
 
 export const CalendarHeader = ({
   currentDate,
@@ -45,7 +46,7 @@ export const CalendarHeader = ({
         <Typography variant="h6">
           {format(currentDate, 'MMMM yyyy')}
         </Typography>
-        <WeekPicker />
+        {view === 'day' ? <DatePicker onChange={onDateChange} /> : <WeekPicker onChange={onDateChange} />}
       </Box>
       <Select
         size="small"

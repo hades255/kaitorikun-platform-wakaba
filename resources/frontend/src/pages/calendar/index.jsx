@@ -14,7 +14,7 @@ const CalendarPage = () => {
     const classes = useStyles();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [view, setView] = useState('week');
-  
+    console.log(currentDate);
     return (
         <ThemeProvider theme={theme}>
             <PanelContent 
@@ -29,7 +29,7 @@ const CalendarPage = () => {
                         onDateChange={setCurrentDate}
                     />
                     <Box className={classes.gridContainer}>
-                    <CalendarGrid currentDate={currentDate} view={view} />
+                        <CalendarGrid currentDate={currentDate} view={view} />
                     </Box>
                 </Paper>
             </PanelContent>

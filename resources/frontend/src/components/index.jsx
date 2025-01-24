@@ -43,6 +43,7 @@ import ModalGlobal from "./helper/ModalGlobal";
 import { CalendarGrid } from "./calendar/calendar-grid";
 import { CalendarHeader } from "./calendar/calendar-header";
 import { WeekPicker } from "./calendar/week-picker";
+import { DatePicker } from "./calendar/date-picker";
 export {
     ModalGlobal,
     TableMaster,
@@ -94,5 +95,6 @@ export {
     useWindowSize,
     CalendarGrid,
     CalendarHeader,
-    WeekPicker
+    WeekPicker,
+    DatePicker
 };

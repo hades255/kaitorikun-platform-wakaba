@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { v4 } from "uuid";
 import { addMonths, endOfWeek, startOfWeek, subMonths } from "date-fns";
-import { getDaysInMonth } from "date-fns/esm";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { makeStyles } from '@mui/styles';
+import { getDaysInMonth } from "date-fns";
+import clsx from "clsx";
 
 export const WeekPicker = ({ onChange }) => {
   const [open, setOpen] = useState(false);
@@ -16,7 +17,7 @@ export const WeekPicker = ({ onChange }) => {
   });
   const classes = useStyles();
   useEffect(() => {
-    onChange && onChange(week);
+    onChange && onChange(week.firstDay);
   }, [week]);
 
   const isLeapYear = () => {
@@ -83,12 +84,12 @@ export const WeekPicker = ({ onChange }) => {
     for (let i = 1; i <= days[month]; i++) {
       let currentDate = new Date(date).setDate(i);
 
-      let cName = "single-number ";
+      let cName = classes.singleNumber;
       if (
         new Date(week.firstDay).getTime() <= new Date(currentDate).getTime() &&
         new Date(currentDate).getTime() <= new Date(week.lastDay).getTime()
       ) {
-        cName = cName + "selected-week";
+        cName = clsx(cName, classes.selectedWeek);
       }
 
       ar.push(
@@ -115,12 +116,13 @@ export const WeekPicker = ({ onChange }) => {
       let currentDate = new Date(previousMonth).setDate(
         days[prevMonthDays] - i + 2
       );
-      let cName = "single-number other-month";
+      let cName = clsx(classes.singleNumber, classes.otherMonth);
       let currentTime = new Date(currentDate).getTime();
       let firstTime = new Date(week.firstDay).getTime();
       let endTime = new Date(week.lastDay).getTime();
       if (currentTime >= firstTime && currentTime <= endTime) {
-        cName = "single-number selected-week";
+        // cName = "single-number selected-week";
+        cName=clsx(classes.singleNumber, classes.selectedWeek);
       }
 
       prevMonth.push(
@@ -142,7 +144,7 @@ export const WeekPicker = ({ onChange }) => {
     }
 
     for (let i = 1; i <= fullDays - [...prevMonth, ...ar].length; i++) {
-      let cName = "single-number other-month";
+      let cName = clsx(classes.singleNumber, classes.otherMonth);
       const lastDay = week.lastDay.getTime();
       const lastDayOfMonth = new Date(
         new Date(date).setDate(getDaysInMonth(date))
@@ -152,7 +154,7 @@ export const WeekPicker = ({ onChange }) => {
         lastDayOfMonth.getTime() <= lastDay &&
         week.firstDay.getMonth() == lastDayOfMonth.getMonth()
       ) {
-        cName = "single-number selected-week";
+        cName = clsx(classes.singleNumber, classes.selectedWeek);
       }
 
       nextMonth.push(
@@ -186,9 +188,9 @@ export const WeekPicker = ({ onChange }) => {
       onClick={() => setOpen(true)}
       tabIndex={0}
     >
-      <p>
+      <Typography>
         {convertDate(week.firstDay)} - {convertDate(week.lastDay)}
-      </p>
+      </Typography>
       {open && (
         <div className={classes.weekOptions}>
           <div className={classes.title}>
@@ -290,5 +292,22 @@ const useStyles = makeStyles((theme) => ({
         placeItems: "center",
         background: "none",
         color: "black",
+    },
+    singleNumber: {
+        width: "100%",
+        aspectRatio: 1,
+        fontSize: "0.8rem",
+        background: "none",
+        color: "black",
+        display: "grid",
+        placeItems: "center",
+    },
+    selectedWeek: {
+        color: "white",
+        backgroundColor: "#ff9900",
+    },
+    otherMonth: {
+        background: "none",
+        color: "#c3c0cc",
     }
 }));

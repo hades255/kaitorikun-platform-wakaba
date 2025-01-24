@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NewChannel;
 use App\Jobs\NewChannelJob;
 use App\Models\Channel;
+use App\Models\CommunityUser;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -36,6 +37,13 @@ class ChannelController extends Controller
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             NewChannelJob::dispatch($channel, Auth::user()->name);
+            CommunityUser::firstOrCreate(
+                [
+                    'community_id' => $validatedData['community_id'],
+                    'user_id' => Auth::id(),
+                ],
+                []
+            );
             // $channel->users()->attach(Auth::id());
             return response()->json(["channel" => $channel, "user" => Auth::user()], 201);
         }

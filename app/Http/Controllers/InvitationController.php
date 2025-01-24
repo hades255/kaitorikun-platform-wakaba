@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
+use App\Models\CommunityUser;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -52,11 +54,10 @@ class InvitationController extends Controller
                     'token' => $token,
                     'contact' => env('MAIL_FROM_ADDRESS', ''),
                     'social' => '/',
-                    'url' => url('/join-community?token=' . $token)
+                    'url' => url('/accept-invitation?token=' . $token),
+                    'subject' => 'コミュニティに参加しましょう'
                 );
-                Mail::send('email.community_invitation', compact('data'), function ($message) use ($data) {
-                    $message->to($data['email'])->subject('コミュニティに参加しましょう');
-                });
+                SendEmailJob::dispatch($data, "email.community_invitation");
                 return response()->json($invitation, 201);
             }
             return response()->json(['error' => 'Failed to send invitation'], 500);
@@ -94,5 +95,43 @@ class InvitationController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function view($id)
+    {
+        $invitation = Invitation::where("token", $id)->first();
+
+        if (!$invitation) {
+            return response()->json(['message' => '招待が見つかりません.'], 404);
+        }
+
+        if ($invitation->status === 'accepted') {
+            return response()->json(['message' => '招待はすでに承諾されています.'], 400);
+        }
+        $invitation->status = 'viewed';
+        $invitation->save();
+
+        return response()->json(['message' => '招待が正常に表示されました!']);
+    }
+
+    public function accept($id)
+    {
+        $invitation = Invitation::where("token", $id)->first();
+
+        if (!$invitation) {
+            return response()->json(['message' => '招待が見つかりません.'], 404);
+        }
+
+        if ($invitation->status === 'accepted') {
+            return response()->json(['message' => '招待はすでに承諾されています.'], 400);
+        }
+        $invitation->status = 'accepted';
+        $invitation->save();
+        $newCom = new CommunityUser();
+        $newCom->community_id = $invitation->community_id;
+        $newCom->user_id = $invitation->receiver_id;
+        $newCom->save();
+
+        return response()->json(['message' => '招待が正常に承諾されました!']);
     }
 }

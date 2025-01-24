@@ -48,13 +48,15 @@ Route::post('/customer/register', [CustomerController::class, 'createOrUpdate'])
 Route::post('/customer/list', [CustomerController::class, 'index']);
 Route::post('/customer/delete', [CustomerController::class, 'destroy']);
 
-Route::get('communities/public', [CommunityController::class, 'getPublic'])->name('communities.getPublic');
-Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');
+Route::post('/invitations/{id}/view', [InvitationController::class, 'view'])->name('invitations.view');
+Route::post('/invitations/{id}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('communities', [CommunityController::class, 'store'])->name('communities.store');
     Route::get('communities/mine', [CommunityController::class, 'getMine'])->name('communities.getMine');
     Route::get('communities/joined', [CommunityController::class, 'getWorking'])->name('communities.getWorking');
+    Route::get('communities/public', [CommunityController::class, 'getPublic'])->name('communities.getPublic');
+    Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');
 
     Route::post('invitations', [InvitationController::class, 'store'])->name('invitations.store');
 

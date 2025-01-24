@@ -9,7 +9,7 @@ class Invitation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['community_id', 'sender_id', 'receiver_id', 'token'];
+    protected $fillable = ['community_id', 'sender_id', 'receiver_id', 'token', 'status'];
 
     public function community() {
         return $this->belongsTo(Community::class);

@@ -11,6 +11,7 @@ export const SET_COMMUNITY = "SET_COMMUNITY";
 export const SET_PUBLIC_COMMUNITY = "SET_PUBLIC_COMMUNITY";
 export const NEW_COMMUNITY = "NEW_COMMUNITY";
 export const NEW_PUBLIC_COMMUNITY = "NEW_PUBLIC_COMMUNITY";
+export const SET_COMMUNITY_AS_MINE = "SET_COMMUNITY_AS_MINE";
 
 export const handler = (data, action) => (dispatch) => {
     dispatch({
@@ -36,6 +37,8 @@ const handleSetPublicCommunity = (data) => handler(data, SET_PUBLIC_COMMUNITY);
 const handleAddCommunity = (data) => handler(data, NEW_COMMUNITY);
 const handleAddPublicCommunity = (data) => handler(data, NEW_PUBLIC_COMMUNITY);
 
+const handleSetMyCommunity = (data) => handler(data, SET_COMMUNITY_AS_MINE);
+
 const actionChannel = {
     handleSetChannel,
     handleSetPublicChannel,
@@ -50,5 +53,6 @@ const actionChannel = {
     handleSetPublicCommunity,
     handleAddCommunity,
     handleAddPublicCommunity,
+    handleSetMyCommunity,
 };
 export { actionChannel };

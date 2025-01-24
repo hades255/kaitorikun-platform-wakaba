@@ -21,6 +21,11 @@ class Community extends Model
         return $this->belongsToMany(User::class, 'community_users');
     }
 
+    public function communityUsers()
+    {
+        return $this->hasMany(CommunityUser::class);
+    }
+
     public function channels()
     {
         return $this->hasMany(Channel::class);

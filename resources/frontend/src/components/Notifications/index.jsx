@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import api from "../../api";
 import { API_ROUTE } from "../../config";
 import { useAuth } from "../../contexts/AuthContext";
@@ -12,29 +11,20 @@ import myEcho from "../helper/Echo";
 const Notifications = () => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
-    const { unreadTab, updateUnreadTab, showNotification } = useNotification();
+    const { updateUnreadTab, showNotification } = useNotification();
     const coms = useSelector(selectorChannel.handleGetCommunities);
     const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
     const [comIds, setComIds] = useState([]);
 
     useEffect(() => {
-        let res = [];
-        coms?.forEach((element) => {
-            if (!comIds.includes(Number(element.id)))
-                res.push(Number(element.id));
-        });
-        if (res.length > 0) setComIds([...comIds, ...res]);
-    }, [coms, comIds]);
-
-    useEffect(() => {
-        let res = [];
-        pubcoms?.forEach((element) => {
-            if (!comIds.includes(Number(element.id)))
-                res.push(Number(element.id));
-        });
-        if (res.length > 0) setComIds([...comIds, ...res]);
-    }, [pubcoms, comIds]);
+        setComIds([
+            ...(coms && coms.length > 0 ? coms.map(({ id }) => id) : []),
+            ...(pubcoms && pubcoms.length > 0
+                ? pubcoms.map(({ id }) => id)
+                : []),
+        ]);
+    }, [coms, pubcoms]);
 
     useEffect(() => {
         myEcho();
@@ -77,20 +67,26 @@ const Notifications = () => {
         };
         const handleReplyToPost = (data) => {
             if (data && data.reply) {
-                updateUnreadTab("com", true);
-                dispatch(actionChannel.handleReplyPost(data.reply));
+                if (auth?.id != data.reply.user_id) {
+                    updateUnreadTab("com", true);
+                    dispatch(actionChannel.handleReplyPost(data.reply));
+                }
             }
         };
         const handleAddReactionToPost = (data) => {
             if (data && data.reaction) {
-                updateUnreadTab("com", true);
-                dispatch(actionChannel.handleAddREACTION(data.reaction));
+                if (auth?.id != data.reaction.user_id) {
+                    updateUnreadTab("com", true);
+                    dispatch(actionChannel.handleAddREACTION(data.reaction));
+                }
             }
         };
         const handleRemoveReactFromPost = (data) => {
             if (data && data.reaction) {
-                updateUnreadTab("com", true);
-                dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+                if (auth?.id != data.reaction.user_id) {
+                    updateUnreadTab("com", true);
+                    dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+                }
             }
         };
         const handleCommunityCreated = (data) => {
@@ -196,29 +192,39 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
+            const getJoinedCommunities = async () => {
+                try {
+                    const response = await api.get(`communities/joined`);
+                    dispatch(
+                        actionChannel.handleSetCommunity(
+                            response.data.communities
+                        )
+                    );
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            const fetchPublicCommunities = async () => {
+                try {
+                    const response = await api.get(
+                        `${API_ROUTE}communities/public`
+                    );
+                    dispatch(
+                        actionChannel.handleSetPublicCommunity(
+                            response.data.communities
+                        )
+                    );
+                } catch (err) {
+                    console.log(err);
+                }
+            };
+            fetchPublicCommunities();
             getUsers();
             getMyChats();
-            getMineCommunities();
+            // getMineCommunities();
+            getJoinedCommunities();
         }
     }, [dispatch, auth]);
-
-    useEffect(() => {
-        const fetchPublicCommunities = async () => {
-            try {
-                const response = await axios.get(
-                    `${API_ROUTE}communities/public`
-                );
-                dispatch(
-                    actionChannel.handleSetPublicCommunity(
-                        response.data.communities
-                    )
-                );
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        fetchPublicCommunities();
-    }, [dispatch]);
 
     return <></>;
 };

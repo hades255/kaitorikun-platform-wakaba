@@ -1,37 +1,38 @@
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
-import axios from "axios";
-import clsx from "clsx";
-import { Box, IconButton, List, ListItem, ListItemText, Typography } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
-import { Remove as RemoveIcon } from "@mui/icons-material";
-import { Button, Menu, MenuItem } from "@mui/material";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+    Box,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Typography,
+    Menu,
+    MenuItem,
+    Divider,
+} from "@mui/material";
+import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
+import { makeStyles } from "@mui/styles";
 import { API_ROUTE } from "../../../config";
+import api from "../../../api";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
 import { useDispatch, useSelector } from "../../../components";
-import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    border: `1px solid red`, // Border using theme color
-    width: "16px", // Tailwind w-4
-    height: "16px", // Tailwind h-4
-    minWidth: "16px", // Tailwind min-w-4
-    padding: "0", // Tailwind p-0
-    display: "flex", // Tailwind flex
-    justifyContent: "center", // Tailwind justify-center
-    alignItems: "center", // Tailwind items-center
-    borderRadius: "50%", // Tailwind rounded
-    marginRight: "8px", // Tailwind mr-2 (theme spacing is 8px * multiplier)
-    fontSize: "12px", // Tailwind text-xs
-  },
+    root: {
+        border: `1px solid red`, // Border using theme color
+        width: "16px", // Tailwind w-4
+        height: "16px", // Tailwind h-4
+        minWidth: "16px", // Tailwind min-w-4
+        padding: "0", // Tailwind p-0
+        display: "flex", // Tailwind flex
+        justifyContent: "center", // Tailwind justify-center
+        alignItems: "center", // Tailwind items-center
+        borderRadius: "50%", // Tailwind rounded
+        marginRight: "8px", // Tailwind mr-2 (theme spacing is 8px * multiplier)
+        fontSize: "12px", // Tailwind text-xs
+    },
 }));
 
 const ChannelSidebar = () => {
@@ -55,10 +56,13 @@ const ChannelSidebar = () => {
         <>
             <List>
                 <AddNewButton />
-                {Array.isArray(communities) &&
-                    communities.map((item, index) => (
-                        <CommunityItem key={index} com={item} />
-                    ))}
+                {Array.isArray(communities) && (
+                    <>
+                        {communities.map((item, index) => (
+                            <CommunityItem key={index} com={item} />
+                        ))}
+                    </>
+                )}
             </List>
             <PublicCommunities />
         </>
@@ -98,8 +102,19 @@ const CommunityItem = ({ com }) => {
                     cursor: "pointer",
                 }}
             >
-                <Box border="ActiveBorder" display="flex" alignItems="center" justifyContent="center" p={2} className={classes.root}>
-                    {!show ? <AddIcon color="!white" /> : <RemoveIcon color="!white" />}
+                <Box
+                    border="ActiveBorder"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    p={2}
+                    className={classes.root}
+                >
+                    {!show ? (
+                        <AddIcon color="!white" />
+                    ) : (
+                        <RemoveIcon color="!white" />
+                    )}
                 </Box>
                 <ListItemText primary={com.name} />
             </ListItem>
@@ -122,6 +137,7 @@ const CommunityItem = ({ com }) => {
                     </ListItem>
                 </>
             )}
+            <Divider />
         </>
     );
 };
@@ -132,7 +148,7 @@ const ChannelItem = ({ channel, active }) => {
     const handleClickChannel = () => {
         const fetchPosts = async () => {
             try {
-                const response = await axios.get(
+                const response = await api.get(
                     `${API_ROUTE}channels/${channel.id}`
                 );
                 dispatch(
@@ -166,31 +182,19 @@ const ChannelItem = ({ channel, active }) => {
 
 const PublicCommunities = () => {
     const { auth } = useAuth();
-    const _communities = useSelector(
-        selectorChannel.handleGetPublicCommunities
-    );
-    const communities = useMemo(
-        () =>
-            Array.isArray(_communities)
-                ? _communities.filter(({ user_id }) => user_id != auth?.id)
-                : [],
-        [auth, _communities]
-    );
+    const communities = useSelector(selectorChannel.handleGetPublicCommunities);
 
     return (
         Array.isArray(communities) &&
         communities.length > 0 && (
             <>
                 <Typography variant="p" fontSize={12} color="white" pl={2}>
-                    {/* Public communities */}
                     公開チャンネル
                 </Typography>
                 <List>
-                    {/* <Link to="/communities"> */}
                     {communities.map((item) => (
                         <CommunityItem key={item.id} com={item} />
                     ))}
-                    {/* </Link> */}
                 </List>
             </>
         )
@@ -244,21 +248,21 @@ const AddNewButton = () => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
+        setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
-      setAnchorEl(null);
+        setAnchorEl(null);
     };
 
     return (
         <Box display="flex" justifyContent="flex-end" paddingX={2} paddingY={1}>
             <IconButton
                 id="basic-button"
-                aria-controls={open ? 'basic-menu' : undefined}
+                aria-controls={open ? "basic-menu" : undefined}
                 aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
+                aria-expanded={open ? "true" : undefined}
                 onClick={handleClick}
-                sx={{color: "white"}}
+                sx={{ color: "white" }}
             >
                 <AddIcon color="!white" />
             </IconButton>
@@ -268,12 +272,18 @@ const AddNewButton = () => {
                 open={open}
                 onClose={handleClose}
                 MenuListProps={{
-                'aria-labelledby': 'basic-button',
+                    "aria-labelledby": "basic-button",
                 }}
             >
-                <MenuItem onClick={handleNewCommunity}>{/* Add Community */}コミュニティを追加</MenuItem>
-                <MenuItem onClick={handleNewChannel}>{/* Add Channel */}チャンネルを追加</MenuItem>
-                <MenuItem onClick={handleClose}>{/* Join Community */}コミュニティに参加</MenuItem>
+                <MenuItem onClick={handleNewCommunity}>
+                    {/* Add Community */}コミュニティを追加
+                </MenuItem>
+                <MenuItem onClick={handleNewChannel}>
+                    {/* Add Channel */}チャンネルを追加
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    {/* Join Community */}コミュニティに参加
+                </MenuItem>
             </Menu>
         </Box>
     );

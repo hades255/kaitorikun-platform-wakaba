@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import clsx from "clsx";
+import { useDispatch } from "react-redux";
+import EmojiPicker from "emoji-picker-react";
 import { formatDistanceToNow } from "date-fns";
+import clsx from "clsx";
 import {
     Card,
     CardContent,
@@ -9,15 +11,19 @@ import {
     Box,
     TextField,
     IconButton,
+    Avatar,
+    Badge,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import EmojiPicker from "emoji-picker-react";
+import { styled } from "@mui/material/styles";
 import api from "../../api";
-import { useAuth } from "../../contexts/AuthContext";
 import { getUserStatusColor } from "../../feature/action";
+import { useAuth } from "../../contexts/AuthContext";
+import { actionChannel } from "../../reduxStore";
 
 const Post = ({ post, users }) => {
+    const dispatch = useDispatch();
     const auth = useAuth();
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
@@ -55,13 +61,13 @@ const Post = ({ post, users }) => {
     const handleReply = () => {
         const saveFunc = async () => {
             try {
-                // const response =
-                await api.post("postreply", {
+                const response = await api.post("postreply", {
                     reply,
                     post_id: post.id,
                     channel_id: post.channel_id,
                 });
-                // dispatch(actionChannel.handleReplyPost(response.data));
+                dispatch(actionChannel.handleReplyPost(response.data));
+                dispatch(actionChannel.handleSetMyCommunity(post.community_id));
                 setReply("");
                 setShowReplyInput(false);
             } catch (error) {
@@ -85,13 +91,13 @@ const Post = ({ post, users }) => {
         }
         const saveFunc = async () => {
             try {
-                // const response =
-                await api.post("postreaction", {
+                const response = await api.post("postreaction", {
                     reaction: emojiData.emoji,
                     post_id: post.id,
                     channel_id: post.channel_id,
                 });
-                // dispatch(actionChannel.handleAddREACTION(response.data));
+                dispatch(actionChannel.handleAddREACTION(response.data));
+                dispatch(actionChannel.handleSetMyCommunity(post.community_id));
             } catch (error) {
                 console.log(error);
             } finally {
@@ -146,7 +152,7 @@ const Post = ({ post, users }) => {
                     {post.subject}
                 </Typography>
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                <div className="flex items-center">
+                <Box display={"flex"} alignItems={"center"}>
                     <IconButton
                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
@@ -166,7 +172,7 @@ const Post = ({ post, users }) => {
                             <EmojiPicker onEmojiClick={handleNewEmojiClick} />
                         </Box>
                     )}
-                </div>
+                </Box>
                 <Box>
                     <Button onClick={() => setShowReplyInput(!showReplyInput)}>
                         {/* Reply */}返信
@@ -191,7 +197,7 @@ const Post = ({ post, users }) => {
                     </Box>
                 )}
                 {showReplies && (
-                    <div className="flex flex-col gap-2">
+                    <Box display="flex" flexDirection="column" gap={2}>
                         {Array.isArray(post.replies) &&
                             post.replies?.map((item) => (
                                 <ReplyItem
@@ -200,7 +206,7 @@ const Post = ({ post, users }) => {
                                     users={users}
                                 />
                             ))}
-                    </div>
+                    </Box>
                 )}
             </CardContent>
         </Card>
@@ -208,6 +214,17 @@ const Post = ({ post, users }) => {
 };
 
 export default Post;
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+    "& .MuiBadge-badge": {
+        backgroundColor: getUserStatusColor("online"),
+        color: getUserStatusColor("online"),
+        width: 12,
+        height: 12,
+        borderRadius: "50%",
+        border: `2px solid ${theme.palette.background.paper}`,
+    },
+}));
 
 const ReplyItem = ({ reply, users }) => {
     const user =
@@ -217,30 +234,50 @@ const ReplyItem = ({ reply, users }) => {
     });
 
     return (
-        <div className="flex items-start justify-between px-3 py-2 rounded-md shadow-lg shadow-[#0008]">
-            <div className="w-full flex items-center space-x-3">
-                <div className="relative">
-                    <AccountCircleOutlinedIcon className="text-gray-700 !w-8 !h-8" />
-                    <div
-                        className={clsx(
-                            `w-3 h-3 rounded-full absolute -bottom-0.5 -right-0.5`,
-                            getUserStatusColor("online")
-                        )}
-                    />
-                </div>
-                <div className="w-full flex flex-col">
-                    <div className="flex justify-between items-center">
-                        <p className="text-gray-700">
-                            {user ? user.name : "Unknown User"}
-                        </p>
-                        <p className="text-gray-500 text-xs">{timeAgo}</p>
-                    </div>
-                    <p className="text-gray-600 text-sm truncate">
+        <Box
+            display="flex"
+            alignItems="start"
+            justifyContent="space-between"
+            px={3}
+            py={2}
+            borderRadius={1}
+            boxShadow={3}
+        >
+            <Box
+                display="flex"
+                alignItems="center"
+                width="100%"
+                spacing={3}
+                gap={3}
+            >
+                <StyledBadge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    variant="dot"
+                >
+                    <Avatar>
+                        <AccountCircleOutlinedIcon />
+                    </Avatar>
+                </StyledBadge>
+                <Box display="flex" flexDirection="column" width="100%">
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
+                        <Typography variant="body1" color="textPrimary">
+                            {user ? user.name : "不明なユーザー"}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                            {timeAgo}
+                        </Typography>
+                    </Box>
+                    <Typography variant="body2" color="textSecondary" noWrap>
                         {reply.reply}
-                    </p>
-                </div>
-            </div>
-        </div>
+                    </Typography>
+                </Box>
+            </Box>
+        </Box>
     );
 };
 
@@ -250,20 +287,26 @@ const EmojiItem = ({ reaction, onClick }) => {
     };
 
     return (
-        <>
-            <span
-                className={clsx(
-                    "cursor-pointer mx-[1px] px-[1px] rounded border text-[#1976d2]",
-                    {
-                        "px-1 bg-[#0004]": reaction.mine,
-                    }
-                )}
-                onClick={handleClick}
-                title={reaction.count}
-            >
-                {reaction.reaction}
-                {reaction.count > 1 && reaction.count}
-            </span>
-        </>
+        <Box
+            component="span"
+            sx={{
+                cursor: "pointer",
+                mx: "1px",
+                px: reaction.mine ? "4px" : "1px",
+                borderRadius: "4px",
+                border: 1,
+                borderColor: "divider",
+                color: "#1976d2",
+                backgroundColor: reaction.mine ? "#0004" : "transparent",
+            }}
+            className={clsx({
+                "additional-class": reaction.mine, // Example for adding additional classes
+            })}
+            onClick={handleClick}
+            title={reaction.count}
+        >
+            {reaction.reaction}
+            {reaction.count > 1 && reaction.count}
+        </Box>
     );
 };

@@ -80,6 +80,9 @@ const Communities = () => {
                     dispatch(
                         actionChannel.handleAddPostToChannel(response.data)
                     );
+                    dispatch(
+                        actionChannel.handleSetMyCommunity(channel.community_id)
+                    );
                     setShowPostEditor(false);
                 } catch (error) {
                     console.log(error);
@@ -191,32 +194,52 @@ const Communities = () => {
                         </div>
                     </Dialog>
                 </div>
-            ) : communities && communities.length > 0 ? (
-                <div>{/* Create new Channel */}新しいチャンネルを作成</div>
             ) : (
-                <Box display="flex" justifyContent="center" width="100%" paddingTop={5} pb={3}>
-                    <Box display="flex" flexDirection="column" gap={2}>
-                        <Typography className="text-xl">
-                            {/* Build your community */}コミュニティを構築する
-                        </Typography>
-                        <Box className="">
-                            {/* Plan community events, engage in discussions, and
+                <>
+                    {communities && communities.length > 0 && (
+                        <div>
+                            {/* Create new Channel */}新しいチャンネルを作成
+                        </div>
+                    )}
+                    <Box
+                        display="flex"
+                        justifyContent="center"
+                        width="100%"
+                        paddingTop={5}
+                        pb={3}
+                    >
+                        <Box display="flex" flexDirection="column" gap={2}>
+                            <Typography className="text-xl">
+                                {/* Build your community */}
+                                コミュニティを構築する
+                            </Typography>
+                            <Box className="">
+                                {/* Plan community events, engage in discussions, and
                             create a sage space to collaborate. */}
-                            コミュニティ
-                            イベントを計画し、ディスカッションに参加し、コラボレーションのための賢明なスペースを作成します。
-                        </Box>
-                        <Box className="flex justify-center">
-                            <Box display="flex" alignItems="center" justifyContent="center" gap={1} flexWrap="wrap" width="100%" sx={{maxWidth: "768px"}}>
-                                {preNamedCommunities?.map((item, index) => (
-                                    <PreNamedItems
-                                        key={index}
-                                        community={item}
-                                    />
-                                ))}
+                                コミュニティ
+                                イベントを計画し、ディスカッションに参加し、コラボレーションのための賢明なスペースを作成します。
+                            </Box>
+                            <Box className="flex justify-center">
+                                <Box
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    gap={1}
+                                    flexWrap="wrap"
+                                    width="100%"
+                                    sx={{ maxWidth: "768px" }}
+                                >
+                                    {preNamedCommunities?.map((item, index) => (
+                                        <PreNamedItems
+                                            key={index}
+                                            community={item}
+                                        />
+                                    ))}
+                                </Box>
                             </Box>
                         </Box>
                     </Box>
-                </Box>
+                </>
             )}
             {showCommunityEditor && (
                 <Dialog
@@ -254,7 +277,7 @@ const PreNamedItems = ({ community }) => {
             onClick={handleClick}
             className={`${classes.preNamesItem} ${
                 community.value ? classes.active : classes.inactive
-              }`}
+            }`}
         >
             {community.title}
         </Box>
@@ -275,15 +298,15 @@ const useStyles = makeStyles((theme) => ({
         transition: "all 0.3s ease",
     },
     active: {
-        backgroundColor: '#313239',
-        '&:hover': {
-          backgroundColor: '#212229',
+        backgroundColor: "#313239",
+        "&:hover": {
+            backgroundColor: "#212229",
         },
-      },
-      inactive: {
-        backgroundColor: '#5a65ba',
-        '&:hover': {
-          backgroundColor: '#4a55aa',
+    },
+    inactive: {
+        backgroundColor: "#5a65ba",
+        "&:hover": {
+            backgroundColor: "#4a55aa",
         },
-      },
+    },
 }));

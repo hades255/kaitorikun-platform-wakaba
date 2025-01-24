@@ -25,14 +25,15 @@ export const addWindowClass = (classList) => {
 
 export const checkSidebarClass = (classList) => {
     const window = document && document.getElementById("sidebar_tab");
-    const sidebar = document && document.getElementsByClassName("sidebar-collapse");
-    
+    const sidebar =
+        document && document.getElementsByClassName("sidebar-collapse");
+
     if (window) {
         // @ts-ignore
         if (sidebar.length > 0) {
-            window.style.display = 'block';
+            window.style.display = "block";
         } else {
-            window.style.display = 'none';
+            window.style.display = "none";
         }
     }
 };
@@ -56,7 +57,7 @@ export const useWindowSize = () => {
 };
 export function postData(endpoint, data) {
     let userData = getItem("userdata");
-    
+
     let config = {
         headers: {
             "x-auth-token": userData.access_token,
@@ -196,8 +197,8 @@ export const previewThumbnail = (file) => {
         reader.readAsDataURL(file);
         reader.onload = () => {
             // if (fileType.includes("image")) {
-                const imgContent = reader.result;
-                resolve(imgContent);
+            const imgContent = reader.result;
+            resolve(imgContent);
             // }
         };
         reader.onerror = () => {
@@ -360,3 +361,7 @@ export const ReanderSelect = ({
                 (warning && <p>{warning}</p>))}
     </div>
 );
+
+export const useQuery = () => {
+    return new URLSearchParams(location.search);
+};

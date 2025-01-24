@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         gap: "8px",
     },
-}));  
+}));
 
 const CreateChannel = () => {
     const classes = useStyles();
@@ -76,6 +76,9 @@ const CreateChannel = () => {
                     "チャンネルが正常に作成されました"
                 );
                 dispatch(actionChannel.handleAddChannel(response.data.channel));
+                dispatch(
+                    actionChannel.handleSetMyCommunity(comData.community_id)
+                );
                 setShowChannelEditor(false);
             } catch (error) {
                 console.log(error);

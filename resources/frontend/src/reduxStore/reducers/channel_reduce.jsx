@@ -10,6 +10,7 @@ import {
     SELECT_CHANNEL,
     SET_CHANNEL,
     SET_COMMUNITY,
+    SET_COMMUNITY_AS_MINE,
     SET_PUBLIC_CHANNEL,
     SET_PUBLIC_COMMUNITY,
 } from "../actions/channel_action";
@@ -128,6 +129,21 @@ const channels = (state = initialState, actions) => {
                               ),
                           }
                         : item
+                ),
+            };
+        case SET_COMMUNITY_AS_MINE:
+            const com = state.communities.find((item) => item.id == data);
+            const pubcom = state.publicCommunities.find(
+                (item) => item.id == data
+            );
+            return {
+                ...state,
+                communities:
+                    pubcom && !com
+                        ? [...state.communities, pubcom]
+                        : [...state.communities],
+                publicCommunities: state.publicCommunities.filter(
+                    (item) => item.id != data
                 ),
             };
         default:

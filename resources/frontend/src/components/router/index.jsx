@@ -9,6 +9,7 @@ import StaffExit from "../../pages/shop-manage/exit";
 import ResetPassword from "../../pages/reset-password";
 import Communities from "../../pages/communities";
 import ChatsPage from "../../pages/chat";
+import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
 
 const MenuRoutes = [
     {
@@ -91,6 +92,12 @@ const MenuRoutes = [
         component: () => <ChatsPage />,
     },
     /** channel&chat end */
+    {
+        path: "/accept-invitation",
+        exact: true,
+        title: "招待を受け入れる",
+        component: () => <AcceptInvitation />,
+    },
 ];
 
 export default MenuRoutes;

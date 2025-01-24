@@ -27,6 +27,10 @@ const tabs = [
         title: "チャット",
         url: "/chat",
     },
+    {
+        title: "カレンダー",
+        url: "/calendar",
+    },
 ];
 
 const Sidebar = (props) => {

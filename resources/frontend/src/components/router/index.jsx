@@ -9,6 +9,7 @@ import StaffExit from "../../pages/shop-manage/exit";
 import ResetPassword from "../../pages/reset-password";
 import Communities from "../../pages/communities";
 import ChatsPage from "../../pages/chat";
+import CalendarPage from "../../pages/calendar";
 
 const MenuRoutes = [
     {
@@ -89,6 +90,12 @@ const MenuRoutes = [
         exact: true,
         title: "チャット",
         component: () => <ChatsPage />,
+    },
+    {
+        path: "/calendar",
+        exact: true,
+        title: "チャット",
+        component: () => <CalendarPage />,
     },
     /** channel&chat end */
 ];

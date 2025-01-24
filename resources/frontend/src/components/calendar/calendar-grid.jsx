@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   startOfWeek,
   endOfWeek,
@@ -8,9 +8,11 @@ import {
   startOfDay,
   addHours,
   isSameHour,
-} from 'date-fns';
-import { Box, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+  getDay,
+} from "date-fns";
+import { Box, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import { DAYS_JSP } from "../../constants";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
@@ -18,17 +20,18 @@ export const CalendarGrid = ({ currentDate, view }) => {
   const classes = useStyles();
 
   const getDaysToShow = () => {
-    if (view === 'day') return [currentDate];
+    if (view === "day") return [currentDate];
     const start = startOfWeek(currentDate, { weekStartsOn: 1 });
     const end = endOfWeek(currentDate, { weekStartsOn: 1 });
     let days = eachDayOfInterval({ start, end });
-    if (view === 'workWeek') {
+    if (view === "workWeek") {
       days = days.slice(0, 5);
     }
     return days;
   };
 
   const days = getDaysToShow();
+
 
   return (
     <Box className={classes.gridContainer}>
@@ -37,10 +40,14 @@ export const CalendarGrid = ({ currentDate, view }) => {
         {days.map((day) => (
           <Box
             key={day.toISOString()}
-            className={isToday(day) ? classes.todayCell : classes.dayCell}
+            className={
+              isToday(day) ? classes.todayCell : classes.dayCell
+            }
           >
-            <Typography variant="subtitle2">{format(day, 'EEE')}</Typography>
-            <Typography variant="h6">{format(day, 'd')}</Typography>
+            <Typography variant="subtitle2">
+              {DAYS_JSP[getDay(day)]}
+            </Typography>
+            <Typography variant="h6">{format(day, "d")}</Typography>
           </Box>
         ))}
       </Box>
@@ -49,8 +56,14 @@ export const CalendarGrid = ({ currentDate, view }) => {
         <Box className={classes.timeColumnContainer}>
           {HOURS.map((hour) => (
             <Box key={hour} className={classes.timeSlot}>
-              <Typography variant="caption" color="text.secondary">
-                {format(addHours(startOfDay(new Date()), hour), 'ha')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+              >
+                {format(
+                  addHours(startOfDay(new Date()), hour),
+                  "ha"
+                )}
               </Typography>
             </Box>
           ))}
@@ -80,58 +93,58 @@ export const CalendarGrid = ({ currentDate, view }) => {
 
 const useStyles = makeStyles((theme) => ({
   gridContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%'
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
   },
   daysHeader: {
-    display: 'flex',
-    borderBottom: `1px solid ${theme.palette.divider}`
+    display: "flex",
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
   timeColumn: {
     width: 80,
     borderRight: `1px solid ${theme.palette.divider}`,
-    backgroundColor: theme.palette.grey[50]
+    backgroundColor: theme.palette.grey[50],
   },
   dayCell: {
     flex: 1,
     padding: theme.spacing(1),
-    textAlign: 'center',
-    backgroundColor: theme.palette.grey[50]
+    textAlign: "center",
+    backgroundColor: theme.palette.grey[50],
   },
   todayCell: {
     flex: 1,
     padding: theme.spacing(1),
-    textAlign: 'center',
+    textAlign: "center",
     backgroundColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText
+    color: theme.palette.primary.contrastText,
   },
   timeSlot: {
     height: 80,
     borderBottom: `1px solid ${theme.palette.divider}`,
     borderRight: `1px solid ${theme.palette.divider}`,
     padding: theme.spacing(1),
-    textAlign: 'right'
+    textAlign: "right",
   },
   hourCell: {
     height: 80,
-    borderBottom: `1px solid ${theme.palette.divider}`
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
   currentHourCell: {
     height: 80,
     borderBottom: `1px solid ${theme.palette.divider}`,
-    backgroundColor: theme.palette.primary.light
+    backgroundColor: theme.palette.primary.light,
   },
   scrollContainer: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
-    overflow: 'auto'
+    overflow: "auto",
   },
   timeColumnContainer: {
     width: 80,
-    flexShrink: 0
+    flexShrink: 0,
   },
   dayColumn: {
-    flex: 1
-  }
+    flex: 1,
+  },
 }));

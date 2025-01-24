@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { v4 } from "uuid";
 import { addMonths, subMonths } from "date-fns";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Box, Typography } from "@mui/material";
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from "@mui/styles";
 import clsx from "clsx";
 
 export const DatePicker = ({ onChange }) => {
@@ -25,7 +25,7 @@ export const DatePicker = ({ onChange }) => {
   const convertDate = (date) => {
     let dt = new Date(date);
 
-    return `${dt.getDate()}.${dt.getMonth() + 1}.${dt.getFullYear()}.`;
+    return `${dt.getFullYear()}年 ${dt.getMonth() + 1}月 ${dt.getDate()}日`
   };
 
   const handleClick = (e) => {
@@ -46,34 +46,19 @@ export const DatePicker = ({ onChange }) => {
     setOpen(false);
   };
 
-  const months = [
-    "Jan.",
-    "Feb.",
-    "Mar.",
-    "Apr.",
-    "May",
-    "Jun",
-    "July",
-    "Aug.",
-    "Sep.",
-    "Oct.",
-    "Nov.",
-    "Dec."
-  ];
-
   const days = {
-    "1": 31,
-    "2": isLeapYear() ? 29 : 28,
-    "3": 31,
-    "4": 30,
-    "5": 31,
-    "6": 30,
-    "7": 31,
-    "8": 31,
-    "9": 30,
-    "10": 31,
-    "11": 30,
-    "12": 31
+    1: 31,
+    2: isLeapYear() ? 29 : 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31,
   };
 
   const renderDays = () => {
@@ -84,13 +69,19 @@ export const DatePicker = ({ onChange }) => {
 
       let cName = classes.singleNumber;
       if (
-        new Date(currentDate).toDateString() === selectedDate.toDateString()
+        new Date(currentDate).toDateString() ===
+        selectedDate.toDateString()
       ) {
         cName = clsx(cName, classes.selectedDate);
       }
 
       ar.push(
-        <div key={v4()} id={i.toString()} className={cName} onClick={handleClick}>
+        <div
+          key={v4()}
+          id={i.toString()}
+          className={cName}
+          onClick={handleClick}
+        >
           {i}
         </div>
       );
@@ -114,8 +105,11 @@ export const DatePicker = ({ onChange }) => {
         days[prevMonthDays] - i + 2
       );
       let cName = clsx(classes.singleNumber, classes.otherMonth);
-      
-      if (new Date(currentDate).toDateString() === selectedDate.toDateString()) {
+
+      if (
+        new Date(currentDate).toDateString() ===
+        selectedDate.toDateString()
+      ) {
         cName = clsx(cName, classes.selectedDate);
       }
 
@@ -138,11 +132,13 @@ export const DatePicker = ({ onChange }) => {
     }
 
     for (let i = 1; i <= fullDays - [...prevMonth, ...ar].length; i++) {
-      let nextMonthDate = new Date(new Date(date).setMonth(date.getMonth() + 1));
+      let nextMonthDate = new Date(
+        new Date(date).setMonth(date.getMonth() + 1)
+      );
       nextMonthDate.setDate(i);
-      
+
       let cName = clsx(classes.singleNumber, classes.otherMonth);
-      
+
       if (nextMonthDate.toDateString() === selectedDate.toDateString()) {
         cName = clsx(cName, classes.selectedDate);
       }
@@ -178,30 +174,36 @@ export const DatePicker = ({ onChange }) => {
       onClick={() => setOpen(true)}
       tabIndex={0}
     >
-      <Typography>
-        {convertDate(selectedDate)}
-      </Typography>
+      <Typography>{convertDate(selectedDate)}</Typography>
       {open && (
         <div className={classes.weekOptions}>
           <div className={classes.title}>
-            <div onClick={() => handleDate()} className={classes.arrowButton}>
+            <div
+              onClick={() => handleDate()}
+              className={classes.arrowButton}
+            >
               <ArrowBackIosNewIcon color="primary" />
             </div>
-            {`${months[date.getMonth()]} ${date.getFullYear()}.`}
-            <div onClick={() => handleDate(true)} className={classes.arrowButton}>
+            {`${(date.getMonth() + 1)}月 ${date.getFullYear()}.`}
+            <div
+              onClick={() => handleDate(true)}
+              className={classes.arrowButton}
+            >
               <ArrowForwardIosIcon color="primary" />
             </div>
           </div>
           <div className={classes.numberContainer}>
-            <div className={classes.day}>Mon</div>
-            <div className={classes.day}>Tue</div>
-            <div className={classes.day}>Wed</div>
-            <div className={classes.day}>Thu</div>
-            <div className={classes.day}>Fri</div>
-            <div className={classes.day}>Sat</div>
-            <div className={classes.day}>Sun</div>
+            <div className={classes.day}>月</div>
+            <div className={classes.day}>火</div>
+            <div className={classes.day}>水</div>
+            <div className={classes.day}>木</div>
+            <div className={classes.day}>金</div>
+            <div className={classes.day}>土</div>
+            <div className={classes.day}>日</div>
           </div>
-          <div className={classes.numberContainer}>{renderDays()}</div>
+          <div className={classes.numberContainer}>
+            {renderDays()}
+          </div>
         </div>
       )}
     </Box>
@@ -263,7 +265,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: "#ff9900",
       borderRadius: "15%",
-    }
+    },
   },
   numberContainer: {
     borderTop: "1px solid gainsboro",
@@ -299,5 +301,5 @@ const useStyles = makeStyles((theme) => ({
   otherMonth: {
     background: "none",
     color: "#c3c0cc",
-  }
+  },
 }));

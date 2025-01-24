@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { v4 } from "uuid";
 import { addMonths, endOfWeek, startOfWeek, subMonths } from "date-fns";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Box, Typography } from "@mui/material";
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from "@mui/styles";
 import { getDaysInMonth } from "date-fns";
 import clsx from "clsx";
 
@@ -13,7 +13,7 @@ export const WeekPicker = ({ onChange }) => {
   const [date, setDate] = useState(new Date());
   const [week, setWeek] = useState({
     firstDay: startOfWeek(new Date(), { weekStartsOn: 1 }),
-    lastDay: endOfWeek(new Date(), { weekStartsOn: 1 })
+    lastDay: endOfWeek(new Date(), { weekStartsOn: 1 }),
   });
   const classes = useStyles();
   useEffect(() => {
@@ -28,7 +28,7 @@ export const WeekPicker = ({ onChange }) => {
   const convertDate = (date) => {
     let dt = new Date(date);
 
-    return `${dt.getDate()}.${dt.getMonth() + 1}.${dt.getFullYear()}.`;
+    return `${dt.getFullYear()}年 ${dt.getMonth() + 1}月 ${dt.getDate()}日`
   };
 
   const handleClick = (e) => {
@@ -48,34 +48,19 @@ export const WeekPicker = ({ onChange }) => {
     setWeek({ firstDay, lastDay });
   };
 
-  const months = [
-    "Jan.",
-    "Feb.",
-    "Mar.",
-    "Apr.",
-    "May",
-    "Jun",
-    "July",
-    "Aug.",
-    "Sep.",
-    "Oct.",
-    "Nov.",
-    "Dec."
-  ];
-
   const days = {
-    "1": 31,
-    "2": isLeapYear() ? 29 : 28,
-    "3": 31,
-    "4": 30,
-    "5": 31,
-    "6": 30,
-    "7": 31,
-    "8": 31,
-    "9": 30,
-    "10": 31,
-    "11": 30,
-    "12": 31
+    1: 31,
+    2: isLeapYear() ? 29 : 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31,
   };
 
   const renderDays = () => {
@@ -86,8 +71,10 @@ export const WeekPicker = ({ onChange }) => {
 
       let cName = classes.singleNumber;
       if (
-        new Date(week.firstDay).getTime() <= new Date(currentDate).getTime() &&
-        new Date(currentDate).getTime() <= new Date(week.lastDay).getTime()
+        new Date(week.firstDay).getTime() <=
+        new Date(currentDate).getTime() &&
+        new Date(currentDate).getTime() <=
+        new Date(week.lastDay).getTime()
       ) {
         cName = clsx(cName, classes.selectedWeek);
       }
@@ -122,7 +109,7 @@ export const WeekPicker = ({ onChange }) => {
       let endTime = new Date(week.lastDay).getTime();
       if (currentTime >= firstTime && currentTime <= endTime) {
         // cName = "single-number selected-week";
-        cName=clsx(classes.singleNumber, classes.selectedWeek);
+        cName = clsx(classes.singleNumber, classes.selectedWeek);
       }
 
       prevMonth.push(
@@ -194,24 +181,32 @@ export const WeekPicker = ({ onChange }) => {
       {open && (
         <div className={classes.weekOptions}>
           <div className={classes.title}>
-            <div onClick={() => handleDate()} className={classes.arrowButton}>
+            <div
+              onClick={() => handleDate()}
+              className={classes.arrowButton}
+            >
               <ArrowBackIosNewIcon color="primary" />
             </div>
-            {`${months[date.getMonth()]} ${date.getFullYear()}.`}
-            <div onClick={() => handleDate(true)} className={classes.arrowButton}>
+            {`${(date.getMonth() + 1).toString() + "月"} ${date.getFullYear()}.`}
+            <div
+              onClick={() => handleDate(true)}
+              className={classes.arrowButton}
+            >
               <ArrowForwardIosIcon color="primary" />
             </div>
           </div>
           <div className={classes.numberContainer}>
-            <div className={classes.day}>Mon</div>
-            <div className={classes.day}>Tue</div>
-            <div className={classes.day}>Wed</div>
-            <div className={classes.day}>Thu</div>
-            <div className={classes.day}>Fri</div>
-            <div className={classes.day}>Sat</div>
-            <div className={classes.day}>Sun</div>
+            <div className={classes.day}>月</div>
+            <div className={classes.day}>火</div>
+            <div className={classes.day}>水</div>
+            <div className={classes.day}>木</div>
+            <div className={classes.day}>金</div>
+            <div className={classes.day}>土</div>
+            <div className={classes.day}>日</div>
           </div>
-          <div className={classes.numberContainer}>{renderDays()}</div>
+          <div className={classes.numberContainer}>
+            {renderDays()}
+          </div>
         </div>
       )}
     </Box>
@@ -219,95 +214,95 @@ export const WeekPicker = ({ onChange }) => {
 };
 
 const useStyles = makeStyles((theme) => ({
-    wrapper: {
-        width: "300px",
-        height: "40px",
-        color: "#454545",
-        position: "relative",
-        borderRadius: "8px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        border: "1px solid #c3c0cc",
-        transition: "0.5s ease",
-        padding: "0 1rem",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: "1rem",
+  wrapper: {
+    width: "300px",
+    height: "40px",
+    color: "#454545",
+    position: "relative",
+    borderRadius: "8px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    border: "1px solid #c3c0cc",
+    transition: "0.5s ease",
+    padding: "0 1rem",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "1rem",
+  },
+  weekOptions: {
+    padding: "0.4rem",
+    position: "absolute",
+    top: "105%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "100%",
+    borderRadius: "5px",
+    border: "1px solid #c3c0cc",
+    display: "flex",
+    overflow: "hidden",
+    background: "white",
+    zIndex: 99,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  title: {
+    padding: "0.8rem",
+    display: "flex",
+    width: "100%",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  arrowButton: {
+    cursor: "pointer",
+    width: "25px",
+    height: "25px",
+    transition: "0.2s ease-in",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: "50%",
+    "&:hover": {
+      backgroundColor: "#ff9900",
+      borderRadius: "15%",
     },
-    weekOptions: {
-        padding: "0.4rem",
-        position: "absolute",
-        top: "105%",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        borderRadius: "5px",
-        border: "1px solid #c3c0cc",
-        display: "flex",
-        overflow: "hidden",
-        background: "white",
-        zIndex: 99,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-    },
-    title: {
-        padding: "0.8rem",
-        display: "flex",
-        width: "100%",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    arrowButton: {
-        cursor: "pointer",
-        width: "25px",
-        height: "25px",
-        transition: "0.2s ease-in",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "50%",
-        "&:hover": {
-            backgroundColor: "#ff9900",
-            borderRadius: "15%",
-        }
-    },
-    numberContainer: {
-        borderTop: "1px solid gainsboro",
-        width: "100%",
-        padding: "0.3rem",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
-    },
-    day: {
-        width: "100%",
-        aspectRatio: 1,
-        fontSize: "0.8rem",
-        background: "none",
-        color: "black",
-        display: "grid",
-        placeItems: "center",
-        background: "none",
-        color: "black",
-    },
-    singleNumber: {
-        width: "100%",
-        aspectRatio: 1,
-        fontSize: "0.8rem",
-        background: "none",
-        color: "black",
-        display: "grid",
-        placeItems: "center",
-    },
-    selectedWeek: {
-        color: "white",
-        backgroundColor: "#ff9900",
-    },
-    otherMonth: {
-        background: "none",
-        color: "#c3c0cc",
-    }
+  },
+  numberContainer: {
+    borderTop: "1px solid gainsboro",
+    width: "100%",
+    padding: "0.3rem",
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
+  },
+  day: {
+    width: "100%",
+    aspectRatio: 1,
+    fontSize: "0.8rem",
+    background: "none",
+    color: "black",
+    display: "grid",
+    placeItems: "center",
+    background: "none",
+    color: "black",
+  },
+  singleNumber: {
+    width: "100%",
+    aspectRatio: 1,
+    fontSize: "0.8rem",
+    background: "none",
+    color: "black",
+    display: "grid",
+    placeItems: "center",
+  },
+  selectedWeek: {
+    color: "white",
+    backgroundColor: "#ff9900",
+  },
+  otherMonth: {
+    background: "none",
+    color: "#c3c0cc",
+  },
 }));

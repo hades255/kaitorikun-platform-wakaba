@@ -3,6 +3,7 @@ import Echo from "laravel-echo";
 import {
     PUBLIC_REVERB_HOST,
     PUBLIC_REVERB_PORT,
+    PUBLIC_REVERB_WSS_PORT,
     VITE_REVERB_APP_KEY,
 } from "../../config";
 
@@ -18,7 +19,7 @@ const myEcho = () => {
         key: VITE_REVERB_APP_KEY,
         wsHost: PUBLIC_REVERB_HOST,
         wsPort: PUBLIC_REVERB_PORT,
-        wssPort: PUBLIC_REVERB_PORT,
+        wssPort: PUBLIC_REVERB_WSS_PORT,
         forceTLS: false,
         enabledTransports: ["ws", "wss"],
         disableStats: true,

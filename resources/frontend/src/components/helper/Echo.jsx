@@ -4,7 +4,7 @@ import {
     PUBLIC_REVERB_HOST,
     PUBLIC_REVERB_PORT,
     PUBLIC_REVERB_WSS_PORT,
-    VITE_REVERB_APP_KEY,
+    REVERB_APP_KEY,
 } from "../../config";
 
 if (typeof window !== "undefined") {
@@ -16,7 +16,7 @@ const myEcho = () => {
     console.log("echo");
     window.Echo = new Echo({
         broadcaster: "reverb",
-        key: VITE_REVERB_APP_KEY,
+        key: REVERB_APP_KEY,
         wsHost: PUBLIC_REVERB_HOST,
         wsPort: PUBLIC_REVERB_PORT,
         wssPort: PUBLIC_REVERB_WSS_PORT,

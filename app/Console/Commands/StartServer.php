@@ -34,7 +34,7 @@ class StartServer extends Command
             'serve' => new Process(['php', 'artisan', 'serve', '--host=0.0.0.0']),
             'queue_work' => new Process(['php', 'artisan', 'queue:work']),
             'reverb_start' => new Process(['php', 'artisan', 'reverb:start', '--host=0.0.0.0']),
-            'npm_watch' => new Process(['npm', 'run', 'watch'])
+            // 'npm_watch' => new Process(['npm', 'run', 'watch'])
         ];
 
         foreach ($processes as $name => $process) {

@@ -37,3 +37,35 @@ php artisan migrate:rollback
 ## Donation
 
 You can support Me On [Saweria](https://saweria.co/samsularifin05)
+
+### what you have to change the env file
+
+```
+    APP_NAME=Laravel
+    QUEUE_CONNECTION=database
+
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    FILESYSTEM_DISK=public
+
+    BROADCAST_DRIVER=reverb
+    REVERB_SERVER_HOST=127.0.0.1
+    REVERB_SERVER_PORT=8080
+    REVERB_APP_ID=439347
+    REVERB_APP_KEY=h2fdakwxbnrd1renb1lf
+    REVERB_APP_SECRET=tkzet3cjr2ky7zlckqnj
+    REVERB_HOST=localhost
+    REVERB_PORT=8080
+    REVERB_SCHEME=http
+
+    MAIL_MAILER=
+    MAIL_HOST=
+    MAIL_PORT=
+    MAIL_USERNAME=
+    MAIL_PASSWORD=
+```

@@ -72,7 +72,7 @@ export default forwardRef(function ZipcodeInput({value = "", inputClass='', clas
             <input
                 type="text"
                 className={"shop-select w-70"}
-                value={zipcode.part1}
+                value={zipcode.part1 || ""}
                 onChange={(e) => handleInputChange(e, "part1")}
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
@@ -82,7 +82,7 @@ export default forwardRef(function ZipcodeInput({value = "", inputClass='', clas
             <input
                 type="text"
                 className={"shop-select w-100"}
-                value={zipcode.part2}
+                value={zipcode.part2 || ""}
                 onChange={(e) => handleInputChange(e, "part2")}
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}

@@ -3,6 +3,7 @@ import Echo from "laravel-echo";
 import {
     PUBLIC_REVERB_HOST,
     PUBLIC_REVERB_PORT,
+    PUBLIC_REVERB_SCHEME,
     PUBLIC_REVERB_WSS_PORT,
     REVERB_APP_KEY,
 } from "../../config";
@@ -20,7 +21,7 @@ const myEcho = () => {
         wsHost: PUBLIC_REVERB_HOST,
         wsPort: PUBLIC_REVERB_PORT,
         wssPort: PUBLIC_REVERB_WSS_PORT,
-        forceTLS: false,
+        forceTLS: (PUBLIC_REVERB_SCHEME ?? "http") === "https",
         enabledTransports: ["ws", "wss"],
         disableStats: true,
     });

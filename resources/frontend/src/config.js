@@ -8,5 +8,6 @@ export const PUBLIC_HOST = server;
 export const PUBLIC_REVERB_HOST = process.env.REVERB_HOST || host_IP_address;
 export const PUBLIC_REVERB_PORT = process.env.REVERB_PORT || "8080";
 export const PUBLIC_REVERB_WSS_PORT = process.env.REVERB_PORT || "443";
+export const PUBLIC_REVERB_SCHEME = process.env.REVERB_SCHEME || "http";
 
 export const API_ROUTE = server + "/api/";

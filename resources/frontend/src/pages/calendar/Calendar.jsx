@@ -12,10 +12,12 @@ import {
     Typography,
     TextField,
     ThemeProvider,
+    FormControlLabel,
+    Switch,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import CloseIcon from "@mui/icons-material/Close";
-import { PanelContent } from "../../components";
+import { PanelContent, ToastNotification } from "../../components";
 import api from "../../api";
 
 const theme = createTheme();
@@ -28,13 +30,17 @@ const theme = createTheme();
 //   description?: string;
 // }
 
-function App() {
+const Calendar = () => {
     const classes = useStyles();
     const calendarRef = useRef(null);
     const [events, setEvents] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [weekends, setWeekends] = useState(false);
-    const [currentEvent, setCurrentEvent] = useState({});
+    const [currentEvent, setCurrentEvent] = useState({
+        title: "",
+        description: "",
+        public: false,
+    });
 
     useEffect(() => {
         fetchEvents();
@@ -46,6 +52,11 @@ function App() {
             setEvents(response.data);
         } catch (error) {
             console.log(error);
+            ToastNotification(
+                "error",
+                error.response.data.error ||
+                    "サーバーエラーです。後でもう一度お試しください"
+            );
         }
     };
 
@@ -53,12 +64,20 @@ function App() {
         setCurrentEvent({
             start: selectInfo.startStr,
             end: selectInfo.endStr,
+            title: "",
+            description: "",
+            public: false,
         });
         setShowModal(true);
     }, []);
 
     const handleEventClick = useCallback((clickInfo) => {
-        setCurrentEvent(clickInfo.event.toPlainObject());
+        console.log(clickInfo.event)
+        const event = clickInfo.event.toPlainObject();
+        setCurrentEvent({
+            ...event,
+            ...event.extendedProps,
+        });
         setShowModal(true);
     }, []);
 
@@ -67,15 +86,20 @@ function App() {
         try {
             if (currentEvent.id) {
                 await api.put(`/events/${currentEvent.id}`, currentEvent);
-                console.log("Event updated successfully");
+                ToastNotification("success", "イベントが正常に更新されました");
             } else {
                 await api.post(`/events`, currentEvent);
-                console.log("Event created successfully");
+                ToastNotification("success", "イベントが正常に作成されました");
             }
             setShowModal(false);
             fetchEvents();
         } catch (error) {
             console.log(error);
+            ToastNotification(
+                "error",
+                error.response.data.error ||
+                    "サーバーエラーです。後でもう一度お試しください"
+            );
         }
     };
 
@@ -83,11 +107,16 @@ function App() {
         if (!currentEvent.id) return;
         try {
             await api.delete(`/events/${currentEvent.id}`);
-            console.log("Event deleted successfully");
+            console.log("イベントは正常に削除されました");
             setShowModal(false);
             fetchEvents();
         } catch (error) {
             console.log(error);
+            ToastNotification(
+                "error",
+                error.response.data.error ||
+                    "サーバーエラーです。後でもう一度お試しください"
+            );
         }
     };
 
@@ -168,7 +197,7 @@ function App() {
                         <Box className={classes.modelForm}>
                             <Box>
                                 <TextField
-                                    label="Title"
+                                    label="タイトル"
                                     variant="outlined"
                                     fullWidth
                                     value={currentEvent.title || ""}
@@ -184,7 +213,7 @@ function App() {
 
                             <Box>
                                 <TextField
-                                    label="Description"
+                                    label="説明"
                                     variant="outlined"
                                     fullWidth
                                     multiline
@@ -198,7 +227,25 @@ function App() {
                                     }
                                 />
                             </Box>
-
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={
+                                            currentEvent.public ? true : false
+                                        }
+                                        onChange={(e) =>
+                                            setCurrentEvent({
+                                                ...currentEvent,
+                                                public: e.target.checked
+                                                    ? 1
+                                                    : 0,
+                                            })
+                                        }
+                                    />
+                                }
+                                label="公開イベント"
+                                sx={{ mb: 2 }}
+                            />
                             <Box
                                 display="flex"
                                 justifyContent="flex-end"
@@ -210,7 +257,7 @@ function App() {
                                         color="error"
                                         onClick={handleDeleteEvent}
                                     >
-                                        Delete
+                                        削除
                                     </Button>
                                 )}
                                 <Button
@@ -218,7 +265,7 @@ function App() {
                                     variant="contained"
                                     color="primary"
                                 >
-                                    Save
+                                    保存
                                 </Button>
                             </Box>
                         </Box>
@@ -227,9 +274,9 @@ function App() {
             </Modal>
         </ThemeProvider>
     );
-}
+};
 
-export default App;
+export default Calendar;
 
 const useStyles = makeStyles({
     root: {

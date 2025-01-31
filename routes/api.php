@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CustomerManage\CustomerController;
 use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
@@ -75,4 +76,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('chats/{chat}', [ChatController::class, 'destroy'])->name('chats.destroy');
 
     Route::get('users', [UserController::class, 'index']);
+
+    Route::get('events', [CalendarEventController::class, 'index']);
+    Route::post('events', [CalendarEventController::class, 'store'])->name('events.store');
+    Route::put('events/{event}', [CalendarEventController::class, 'update'])->name('events.update');
+    Route::delete('events/{event}', [CalendarEventController::class, 'destroy'])->name('events.edit');
 });

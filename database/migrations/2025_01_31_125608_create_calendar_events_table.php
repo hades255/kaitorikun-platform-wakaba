@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('calendar_event', function (Blueprint $table) {
+        Schema::create('calendar_events', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->string('description');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('calendar_event');
+        Schema::dropIfExists('calendar_events');
     }
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import axios from "axios";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -17,11 +16,9 @@ import {
 import { makeStyles } from "@mui/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import { PanelContent } from "../../components";
-import { DatePicker } from "../../components/calendar/DatePicker";
+import api from "../../api";
 
 const theme = createTheme();
-
-const API_URL = "http://localhost:3000/api";
 
 // interface Event {
 //   id: string;
@@ -38,9 +35,6 @@ function App() {
     const [showModal, setShowModal] = useState(false);
     const [weekends, setWeekends] = useState(false);
     const [currentEvent, setCurrentEvent] = useState({});
-    const [pickerVisible, setPickerVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [title, setTitle] = useState("");
 
     useEffect(() => {
         fetchEvents();
@@ -48,50 +42,12 @@ function App() {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get(`${API_URL}/events`);
+            const response = await api.get(`/events`);
             setEvents(response.data);
         } catch (error) {
             console.log(error);
         }
     };
-
-    const formatDateInJapanese = (date, weekday) => {
-        const options = {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        };
-        if (weekday) options.weekday = "long";
-        return new Intl.DateTimeFormat("ja-JP", options).format(date);
-    };
-
-    const handleDatesSet = (dateInfo) => {
-        //  dayGridMonth,timeGridWeek,timeGridDay
-        if (dateInfo.view.type === "timeGridDay")
-            setTitle(formatDateInJapanese(dateInfo.start, true));
-        else
-            setTitle(
-                `${formatDateInJapanese(
-                    dateInfo.start
-                )} - ${formatDateInJapanese(dateInfo.end)}`
-            );
-    };
-
-    const handleDatePickerClick = useCallback(() => {
-        setPickerVisible(!pickerVisible);
-    }, [pickerVisible]);
-
-    const handleDateChange = useCallback(
-        (date) => {
-            setSelectedDate(date);
-            const calendarApi = calendarRef.current.getApi();
-            calendarApi.gotoDate(date);
-            setPickerVisible(false);
-        },
-        [calendarRef]
-    );
-
-    const handleViewChange = useCallback((view) => {}, []);
 
     const handleDateSelect = useCallback((selectInfo) => {
         setCurrentEvent({
@@ -110,13 +66,10 @@ function App() {
         e.preventDefault();
         try {
             if (currentEvent.id) {
-                await axios.put(
-                    `${API_URL}/events/${currentEvent.id}`,
-                    currentEvent
-                );
+                await api.put(`/events/${currentEvent.id}`, currentEvent);
                 console.log("Event updated successfully");
             } else {
-                await axios.post(`${API_URL}/events`, currentEvent);
+                await api.post(`/events`, currentEvent);
                 console.log("Event created successfully");
             }
             setShowModal(false);
@@ -129,7 +82,7 @@ function App() {
     const handleDeleteEvent = async () => {
         if (!currentEvent.id) return;
         try {
-            await axios.delete(`${API_URL}/events/${currentEvent.id}`);
+            await api.delete(`/events/${currentEvent.id}`);
             console.log("Event deleted successfully");
             setShowModal(false);
             fetchEvents();
@@ -169,11 +122,6 @@ function App() {
                                 title: "就業日の表示を切り替える",
                                 click: handleClickShowWorkday,
                             },
-                            datePicker: {
-                                text: title,
-                                click: handleDatePickerClick,
-                                title: "日付ピッカーを開く",
-                            },
                         }}
                         buttonText={{
                             dayGridMonth: "月",
@@ -191,26 +139,9 @@ function App() {
                         height="calc(100vh - 200px)"
                         select={handleDateSelect}
                         eventClick={handleEventClick}
-                        viewDidMount={handleViewChange}
-                        datesSet={handleDatesSet}
                     />
                 </Paper>
             </PanelContent>
-            <Modal
-                open={pickerVisible}
-                onClose={() => {
-                    setPickerVisible(false);
-                }}
-                aria-labelledby="datepicker-modal"
-                aria-describedby="datepicker-modal in calendar"
-            >
-                <Box className={classes.modal}>
-                    <DatePicker
-                        onChange={handleDateChange}
-                        selectedDate={selectedDate}
-                    />
-                </Box>
-            </Modal>
             <Modal
                 open={showModal}
                 onClose={handleClose}

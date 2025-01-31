@@ -72,7 +72,7 @@ const Calendar = () => {
     }, []);
 
     const handleEventClick = useCallback((clickInfo) => {
-        console.log(clickInfo.event)
+        console.log(clickInfo.event);
         const event = clickInfo.event.toPlainObject();
         setCurrentEvent({
             ...event,
@@ -184,7 +184,9 @@ const Calendar = () => {
                             variant="h6"
                             component="h2"
                         >
-                            {currentEvent.id ? "Edit Event" : "New Event"}
+                            {currentEvent.id
+                                ? "イベントを編集"
+                                : "新しいイベント"}
                         </Typography>
                         <Button
                             onClick={handleClose}

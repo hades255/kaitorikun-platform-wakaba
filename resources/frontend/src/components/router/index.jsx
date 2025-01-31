@@ -10,6 +10,7 @@ import ResetPassword from "../../pages/reset-password";
 import Communities from "../../pages/communities";
 import ChatsPage from "../../pages/chat";
 import CalendarPage from "../../pages/calendar";
+import CalendarPageTest from "../../pages/calendar/index copy";
 import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
 
 const MenuRoutes = [
@@ -97,6 +98,12 @@ const MenuRoutes = [
         exact: true,
         title: "チャット",
         component: () => <CalendarPage />,
+    },
+    {
+        path: "/calendar_test",
+        exact: true,
+        title: "招待を受け入れる",
+        component: () => <CalendarPageTest />,
     },
     /** channel&chat end */
     {

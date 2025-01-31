@@ -97,13 +97,13 @@ const MenuRoutes = [
         path: "/calendar",
         exact: true,
         title: "チャット",
-        component: () => <CalendarPage />,
+        component: () => <CalendarPageTest />,
     },
     {
         path: "/calendar_test",
         exact: true,
         title: "招待を受け入れる",
-        component: () => <CalendarPageTest />,
+        component: () => <CalendarPage />,
     },
     /** channel&chat end */
     {

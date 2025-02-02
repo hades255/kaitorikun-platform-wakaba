@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
     Box,
     TextField,
@@ -6,12 +6,15 @@ import {
     FormControlLabel,
     Button,
     Typography,
-    Paper,
+    DialogTitle,
+    DialogContent,
 } from "@mui/material";
 import api from "../../api";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel } from "../../reduxStore";
 import { ToastNotification, useDispatch } from "..";
+import CommunityGuideline from "./CommunityGuideline";
+import CommunityIconUrl from "./CommunityIconUrl";
 
 const CreateCommunity = () => {
     const dispatch = useDispatch();
@@ -22,6 +25,8 @@ const CreateCommunity = () => {
         name: preSetCommunityName,
         description: "",
         icon: "",
+        guideline:
+            "コミュニティのメンバーに対して親切で敬意を持って接してください。失礼な態度や残酷な態度はとらないでください。自分らしく参加し、違反する投稿はしないでください",
         requireApproval: false,
         isPublic: true,
     });
@@ -64,100 +69,135 @@ const CreateCommunity = () => {
         saveChannel();
     };
 
-    return (
-        <Paper sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
-            <Typography variant="h5" sx={{ mb: 3 }}>
-                {/* Create New community */}新しいコミュニティを作る
-            </Typography>
+    const handleClose = useCallback(
+        () => setShowCommunityEditor(false),
+        [setShowCommunityEditor]
+    );
 
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    fullWidth
-                    label="コミュニティ名"
-                    // label="community Name"
-                    value={comData.name}
-                    onChange={(e) =>
-                        setComData({
-                            ...comData,
-                            name: e.target.value,
-                        })
-                    }
-                    required
-                    sx={{ mb: 2 }}
-                />
-                <TextField
-                    fullWidth
-                    // label="community Icon URL"
-                    label="コミュニティアイコン URL"
-                    value={comData.icon}
-                    onChange={(e) =>
-                        setComData({
-                            ...comData,
-                            icon: e.target.value,
-                        })
-                    }
-                    sx={{ mb: 2 }}
-                />
-                <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="説明"
-                    // label="Description"
-                    value={comData.description}
-                    onChange={(e) =>
-                        setComData({
-                            ...comData,
-                            description: e.target.value,
-                        })
-                    }
-                    sx={{ mb: 2 }}
-                />
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={comData.requireApproval}
-                            onChange={(e) =>
-                                setComData({
-                                    ...comData,
-                                    requireApproval: e.target.checked,
-                                })
-                            }
-                        />
-                    }
-                    label="参加するには承認が必要"
-                    // label="Require approval to join"
-                    sx={{ mb: 1 }}
-                />
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={comData.isPublic}
-                            onChange={(e) =>
-                                setComData({
-                                    ...comData,
-                                    isPublic: e.target.checked,
-                                })
-                            }
-                        />
-                    }
-                    label="公開コミュニティ"
-                    // label="Public community"
-                    sx={{ mb: 2 }}
-                />
-                <Box display="flex" sx={{ gap: 2 }}>
-                    <Button variant="contained" type="submit">
-                        {/* Create community */}コミュニティを作成
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setShowCommunityEditor(false)}
+    return (
+        <>
+            <DialogTitle>新しいコミュニティを作る</DialogTitle>
+            <DialogContent>
+                <form onSubmit={handleSubmit}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            mb: 2,
+                        }}
                     >
-                        {/* Cancel */}キャンセル
-                    </Button>
-                </Box>
-            </form>
-        </Paper>
+                        <CommunityIconUrl
+                            comData={comData}
+                            setComData={setComData}
+                        />
+                        <TextField
+                            fullWidth
+                            variant="standard"
+                            label="コミュニティ名"
+                            value={comData.name}
+                            onChange={(e) =>
+                                setComData({
+                                    ...comData,
+                                    name: e.target.value,
+                                })
+                            }
+                            placeholder="コミュニティに名前を付ける"
+                            required
+                        />
+                    </Box>
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        variant="filled"
+                        label="説明(オプション)"
+                        value={comData.description}
+                        onChange={(e) =>
+                            setComData({
+                                ...comData,
+                                description: e.target.value,
+                            })
+                        }
+                        placeholder="コミュニティについて簡単に説明して、コミュニティの目的を人々に知らせてください。"
+                        sx={{ mb: 2 }}
+                    />
+                    <CommunityGuideline
+                        comData={comData}
+                        setComData={setComData}
+                    />
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            mb: 2,
+                        }}
+                    >
+                        <Box sx={{ width: "100%" }}>
+                            <Typography variant="subtitle1">
+                                参加するには承認が必要です
+                            </Typography>
+                            <Typography variant="subtitle2">
+                                コミュニティのオーナーは、参加する前に新しいメンバーを承認する必要があります。
+                            </Typography>
+                        </Box>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={comData.requireApproval}
+                                    onChange={(e) =>
+                                        setComData({
+                                            ...comData,
+                                            requireApproval: e.target.checked,
+                                        })
+                                    }
+                                />
+                            }
+                            sx={{ mb: 1 }}
+                        />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            mb: 2,
+                        }}
+                    >
+                        <Box sx={{ width: "100%" }}>
+                            <Typography variant="subtitle1">公開</Typography>
+                            <Typography variant="subtitle2">
+                                オンにすると、このコミュニティが検索に表示され、おすすめに表示される場合があります。
+                                <span>詳細</span>
+                            </Typography>
+                        </Box>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={comData.isPublic}
+                                    onChange={(e) =>
+                                        setComData({
+                                            ...comData,
+                                            isPublic: e.target.checked,
+                                        })
+                                    }
+                                />
+                            }
+                            sx={{ mb: 2 }}
+                        />
+                    </Box>
+                    <Box display="flex" justifyContent="end" sx={{ gap: 2 }}>
+                        <Button variant="outlined" onClick={handleClose}>
+                            キャンセル
+                        </Button>
+                        <Button variant="contained" type="submit">
+                            コミュニティを作成
+                        </Button>
+                    </Box>
+                </form>
+            </DialogContent>
+        </>
     );
 };
 

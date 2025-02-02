@@ -81,13 +81,6 @@ const CommunityItem = ({ com }) => {
     };
 
     const handleClickNew = useCallback(() => {
-        dispatch(
-            actionChannel.handleSelectChannel({
-                channel: null,
-                posts: [],
-                users: [],
-            })
-        );
         setPreSetCommunityId(com.id);
         setShowChannelEditor(true);
     }, [dispatch, setShowChannelEditor, setPreSetCommunityId, com, channel]);

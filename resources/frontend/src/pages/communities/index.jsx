@@ -1,6 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
-import clsx from "clsx";
-import { Button, Dialog, TextField } from "@mui/material";
+import { Box, Button, Dialog, TextField, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import SchoolIcon from "@mui/icons-material/School";
+import BusinessIcon from "@mui/icons-material/Business";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import NightlifeIcon from "@mui/icons-material/Nightlife";
+import PaletteIcon from "@mui/icons-material/Palette";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+import GrassIcon from "@mui/icons-material/Grass";
+import HouseIcon from "@mui/icons-material/House";
+import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import api from "../../api";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { useAuth } from "../../contexts/AuthContext";
@@ -12,26 +23,31 @@ import {
     useSelector,
 } from "../../components";
 import CreateCommunity from "../../components/community/New";
+import CreateChannel from "../../components/community/NewChannel";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
-import CreateChannel from "../../components/community/NewChannel";
-import { Box } from "@mui/material";
-import { Typography } from "antd";
-import { makeStyles, useTheme } from "@mui/styles";
 
 const preNamedCommunities = [
-    { title: "自分で作成", value: "" },
-    { title: "学校", value: "学校" },
-    { title: "ビジネス", value: "ビジネス" },
-    { title: "スポーツ", value: "スポーツ" },
-    { title: "専門職", value: "専門職" },
-    { title: "ライフイベント", value: "ライフイベント" },
-    { title: "芸術と文化", value: "芸術と文化" },
-    { title: "ゲーム", value: "ゲーム" },
-    { title: "青少年団体", value: "青少年団体" },
-    { title: "近所", value: "近所" },
-    { title: "親", value: "親" },
-    { title: "ボランティア", value: "ボランティア" },
+    { title: "自分で作成", value: "", icon: null },
+    { title: "学校", value: "学校", icon: <SchoolIcon /> },
+    { title: "ビジネス", value: "ビジネス", icon: <BusinessIcon /> },
+    { title: "スポーツ", value: "スポーツ", icon: <EmojiEventsIcon /> },
+    { title: "専門職", value: "専門職", icon: <BusinessCenterIcon /> },
+    {
+        title: "ライフイベント",
+        value: "ライフイベント",
+        icon: <NightlifeIcon />,
+    },
+    { title: "芸術と文化", value: "芸術と文化", icon: <PaletteIcon /> },
+    { title: "ゲーム", value: "ゲーム", icon: <SportsEsportsIcon /> },
+    { title: "青少年団体", value: "青少年団体", icon: <GrassIcon /> },
+    { title: "近所", value: "近所", icon: <HouseIcon /> },
+    { title: "親", value: "親", icon: <FamilyRestroomIcon /> },
+    {
+        title: "ボランティア",
+        value: "ボランティア",
+        icon: <VolunteerActivismIcon />,
+    },
 ];
 // const preNamedCommunities = [
 //     { title: "Create my own", value: "" },
@@ -132,7 +148,7 @@ const Communities = () => {
     return (
         <PanelContent
             headerContent
-            title={channel ? channel.name : "チャンネル"}
+            title={channel ? channel.name : "コミュニティ"}
         >
             {channel ? (
                 <div>
@@ -197,9 +213,7 @@ const Communities = () => {
             ) : (
                 <>
                     {communities && communities.length > 0 && (
-                        <div>
-                            {/* Create new Channel */}新しいチャンネルを作成
-                        </div>
+                        <div>新しいコミュニティを作成</div>
                     )}
                     <Box
                         display="flex"
@@ -210,15 +224,14 @@ const Communities = () => {
                     >
                         <Box display="flex" flexDirection="column" gap={2}>
                             <Typography className="text-xl">
-                                {/* Build your community */}
                                 コミュニティを構築する
                             </Typography>
-                            <Box className="">
-                                {/* Plan community events, engage in discussions, and
-                            create a sage space to collaborate. */}
-                                コミュニティ
-                                イベントを計画し、ディスカッションに参加し、コラボレーションのための賢明なスペースを作成します。
-                            </Box>
+                            <Typography variant="">
+                                コミュニティイベントを計画し、ディスカッションに参加し、協力するための安全なスペースを作ります。
+                            </Typography>
+                            <Typography color="#4a55aa">
+                                コミュニティについてもっと知る
+                            </Typography>
                             <Box className="flex justify-center">
                                 <Box
                                     display="flex"
@@ -245,6 +258,7 @@ const Communities = () => {
                 <Dialog
                     open={showCommunityEditor}
                     onClose={() => setShowCommunityEditor(false)}
+                    maxWidth="md"
                 >
                     <CreateCommunity />
                 </Dialog>
@@ -279,6 +293,7 @@ const PreNamedItems = ({ community }) => {
                 community.value ? classes.active : classes.inactive
             }`}
         >
+            {community.icon}
             {community.title}
         </Box>
     );
@@ -288,14 +303,17 @@ const useStyles = makeStyles((theme) => ({
     preNamesItem: {
         paddingLeft: "1rem",
         paddingRight: "1rem",
-        paddingTop: "0.25rem",
-        paddingBottom: "0.25rem",
+        paddingTop: "0.5rem",
+        paddingBottom: "0.5rem",
         borderRadius: "999px",
-        border: "1px solid transparent",
+        border: "2px solid #212229",
         color: "white",
         fontWeight: 600,
         cursor: "pointer",
         transition: "all 0.3s ease",
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
     },
     active: {
         backgroundColor: "#313239",

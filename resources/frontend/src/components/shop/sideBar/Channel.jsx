@@ -21,7 +21,6 @@ import { useDispatch, useSelector } from "../../../components";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        border: `1px solid red`, // Border using theme color
         width: "16px", // Tailwind w-4
         height: "16px", // Tailwind h-4
         minWidth: "16px", // Tailwind min-w-4
@@ -29,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
         display: "flex", // Tailwind flex
         justifyContent: "center", // Tailwind justify-center
         alignItems: "center", // Tailwind items-center
-        borderRadius: "50%", // Tailwind rounded
         marginRight: "8px", // Tailwind mr-2 (theme spacing is 8px * multiplier)
         fontSize: "12px", // Tailwind text-xs
     },

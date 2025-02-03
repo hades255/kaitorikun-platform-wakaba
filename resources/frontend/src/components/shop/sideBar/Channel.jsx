@@ -162,6 +162,7 @@ const ChannelItem = ({ channel, active, handleClickChannel }) => {
             onClick={handleClick}
             sx={{
                 pl: 4,
+                py: 0,
                 bgcolor: active ? "#0004" : "#0000",
                 cursor: "pointer",
             }}

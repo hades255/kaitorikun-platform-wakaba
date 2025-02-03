@@ -41,7 +41,7 @@ class InvitationController extends Controller
         $email = $validatedData["email"];
         $receiver = User::where("email", $email)->first();
         if ($receiver) {
-            $token = hash("sha256", $email);
+            $token = hash("sha256", $email . "-" . microtime(true));
             $invitation = new Invitation();
             $invitation->sender_id = $userId;
             $invitation->community_id = $validatedData["community_id"];
@@ -121,16 +121,19 @@ class InvitationController extends Controller
         if (!$invitation) {
             return response()->json(['message' => '招待が見つかりません.'], 404);
         }
-
         if ($invitation->status === 'accepted') {
             return response()->json(['message' => '招待はすでに承諾されています.'], 400);
         }
-        $invitation->status = 'accepted';
-        $invitation->save();
+        $old = CommunityUser::where("community_id", $invitation->community_id)->where("user_id", $invitation->receiver_id)->first();
+        if ($old) {
+            return response()->json(['message' => '招待はすでに承諾されています.'], 400);
+        }
         $newCom = new CommunityUser();
         $newCom->community_id = $invitation->community_id;
         $newCom->user_id = $invitation->receiver_id;
         $newCom->save();
+        $invitation->status = 'accepted';
+        $invitation->save();
 
         return response()->json(['message' => '招待が正常に承諾されました!']);
     }

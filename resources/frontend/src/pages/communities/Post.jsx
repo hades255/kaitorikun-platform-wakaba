@@ -13,6 +13,7 @@ import {
     Badge,
     Chip,
     Popover,
+    Divider,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import MoodIcon from "@mui/icons-material/Mood";
@@ -271,8 +272,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 const ReplyItem = ({ reply, users }) => {
-    const user =
-        Array.isArray(users) && users.find(({ id }) => id == reply.user_id);
+    console.log(reply, users);
     const timeAgo = formatDistanceToNow(new Date(reply.updated_at), {
         addSuffix: true,
     });
@@ -280,8 +280,8 @@ const ReplyItem = ({ reply, users }) => {
     return (
         <Box
             display="flex"
-            alignItems="start"
-            justifyContent="space-between"
+            flexDirection="column"
+            width="100%"
             px={3}
             py={2}
             borderRadius={1}
@@ -289,8 +289,7 @@ const ReplyItem = ({ reply, users }) => {
         >
             <Box
                 display="flex"
-                alignItems="center"
-                width="100%"
+                justifyContent="space-between"
                 spacing={3}
                 gap={3}
             >
@@ -301,24 +300,13 @@ const ReplyItem = ({ reply, users }) => {
                 >
                     <Creator creature={reply} users={users} />
                 </StyledBadge>
-                <Box display="flex" flexDirection="column" width="100%">
-                    <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="body1" color="textPrimary">
-                            {user ? user.name : "不明なユーザー"}
-                        </Typography>
-                        <Typography variant="caption" color="textSecondary">
-                            {timeAgo}
-                        </Typography>
-                    </Box>
-                    <Typography variant="body2" color="textSecondary" noWrap>
-                        {reply.reply}
-                    </Typography>
-                </Box>
+                <Typography variant="caption" color="textSecondary">
+                    {timeAgo}
+                </Typography>
             </Box>
+            <Typography variant="body2" color="textSecondary" noWrap>
+                {reply.reply}
+            </Typography>
         </Box>
     );
 };
@@ -372,10 +360,15 @@ const EmojiItem = ({ reaction, onClick, users }) => {
                         onClose={handlePopoverClose}
                         disableRestoreFocus
                     >
-                        <Box p={2}>
-                            {reaction.users.map((item) => (
+                        <Box
+                            p={2}
+                            display={"flex"}
+                            flexDirection={"column"}
+                            gap={1}
+                        >
+                            {reaction.users.map((item, index) => (
                                 <Creator
-                                    key={item}
+                                    key={index}
                                     users={users}
                                     creature={{ user_id: item }}
                                 />

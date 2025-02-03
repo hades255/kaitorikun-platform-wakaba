@@ -9,7 +9,7 @@ const Creator = ({ creature, users }) => {
         <Box display={"flex"} alignItems={"center"} gap={1}>
             <Avatar
                 alt={user?.name}
-                src={user.icon || "avatar"}
+                src={user?.icon || "avatar"}
                 sx={{
                     color: "black",
                     width: 36,

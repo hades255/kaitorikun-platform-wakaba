@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import EmojiPicker from "emoji-picker-react";
 import { formatDistanceToNow } from "date-fns";
-import clsx from "clsx";
 import {
     Card,
     CardContent,
@@ -11,20 +10,24 @@ import {
     Box,
     TextField,
     IconButton,
-    Avatar,
     Badge,
+    Chip,
+    Popover,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import MoodIcon from "@mui/icons-material/Mood";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { styled } from "@mui/material/styles";
 import api from "../../api";
 import { getUserStatusColor } from "../../feature/action";
 import { useAuth } from "../../contexts/AuthContext";
 import { actionChannel } from "../../reduxStore";
+import Creator from "../../components/community/Creator";
 
-const Post = ({ post, users }) => {
+const Post = ({ post, users, channel }) => {
     const dispatch = useDispatch();
     const auth = useAuth();
+    const pickerRef = useRef(null);
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
     const [reply, setReply] = useState("");
@@ -34,8 +37,26 @@ const Post = ({ post, users }) => {
         addSuffix: true,
     });
 
+    const handleClickOutside = (event) => {
+        if (pickerRef.current && !pickerRef.current.contains(event.target)) {
+            setShowEmojiPicker(false);
+        }
+    };
+
     useEffect(() => {
-        if (post.reactions && post.reactions.length > 0) {
+        if (showEmojiPicker) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showEmojiPicker]);
+
+    useEffect(() => {
+        if (Array.isArray(post.reactions) && post.reactions.length > 0) {
             let res = {};
             post.reactions?.forEach((item) => {
                 if (res[item.reaction]) {
@@ -44,11 +65,13 @@ const Post = ({ post, users }) => {
                             res[item.reaction].mine ||
                             item.user_id == auth.auth?.id,
                         count: res[item.reaction].count + 1,
+                        users: [...res[item.reaction].users, item.user_id],
                     };
                 } else {
                     res[item.reaction] = {
                         mine: item.user_id == auth.auth?.id,
                         count: 1,
+                        users: [item.user_id],
                     };
                 }
             });
@@ -144,20 +167,31 @@ const Post = ({ post, users }) => {
     return (
         <Card sx={{ mb: 2 }}>
             <CardContent>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="h6">{post.title}</Typography>
+                <Box display={"flex"} alignItems={"center"} gap={1}>
+                    <Box
+                        height={32}
+                        width={8}
+                        borderRadius={2}
+                        bgcolor={"#4a55aa"}
+                    ></Box>
+                    <Creator creature={post} users={users} />
+                    {channel?.user_id == post?.user_id && (
+                        <Chip
+                            variant="outlined"
+                            color="secondary"
+                            size="small"
+                            label="所有者"
+                            icon={<WorkspacePremiumIcon />}
+                        />
+                    )}
                     <Typography variant="subtitle1">{timeAgo}</Typography>
                 </Box>
+                <Typography variant="h6">{post.title}</Typography>
                 <Typography variant="subtitle1" color="text.secondary">
                     {post.subject}
                 </Typography>
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                <Box display={"flex"} alignItems={"center"}>
-                    <IconButton
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    >
-                        <AddIcon />
-                    </IconButton>
+                <Box display={"flex"} alignItems={"center"} gap={1}>
                     {Array.isArray(reactions) &&
                         reactions?.map((item) => (
                             <EmojiItem
@@ -167,8 +201,18 @@ const Post = ({ post, users }) => {
                                 onClick={handleEmojiClick}
                             />
                         ))}
+                    <IconButton
+                        color="primary"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    >
+                        <MoodIcon />
+                        <AddIcon />
+                    </IconButton>
                     {showEmojiPicker && (
-                        <Box sx={{ position: "absolute", zIndex: 1 }}>
+                        <Box
+                            sx={{ position: "absolute", zIndex: 1 }}
+                            ref={pickerRef}
+                        >
                             <EmojiPicker onEmojiClick={handleNewEmojiClick} />
                         </Box>
                     )}
@@ -255,9 +299,7 @@ const ReplyItem = ({ reply, users }) => {
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                 >
-                    <Avatar>
-                        <AccountCircleOutlinedIcon />
-                    </Avatar>
+                    <Creator creature={reply} users={users} />
                 </StyledBadge>
                 <Box display="flex" flexDirection="column" width="100%">
                     <Box
@@ -281,32 +323,66 @@ const ReplyItem = ({ reply, users }) => {
     );
 };
 
-const EmojiItem = ({ reaction, onClick }) => {
-    const handleClick = () => {
-        onClick(reaction);
+const EmojiItem = ({ reaction, onClick, users }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handlePopoverOpen = (event) => {
+        setAnchorEl(event.currentTarget);
     };
 
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+
+    const handleClick = () => onClick(reaction);
+
     return (
-        <Box
-            component="span"
-            sx={{
-                cursor: "pointer",
-                mx: "1px",
-                px: reaction.mine ? "4px" : "1px",
-                borderRadius: "4px",
-                border: 1,
-                borderColor: "divider",
-                color: "#1976d2",
-                backgroundColor: reaction.mine ? "#0004" : "transparent",
-            }}
-            className={clsx({
-                "additional-class": reaction.mine, // Example for adding additional classes
-            })}
-            onClick={handleClick}
-            title={reaction.count}
-        >
-            {reaction.reaction}
-            {reaction.count > 1 && reaction.count}
-        </Box>
+        <div onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
+            <Badge
+                badgeContent={reaction.count > 1 ? reaction.count : 0}
+                color="info"
+                sx={{ cursor: "pointer" }}
+            >
+                <Chip
+                    sx={{ fontSize: 24 }}
+                    variant="outlined"
+                    color="secondary"
+                    label={reaction.reaction}
+                    onClick={handleClick}
+                ></Chip>
+            </Badge>
+            {Array.isArray(reaction.users) &&
+                reaction.users.length > 0 &&
+                open && (
+                    <Popover
+                        id="mouse-over-popover"
+                        sx={{ pointerEvents: "none" }}
+                        open={open}
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "left",
+                        }}
+                        transformOrigin={{
+                            vertical: "top",
+                            horizontal: "left",
+                        }}
+                        onClose={handlePopoverClose}
+                        disableRestoreFocus
+                    >
+                        <Box p={2}>
+                            {reaction.users.map((item) => (
+                                <Creator
+                                    key={item}
+                                    users={users}
+                                    creature={{ user_id: item }}
+                                />
+                            ))}
+                        </Box>
+                    </Popover>
+                )}
+        </div>
     );
 };

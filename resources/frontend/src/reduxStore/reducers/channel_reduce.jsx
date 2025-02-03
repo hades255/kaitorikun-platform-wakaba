@@ -20,6 +20,7 @@ const initialState = {
     publicCommunities: [],
     channels: [],
     publicChannels: [],
+    community: null,
     channel: null,
     users: [],
     posts: [],
@@ -84,6 +85,7 @@ const channels = (state = initialState, actions) => {
         case SELECT_CHANNEL:
             return {
                 ...state,
+                community: data.community,
                 channel: data.channel,
                 users: data.users,
                 posts: data.posts,

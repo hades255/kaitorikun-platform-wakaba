@@ -56,6 +56,7 @@ class CommunityController extends Controller
                 $channel->description = 'コミュニティのデフォルト チャンネル';
                 $channel->user_id = Auth::id();
                 $channel->community_id = $community->id;
+                $channel->type = 0;
                 $channel->save();
 
                 if ($community->isPublic) {

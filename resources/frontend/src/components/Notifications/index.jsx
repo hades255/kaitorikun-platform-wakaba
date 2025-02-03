@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
-import { API_ROUTE } from "../../config";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
@@ -13,18 +12,22 @@ const Notifications = () => {
     const { auth } = useAuth();
     const { updateUnreadTab, showNotification } = useNotification();
     const coms = useSelector(selectorChannel.handleGetCommunities);
-    const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
+    // const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
     const [comIds, setComIds] = useState([]);
 
     useEffect(() => {
-        setComIds([
-            ...(coms && coms.length > 0 ? coms.map(({ id }) => id) : []),
-            ...(pubcoms && pubcoms.length > 0
-                ? pubcoms.map(({ id }) => id)
-                : []),
-        ]);
-    }, [coms, pubcoms]);
+        setComIds(Array.isArray(coms) ? coms.map(({ id }) => id) : []);
+    }, [coms]);
+
+    // useEffect(() => {
+    //     setComIds([
+    //         ...(coms && coms.length > 0 ? coms.map(({ id }) => id) : []),
+    //         ...(pubcoms && pubcoms.length > 0
+    //             ? pubcoms.map(({ id }) => id)
+    //             : []),
+    //     ]);
+    // }, [coms, pubcoms]);
 
     useEffect(() => {
         myEcho();
@@ -89,23 +92,23 @@ const Notifications = () => {
                 }
             }
         };
-        const handleCommunityCreated = (data) => {
-            if (data && data.community && data.channel) {
-                if (auth?.id != data.community.user_id) {
-                    updateUnreadTab("com", true);
-                    dispatch(
-                        actionChannel.handleAddPublicCommunity({
-                            ...data.community,
-                            channels: [data.channel],
-                        })
-                    );
-                    if (data.name)
-                        showNotification("新しいコミュニティ", {
-                            message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
-                        });
-                }
-            }
-        };
+        // const handleCommunityCreated = (data) => {
+        //     if (data && data.community && data.channel) {
+        //         if (auth?.id != data.community.user_id) {
+        //             updateUnreadTab("com", true);
+        //             dispatch(
+        //                 actionChannel.handleAddPublicCommunity({
+        //                     ...data.community,
+        //                     channels: [data.channel],
+        //                 })
+        //             );
+        //             if (data.name)
+        //                 showNotification("新しいコミュニティ", {
+        //                     message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
+        //                 });
+        //         }
+        //     }
+        // };
 
         const handleNewChat = (data) => {
             if (
@@ -124,7 +127,7 @@ const Notifications = () => {
             }
         };
 
-        channel.listen(".channel.community.created", handleCommunityCreated);
+        // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
         channel.listen(".channel.post.created", handlePostCreated);
         channel.listen(".channel.post.reply", handleReplyToPost);
@@ -141,7 +144,7 @@ const Notifications = () => {
 
         return () => {
             if (channel) {
-                channel.stopListening(".channel.community.created");
+                // channel.stopListening(".channel.community.created");
                 channel.stopListening(".channel.created");
                 channel.stopListening(".channel.post.created");
                 channel.stopListening(".channel.post.reply");
@@ -163,14 +166,14 @@ const Notifications = () => {
             //     }
             // };
             //  get all users
-            const getUsers = async () => {
-                try {
-                    const response = await api.get("users");
-                    dispatch(actionChat.handleSetUsers(response.data));
-                } catch (error) {
-                    console.log(error);
-                }
-            };
+            // const getUsers = async () => {
+            //     try {
+            //         const response = await api.get("users");
+            //         dispatch(actionChat.handleSetUsers(response.data));
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // };
             //  get all chats
             const getMyChats = async () => {
                 try {
@@ -180,18 +183,18 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
-            const getMineCommunities = async () => {
-                try {
-                    const response = await api.get(`communities/mine`);
-                    dispatch(
-                        actionChannel.handleSetCommunity(
-                            response.data.communities
-                        )
-                    );
-                } catch (error) {
-                    console.log(error);
-                }
-            };
+            // const getMineCommunities = async () => {
+            //     try {
+            //         const response = await api.get(`communities/mine`);
+            //         dispatch(
+            //             actionChannel.handleSetCommunity(
+            //                 response.data.communities
+            //             )
+            //         );
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // };
             const getJoinedCommunities = async () => {
                 try {
                     const response = await api.get(`communities/joined`);
@@ -204,22 +207,22 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
-            const fetchPublicCommunities = async () => {
-                try {
-                    const response = await api.get(
-                        `${API_ROUTE}communities/public`
-                    );
-                    dispatch(
-                        actionChannel.handleSetPublicCommunity(
-                            response.data.communities
-                        )
-                    );
-                } catch (err) {
-                    console.log(err);
-                }
-            };
-            fetchPublicCommunities();
-            getUsers();
+            // const fetchPublicCommunities = async () => {
+            //     try {
+            //         const response = await api.get(
+            //             `${API_ROUTE}communities/public`
+            //         );
+            //         dispatch(
+            //             actionChannel.handleSetPublicCommunity(
+            //                 response.data.communities
+            //             )
+            //         );
+            //     } catch (err) {
+            //         console.log(err);
+            //     }
+            // };
+            // fetchPublicCommunities();
+            // getUsers();
             getMyChats();
             // getMineCommunities();
             getJoinedCommunities();

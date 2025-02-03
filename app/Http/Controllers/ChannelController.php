@@ -34,6 +34,7 @@ class ChannelController extends Controller
         $channel->description = $validatedData['description'];
         $channel->icon = $validatedData['icon'];
         $channel->community_id = $validatedData['community_id'];
+        $channel->type = 1;
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             NewChannelJob::dispatch($channel, Auth::user()->name);

@@ -1,4 +1,5 @@
 const handleGetCommunities = (state) => state.channels.communities;
+const handleGetCommunity = (state) => state.channels.community;
 const handleGetChannels = (state) => state.channels.channels;
 const handleGetPublicCommunities = (state) => state.channels.publicCommunities;
 const handleGetPublicChannels = (state) => state.channels.publicChannels;
@@ -12,6 +13,7 @@ const selectorChannel = {
     handleGetChannel,
     handleGetUsers,
     handleGetPosts,
+    handleGetCommunity,
     handleGetCommunities,
     handleGetPublicCommunities,
 };

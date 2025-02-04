@@ -13,17 +13,20 @@ import {
     Badge,
     Chip,
     Popover,
-    Divider,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import MoodIcon from "@mui/icons-material/Mood";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { styled } from "@mui/material/styles";
+import moment from "moment";
+import "moment/locale/ja";
 import api from "../../api";
 import { getUserStatusColor } from "../../feature/action";
 import { useAuth } from "../../contexts/AuthContext";
 import { actionChannel } from "../../reduxStore";
 import Creator from "../../components/community/Creator";
+
+moment.locale("ja");
 
 const Post = ({ post, users, channel }) => {
     const dispatch = useDispatch();
@@ -34,9 +37,6 @@ const Post = ({ post, users, channel }) => {
     const [reply, setReply] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [reactions, setReactions] = useState([]);
-    const timeAgo = formatDistanceToNow(new Date(post.updated_at), {
-        addSuffix: true,
-    });
 
     const handleClickOutside = (event) => {
         if (pickerRef.current && !pickerRef.current.contains(event.target)) {
@@ -185,7 +185,9 @@ const Post = ({ post, users, channel }) => {
                             icon={<WorkspacePremiumIcon />}
                         />
                     )}
-                    <Typography variant="subtitle1">{timeAgo}</Typography>
+                    <Typography variant="subtitle1">
+                        {moment(post.created_at).fromNow()}
+                    </Typography>
                 </Box>
                 <Typography variant="h6">{post.title}</Typography>
                 <Typography variant="subtitle1" color="text.secondary">
@@ -272,11 +274,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 const ReplyItem = ({ reply, users }) => {
-    console.log(reply, users);
-    const timeAgo = formatDistanceToNow(new Date(reply.updated_at), {
-        addSuffix: true,
-    });
-
     return (
         <Box
             display="flex"
@@ -301,7 +298,7 @@ const ReplyItem = ({ reply, users }) => {
                     <Creator creature={reply} users={users} />
                 </StyledBadge>
                 <Typography variant="caption" color="textSecondary">
-                    {timeAgo}
+                    {moment(reply.created_at).fromNow()}
                 </Typography>
             </Box>
             <Typography variant="body2" color="textSecondary" noWrap>

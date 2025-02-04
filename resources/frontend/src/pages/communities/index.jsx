@@ -350,7 +350,7 @@ export default Communities;
 const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
     return (
         <>
-            {community ? (
+            {community && (
                 <Box
                     width={"100%"}
                     display={"flex"}
@@ -405,8 +405,6 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
                         </ButtonGroup>
                     </Box>
                 </Box>
-            ) : (
-                <Typography variant="h4">コミュニティ</Typography>
             )}
         </>
     );

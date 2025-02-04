@@ -37,7 +37,8 @@ class CommunityController extends Controller
                 $validatedData = $request->validate([
                     'name' => 'required|string|max:255',
                     'description' => 'nullable|string|max:1000',
-                    'icon' => 'nullable|string|max:255',
+                    'guideline' => 'nullable|string|max:1000',
+                    'icon' => 'nullable|string',
                     'requireApproval' => 'required|boolean',
                     'isPublic' => 'required|boolean',
                 ]);
@@ -45,6 +46,7 @@ class CommunityController extends Controller
                 $community = new Community();
                 $community->name = $validatedData['name'];
                 $community->description = $validatedData['description'] ?? null;
+                $community->guideline = $validatedData['guideline'];
                 $community->icon = $validatedData['icon'] ?? null;
                 $community->requireApproval = $validatedData['requireApproval'];
                 $community->isPublic = $validatedData['isPublic'];

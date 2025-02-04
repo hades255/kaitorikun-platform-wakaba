@@ -8,7 +8,7 @@ const CommunityIconUrl = ({ comData, setComData }) => {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.accept = "image/*";
-        fileInput.onchange = (e) => {   //  todo    fix
+        fileInput.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();

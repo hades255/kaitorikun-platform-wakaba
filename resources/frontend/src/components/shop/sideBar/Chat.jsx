@@ -158,21 +158,25 @@ export default ChatSidebar;
 const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
     const chats = useSelector(selectorChat.handleGetChats);
 
+    const classes = useStyles();
+    const { auth } = useAuth();
+
     const lastChat = useMemo(() => {
         if (user && Array.isArray(chats) && chats.length > 0) {
             return chats
-                .filter(({ from, to }) => from == user?.id || to == user?.id)
+                .filter(({ from, to }) =>
+                    auth?.id == user?.id
+                        ? from == auth?.id && to == auth?.id
+                        : from == user?.id || to == user?.id
+                )
                 .sort((a, b) => {
-                    if (a.created_at > b.created_at) return 1;
-                    if (a.created_at < b.created_at) return -1;
+                    if (a.created_at < b.created_at) return 1;
+                    if (a.created_at > b.created_at) return -1;
                     return 0;
                 })[0];
         }
         return null;
-    }, [chats, user]);
-
-    const classes = useStyles();
-    const { auth } = useAuth();
+    }, [chats, user, auth]);
 
     const handleClick = useCallback(() => {
         onClick(user);

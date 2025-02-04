@@ -1,14 +1,24 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import clsx from "clsx";
-import { Box, List, Typography } from "@mui/material";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import { Avatar, Box, List, ListItemAvatar, Typography } from "@mui/material";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import { makeStyles } from "@mui/styles";
+import { format, isThisYear, isToday } from "date-fns";
 import { getUserStatusColor } from "../../../feature/action";
 import { useAuth } from "../../../contexts/AuthContext";
 import { actionChat } from "../../../reduxStore/actions/chat_action";
 import { selectorChat } from "../../../reduxStore/selector/selectorChat";
-import { makeStyles } from "@mui/styles";
+
+export const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (!isThisYear(date)) {
+        return format(date, "yyyy/MM/dd");
+    } else if (!isToday(date)) {
+        return format(date, "MM/dd");
+    }
+    return format(date, "HH:mm");
+};
 
 const ChatSidebar = () => {
     const classes = useStyles();
@@ -146,6 +156,21 @@ const ChatSidebar = () => {
 export default ChatSidebar;
 
 const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
+    const chats = useSelector(selectorChat.handleGetChats);
+
+    const lastChat = useMemo(() => {
+        if (user && Array.isArray(chats) && chats.length > 0) {
+            return chats
+                .filter(({ from, to }) => from == user?.id || to == user?.id)
+                .sort((a, b) => {
+                    if (a.created_at > b.created_at) return 1;
+                    if (a.created_at < b.created_at) return -1;
+                    return 0;
+                })[0];
+        }
+        return null;
+    }, [chats, user]);
+
     const classes = useStyles();
     const { auth } = useAuth();
 
@@ -163,58 +188,16 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
 
     return (
         <Box
-            // className={clsx(
-            //     "mb-1 px-3 py-2 hover:bg-gray-700 rounded-md cursor-pointer group transition-all relative",
-            //     {
-            //         "bg-[#fff2]": selected?.id == user.id,
-            //     }
-            // )}
             className={`${classes.boxContainer} ${
                 selected?.id === user.id ? classes.selected : ""
             }`}
             onClick={handleClick}
         >
-            {/* <div className="w-full flex items-center space-x-3">
-                <div className="relative">
-                    <AccountCircleOutlinedIcon className="text-gray-300 !w-8 !h-8" />
-                    <div
-                        className={clsx(
-                            `w-3 h-3 rounded-full absolute -bottom-0.5 -right-0.5`,
-                            getUserStatusColor("online")
-                        )}
-                    />
-                </div>
-                <div className="w-full flex flex-col">
-                    <div className="flex justify-between items-center">
-                        <p className="text-gray-200">
-                            {user.name}
-                            {auth?.id == user.id && "(あなた)"}
-                        </p>
-                        <p className="text-gray-400 text-xs">{"10:18"}</p>
-                    </div>
-                    <p className="text-gray-400 text-sm truncate">
-                        {"lastMessage"}
-                    </p>
-                </div>
-            </div>
-            <div className="absolute top-0 right-2 h-full flex items-center">
-                <button
-                    onClick={handleClickPin}
-                    className={`px-1 rounded-full ${
-                        user.isPinned ? "text-blue-400" : "text-gray-400"
-                    } opacity-0 group-hover:opacity-100 hover:bg-gray-600`}
-                >
-                    <PushPinOutlinedIcon className="!w-4 !h-4" />
-                </button>
-            </div>
-            {count > 0 && (
-                <div className="absolute bottom-2 right-2 w-4 min-w-4 h-4 rounded-full bg-red-600 text-white text-sm flex justify-center items-center">
-                    {count}
-                </div>
-            )} */}
             <div className={classes.container} onClick={handleClick}>
                 <div className={classes.iconWrapper}>
-                    <AccountCircleOutlinedIcon className={classes.icon} />
+                    <ListItemAvatar>
+                        <Avatar sx={{ color: "black" }}>{user.name[0]}</Avatar>
+                    </ListItemAvatar>
                     <div
                         className={`${classes.statusDot} ${getUserStatusColor(
                             "online"
@@ -227,9 +210,11 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                             {user.name}
                             {auth?.id === user.id && "(あなた)"}
                         </p>
-                        <p className={classes.userTime}>{"10:18"}</p>
+                        <p className={classes.userTime}>
+                            {formatDate(lastChat?.updated_at)}
+                        </p>
                     </div>
-                    <p className={classes.lastMessage}>{"lastMessage"}</p>
+                    <p className={classes.lastMessage}>{lastChat?.content}</p>
                 </div>
                 <div className={classes.pinWrapper}>
                     <button
@@ -325,6 +310,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: 0,
         "&:hover": {
             backgroundColor: "#4b5563",
+            opacity: 1,
         },
         "&:hover + &": {
             opacity: 1,

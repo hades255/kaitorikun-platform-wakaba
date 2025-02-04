@@ -166,14 +166,14 @@ const Notifications = () => {
             //     }
             // };
             //  get all users
-            // const getUsers = async () => {
-            //     try {
-            //         const response = await api.get("users");
-            //         dispatch(actionChat.handleSetUsers(response.data));
-            //     } catch (error) {
-            //         console.log(error);
-            //     }
-            // };
+            const getUsers = async () => {
+                try {
+                    const response = await api.get("users");
+                    dispatch(actionChat.handleSetUsers(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
             //  get all chats
             const getMyChats = async () => {
                 try {
@@ -222,7 +222,7 @@ const Notifications = () => {
             //     }
             // };
             // fetchPublicCommunities();
-            // getUsers();
+            getUsers();
             getMyChats();
             // getMineCommunities();
             getJoinedCommunities();

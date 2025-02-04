@@ -11,6 +11,10 @@ import { actionChat } from "../../reduxStore/actions/chat_action";
 import ChatInput from "../../components/chat/ChatInput";
 import { PanelContent, useDispatch, useSelector } from "../../components";
 import { PUBLIC_HOST } from "../../config";
+import moment from "moment";
+import "moment/locale/ja"; // Import Japanese locale
+
+moment.locale("ja"); // Set locale globally
 
 const ChatsPage = () => {
     const { auth } = useAuth();
@@ -158,28 +162,56 @@ const ChatItem = ({ chat, selectedUser }) => {
     }, [dispatch, chat]);
 
     return (
-        <MessageBox
-            id={chat.id}
-            position={chat.to === selectedUser.id ? "right" : "left"}
-            type={type}
-            // title={chat.content}
-            text={chat.content}
-            date={chat.created_at}
-            data={data}
-            // replyButton={true}
-            removeButton={true}
-            // onClick={(e) => {
-            //     console.log(e);
-            // }}
-            // onDownload={(e) => {
-            //     console.log(e);
-            // }}
-            // onReplyClick={(e) => {
-            //     console.log(e);
-            // }}
-            onRemoveMessageClick={handleClickRemove}
-            status={chat.status == "read" ? "read" : "sent"}
-        />
+        <div>
+            {
+                chat.to === selectedUser.id ? (
+                    <div style={{
+                        bottom: "-5px",
+                        right: "10px",
+                        fontSize: "12px",
+                        color: "gray",
+                        textAlign: "right",
+                        paddingRight: "20px"
+                    }}>
+                        {moment(chat.created_at).fromNow()} {/* Relative time */}
+                    </div>
+                ) : (
+                    <div style={{
+                        bottom: "-5px",
+                        right: "10px",
+                        fontSize: "12px",
+                        color: "gray",
+                        textAlign: "left",
+                        paddingLeft: "20px"
+                    }}>
+                        {moment(chat.created_at).fromNow()} {/* Relative time */}
+                    </div>
+                )
+            }
+            <MessageBox
+                id={chat.id}
+                position={chat.to === selectedUser.id ? "right" : "left"}
+                type={type}
+                // title={chat.content}
+                text={chat.content}
+                // date={chat.created_at}
+                data={data}
+                // replyButton={true}
+                removeButton={true}
+                // onClick={(e) => {
+                //     console.log(e);
+                // }}
+                // onDownload={(e) => {
+                //     console.log(e);
+                // }}
+                // onReplyClick={(e) => {
+                //     console.log(e);
+                // }}
+                onRemoveMessageClick={handleClickRemove}
+                status={chat.status == "read" ? "read" : "sent"}
+            />
+            
+        </div>
     );
 };
 

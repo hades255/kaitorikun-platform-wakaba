@@ -30,9 +30,11 @@ let FormStaffExit = (props) => {
     const [address1, setAddress1] = useState()
     const [address2, setAddress2] = useState()
     const [address3, setAddress3] = useState()
+    const [identificationId1, setIdentificationId1] = useState()
     const [identificationType1, setIdentificationType1] = useState()
     const [identificationFile1, setIdentificationFile1] = useState()
     const [isVisible, setIsVisible] = useState(false);
+    const [identificationId2, setIdentificationId2] = useState()
     const [identificationType2, setIdentificationType2] = useState()
     const [identificationFile2, setIdentificationFile2] = useState()
     const [historyType, setHistoryType] = useState()
@@ -64,19 +66,19 @@ let FormStaffExit = (props) => {
                 setEmail(staff.email);
                 setShop(data.shops[staff.shop_id - 1].name);
                 switch (staff.user_type) {
-                    case 1:
-                        setType("オーナー");
-                        break;
-                    case 2:
+                    case 3:
                         setType("マネージャー");
                         break;
-                    case 3:
-                        setType("店長");
-                        break;
                     case 4:
-                        setType("社員");
+                        setType("本部社員");
                         break;
                     case 5:
+                        setType("店長");
+                        break;
+                    case 6:
+                        setType("社員");
+                        break;
+                    case 7:
                         setType("アルバイト");
                         break;
 
@@ -102,9 +104,53 @@ let FormStaffExit = (props) => {
                 setAddress1(data.prefectures[staff.address1 - 1].name);
                 setAddress2(data.cities[staff.address2 - 1].name);
                 setAddress3(staff.address3);
+                if (staff.identification_id1) {
+                    switch (staff.identification_id1) {
+                        case 1:
+                            setIdentificationId1('マイナンバー')
+                            break;
+
+                        case 2:
+                            setIdentificationId1('運転免許証')
+                            break;
+
+                        case 3:
+                            setIdentificationId1('健康保険証')
+                            break;
+
+                        case 4:
+                            setIdentificationId1('パスポート')
+                            break;
+
+                        default:
+                            setIdentificationId1('')
+                            break;
+                    }
+                }
                 setIdentificationType1(staff.identification_type1);
                 setIdentificationFile1(staff.identification_path1);
                 if (staff.identification_id2) {
+                    switch (staff.identification_id2) {
+                        case 1:
+                            setIdentificationId2('マイナンバー')
+                            break;
+
+                        case 2:
+                            setIdentificationId2('運転免許証')
+                            break;
+
+                        case 3:
+                            setIdentificationId2('健康保険証')
+                            break;
+
+                        case 4:
+                            setIdentificationId2('パスポート')
+                            break;
+
+                        default:
+                            setIdentificationId2('')
+                            break;
+                    }
                     setIsVisible(true);
                 }
                 setIdentificationType2(staff.identification_type2);
@@ -241,159 +287,169 @@ let FormStaffExit = (props) => {
     return (
         <div>
             <div className='staff-register-container'>
-                <div>
-                    <div className="flex-center min-w-400 mt-10">
+                <div className='screen-div2'>
+                    <div className="mt-10">
                         <div className="input-label">スタッフID</div>
                         <div className="input-value">
                             <TextInput
                                 value={staffId}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
                                 value={name}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">カタカナ名</div>
                         <div className="input-value">
                             <TextInput
                                 value={nameKana}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">生年月日</div>
                         <div className="input-value">
                             <TextInput
                                 value={birthday}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">性別</div>
                         <div className="input-value">
                             <TextInput
                                 value={gender}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">郵便番号</div>
                         <div className="input-value">
                             <TextInput
                                 value={zipCode}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <TextInput
                                 value={address1}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <TextInput
                                 value={address2}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">住所詳細</div>
                         <div className="input-value">
                             <TextInput
                                 value={address3}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
                 </div>
-                <div>
-                    <div className="flex-center min-w-400 mt-10">
+                <div className='screen-div2'>
+                    <div className="mt-10">
                         <div className="input-label">店舗名</div>
                         <div className="input-value">
                             <TextInput
                                 value={shop}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">種別</div>
                         <div className="input-value">
                             <TextInput
                                 value={type}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">メールアドレス</div>
                         <div className="input-value">
                             <TextInput
                                 value={email}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">電話番号</div>
                         <div className="input-value">
                             <TextInput
                                 value={phoneNumber}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    {/* <div className="mt-10">
                         <div className="input-label">パスワード</div>
                         <div className="input-value">
                             <TextInput
                                 value={""}
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 readOnly
                             />
                         </div>
-                    </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    </div> */}
+                    <div className="mt-20">
                         <div className="input-label">本人確認書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
                                 <div>
                                     <div className='flex-center'>
+                                        <TextInput
+                                            value={identificationId1}
+                                            className="mt-1 block w-full w-100-pro"
+                                            readOnly
+                                        />
                                         <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                     </div>
                                     {isVisible && (
                                         <div className='flex-center mt-10'>
+                                            <TextInput
+                                                value={identificationId2}
+                                                className="mt-1 block w-full w-100-pro"
+                                                readOnly
+                                            />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                         </div>
                                     )}
@@ -401,7 +457,7 @@ let FormStaffExit = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -414,14 +470,14 @@ let FormStaffExit = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">連帯保証人</div>
                         <div className="input-value">
                             <div className='flex-left'>
                                 <div className='flex-center'>
                                     <TextInput
                                         value={guarantorId}
-                                        className="mt-1 block w-full"
+                                        className="mt-1 block w-full w-100-pro"
                                         readOnly
                                     />
                                     <div className="flex-center image-show-btn" onClick={handleContractBtn}>誓約書画像</div>
@@ -431,28 +487,20 @@ let FormStaffExit = (props) => {
                     </div>
                 </div>
             </div>
+
             <div className='flex-center'
                 style={{
                     marginTop: '50px',
+                    gap: '100px'
                 }}>
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="danger"
-                    title="退会する"
-                    className="w-100"
-                    onClick={handleRegisterClick}
-                />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="secondary"
-                    title="キャンセル"
-                    className="w-100"
+                <div
+                    className="cancel-btn"
                     onClick={handleCancelClick}
-                />
+                >キャンセル</div>
+                <div
+                    className="exit-btn"
+                    onClick={handleRegisterClick}
+                >退会する</div>
 
             </div>
             <Dialog

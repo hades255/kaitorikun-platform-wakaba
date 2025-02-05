@@ -37,6 +37,7 @@ const TableMaster = (props) => {
         disableButton2,
         disableButton3,
         width = 1300,
+        pageSize,
     } = props;
 
     const utility = useSelector((state) => state.utility);
@@ -164,7 +165,7 @@ const TableMaster = (props) => {
                     columns={columns}
                     loading={utility.getLoading.table || isLoading}
                     rowKey={rowKey}
-                    scroll={{ x: scrollX ? (width ? width : 1300) : 0 }}
+                    scroll={{ x: scrollX ? (width ? width : 320) : 0 }}
                     pagination={
                         disabledPagenation
                             ? false
@@ -172,6 +173,7 @@ const TableMaster = (props) => {
                                 total: total || 0,
                                 pageSizeOptions: pageSizeOptions,
                                 showSizeChanger: false,
+                                defaultPageSize: pageSize,
                                 showQuickJumper: false,
                                 showTotal: (total, range) =>
                                     `合計${total}件中 ${range[0]}-${range[1]}`,

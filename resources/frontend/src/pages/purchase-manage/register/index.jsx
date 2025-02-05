@@ -24,7 +24,7 @@ const PurchaseRegister = (props) => {
     };
     return (
         <PanelContent title="">
-            <div className="page-title">顧客情報</div>
+            <div className="page-title">買取計算書</div>
             <FormPurchaseRegister onSubmit={(data) => handleSubmit(data)} />
         </PanelContent>
     );

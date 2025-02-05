@@ -316,70 +316,74 @@ let FormStaffRegister = (props) => {
         }
 
         dispatch(utilityAction.setLoading("content"));
-        try {
-            const formData = new FormData();
-            formData.append("staff_id", staffId);
-            formData.append("email", email);
-            formData.append("password", password);
-            formData.append("shop_id", shop);
-            formData.append("user_type", type);
-            formData.append("name", name);
-            formData.append("name_kana", nameKana);
-            formData.append("phone_number", phoneNumber);
-            formData.append("birthday", birthday);
-            formData.append("gender", gender);
-            formData.append("zipcode", zipCode);
-            formData.append("address1", address1);
-            formData.append("address2", address2);
-            formData.append("address3", address3);
-            if (identificationId1 !== undefined && identificationType1 !== undefined) {
-                formData.append("identification_id1", identificationId1);
-                formData.append("identification_type1", identificationType1);
-                formData.append("files[]", identificationFile1);
-            }
-            if (identificationId2 !== undefined && identificationType2 !== undefined) {
-                formData.append("identification_id2", identificationId2);
-                formData.append("identification_type2", identificationType2);
-                formData.append("files[]", identificationFile2);
-            }
-            if (historyType !== undefined) {
-                formData.append("history_type", historyType);
-                formData.append("files[]", historyFile);
-            }
-            if (workingHistoryType !== undefined) {
-                formData.append("working_history_type", workingHistoryType);
-                formData.append("files[]", workingHistoryFile);
-            }
-            if (contractType !== undefined) {
-                formData.append("contract_type", contractType);
-                formData.append("files[]", contractFile);
-            }
-            formData.append("guarantor_id", guarantorId);
-            console.log(formData);
+        if (window.confirm("この操作でスタッフが登録されます。本当に登録しますか？")) {
+            try {
+                const formData = new FormData();
+                formData.append("staff_id", staffId);
+                formData.append("email", email);
+                formData.append("password", password);
+                formData.append("shop_id", shop);
+                formData.append("user_type", type);
+                formData.append("name", name);
+                formData.append("name_kana", nameKana);
+                formData.append("phone_number", phoneNumber);
+                formData.append("birthday", birthday);
+                formData.append("gender", gender);
+                formData.append("zipcode", zipCode);
+                formData.append("address1", address1);
+                formData.append("address2", address2);
+                formData.append("address3", address3);
+                if (identificationId1 !== undefined && identificationType1 !== undefined) {
+                    formData.append("identification_id1", identificationId1);
+                    formData.append("identification_type1", identificationType1);
+                    formData.append("files[]", identificationFile1);
+                }
+                if (identificationId2 !== undefined && identificationType2 !== undefined) {
+                    formData.append("identification_id2", identificationId2);
+                    formData.append("identification_type2", identificationType2);
+                    formData.append("files[]", identificationFile2);
+                }
+                if (historyType !== undefined) {
+                    formData.append("history_type", historyType);
+                    formData.append("files[]", historyFile);
+                }
+                if (workingHistoryType !== undefined) {
+                    formData.append("working_history_type", workingHistoryType);
+                    formData.append("files[]", workingHistoryFile);
+                }
+                if (contractType !== undefined) {
+                    formData.append("contract_type", contractType);
+                    formData.append("files[]", contractFile);
+                }
+                formData.append("guarantor_id", guarantorId);
+                console.log(formData);
 
-            let feedback = await multiPostData("staff/register", formData)
-            if (feedback.status === 200) {
-                setTimeout(() => {
-                    window.history.back();
-                }, 300);
+                let feedback = await multiPostData("staff/register", formData)
+                if (feedback.status === 200) {
+                    setTimeout(() => {
+                        window.history.back();
+                    }, 300);
+                }
+                dispatch(utilityAction.stopLoading());
+            } catch (error) {
+                console.log(error)
+                ToastNotification("error", error?.message);
+                dispatch(utilityAction.stopLoading());
             }
-            dispatch(utilityAction.stopLoading());
-        } catch (error) {
-            console.log(error)
-            ToastNotification("error", error?.message);
-            dispatch(utilityAction.stopLoading());
+        } else {
+            props.history.push("/");
         }
     };
 
     const handleCancelClick = () => {
-        window.history.back();
+        props.history.push("/");
     };
 
     return (
         <div>
             <div className='staff-register-container'>
-                <div>
-                    <div className="flex-center min-w-400 mt-10">
+                <div className='screen-div2'>
+                    <div className="mt-10">
                         <div className="input-label">スタッフID</div>
                         <div className="input-value">
                             <TextInput
@@ -394,7 +398,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
@@ -408,7 +412,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">カタカナ名</div>
                         <div className="input-value">
                             <TextInput
@@ -422,7 +426,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">生年月日</div>
                         <div className="input-value">
                             <DateInput
@@ -431,12 +435,12 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">性別</div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => setGender(e.target.value)}
-                                className="shop-select w-100"
+                                className="shop-select"
                                 size='small'
                             >
                                 <MenuItem value={1}>男</MenuItem>
@@ -444,7 +448,7 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">郵便番号</div>
                         <div className="input-value">
                             <ZipcodeInput
@@ -453,7 +457,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <Select
@@ -470,7 +474,7 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <Select
@@ -484,7 +488,7 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">住所詳細</div>
                         <div className="input-value">
                             <TextInput
@@ -499,8 +503,8 @@ let FormStaffRegister = (props) => {
                         </div>
                     </div>
                 </div>
-                <div>
-                    <div className="flex-center min-w-400 mt-10">
+                <div className='screen-div2'>
+                    <div className="mt-10">
                         <div className="input-label">店舗名</div>
                         <div className="input-value">
                             <Select
@@ -518,7 +522,7 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">種別</div>
                         <div className="input-value">
                             <Select
@@ -530,14 +534,15 @@ let FormStaffRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">種別</span>
                                 </MenuItem>
-                                <MenuItem value={2}>マネージャー</MenuItem>
-                                <MenuItem value={3}>店長</MenuItem>
-                                <MenuItem value={4}>社員</MenuItem>
-                                <MenuItem value={5}>アルバイト</MenuItem>
+                                <MenuItem value={3}>マネージャー</MenuItem>
+                                <MenuItem value={4}>本部社員</MenuItem>
+                                <MenuItem value={5}>店長</MenuItem>
+                                <MenuItem value={6}>社員</MenuItem>
+                                <MenuItem value={7}>アルバイト</MenuItem>
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">メールアドレス</div>
                         <div className="input-value">
                             <TextInput
@@ -551,7 +556,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">電話番号</div>
                         <div className="input-value">
                             <PhoneInput
@@ -563,7 +568,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">パスワード</div>
                         <div className="input-value">
                             <TextInput
@@ -578,7 +583,7 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-base min-w-400">
+                    <div className="flex-left mt-20">
                         <div className="input-label">本人確認書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -626,7 +631,7 @@ let FormStaffRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -647,7 +652,7 @@ let FormStaffRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-center min-w-400 mt-10">
+                    <div className="mt-10">
                         <div className="input-label">連帯保証人</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -675,25 +680,16 @@ let FormStaffRegister = (props) => {
             <div className='flex-center'
                 style={{
                     marginTop: '50px',
+                    gap: '100px'
                 }}>
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="primary"
-                    title="登録する"
-                    className="w-100"
-                    onClick={handleRegisterClick}
-                />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="secondary"
-                    title="キャンセル"
-                    className="w-100"
+                <div
+                    className="cancel-btn"
                     onClick={handleCancelClick}
-                />
+                >キャンセル</div>
+                <div
+                    className="register-btn"
+                    onClick={handleRegisterClick}
+                >登録する</div>
 
             </div>
             <Dialog

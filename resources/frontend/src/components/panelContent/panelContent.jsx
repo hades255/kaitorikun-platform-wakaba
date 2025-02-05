@@ -10,11 +10,10 @@ const PanelContent = (props) => {
                     title={props.title}
                     menu={props.menu}
                     submenu={props.submenu}
-                    row={props.row}
                 />
             )}
             <section style={{flexGrow: 1}} className="content">
-                <Box height="100%" className="container-fluid">{props.children}</Box>
+                <Box height="100%" className="container-fluid" >{props.children}</Box>
             </section>
         </Box>
     );

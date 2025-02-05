@@ -22,7 +22,6 @@ import { pdfjs, Document, Page } from "react-pdf";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
 import { actionTheme, utilityAction } from "../../../../reduxStore";
 import Tesseract from 'tesseract.js';
-import TableCustomerVisitShop from '../table';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -379,30 +378,9 @@ let FormCustomerRegister = (props) => {
 
     return (
         <div>
-            <div className='flex-center'>
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="primary"
-                    title="登録する"
-                    className="w-100"
-                    onClick={handleRegisterClick}
-                />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="secondary"
-                    title="キャンセル"
-                    className="w-100"
-                    onClick={handleCancelClick}
-                />
-
-            </div>
             <div className='customer-register-container'>
-                <div>
-                    <div className="flex-center mt-10 min-w-400">
+                <div className='screen-div'>
+                    <div className="mt-10">
                         <div className="input-label">店舗名</div>
                         <div className="input-value">
                             <Select
@@ -420,7 +398,7 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">種別</div>
                         <div className="input-value">
                             <Select
@@ -433,77 +411,80 @@ let FormCustomerRegister = (props) => {
                                     <span className="text-gray-500">種別</span>
                                 </MenuItem>
                                 <MenuItem value={2}>マネージャー</MenuItem>
-                                <MenuItem value={3}>店長</MenuItem>
-                                <MenuItem value={4}>社員</MenuItem>
-                                <MenuItem value={5}>アルバイト</MenuItem>
+                                <MenuItem value={3}>本部社員</MenuItem>
+                                <MenuItem value={4}>店長</MenuItem>
+                                <MenuItem value={5}>社員</MenuItem>
+                                <MenuItem value={6}>アルバイト</MenuItem>
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
                                 id="name"
                                 type="text"
                                 name="name"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 onChange={(e) => setName(e.target.value)}
                                 required
                                 placeholder="名前"
                             />
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">カタカナ名</div>
                         <div className="input-value">
                             <TextInput
                                 id="name_kana"
                                 type="text"
                                 name="name_kana"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 onChange={(e) => setNameKana(e.target.value)}
                                 required
                                 placeholder="カタカナ名"
                             />
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">電話番号(自宅)</div>
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
                                 name="phone"
+                                className="mt-1 block w-full w-100-pro"
                                 placeholder='電話番号'
                                 onChange={(e) => setPhoneNumber1(e.target.value)}
                             />
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">電話番号(携帯)</div>
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
                                 name="phone"
+                                className="mt-1 block w-full w-100-pro"
                                 placeholder='電話番号'
                                 onChange={(e) => setPhoneNumber2(e.target.value)}
                             />
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">生年月日</div>
                         <div className="input-value">
                             <DateInput
-                                className="shop-select w-100"
+                                className="shop-select"
                                 onChange={(e) => setBirthday(e)}
                             />
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">性別</div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => setGender(e.target.value)}
-                                className="shop-select w-100"
+                                className="shop-select"
                                 size='small'
                             >
                                 <MenuItem value={1}>男</MenuItem>
@@ -511,7 +492,7 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">郵便番号</div>
                         <div className="input-value">
                             <ZipcodeInput
@@ -519,12 +500,12 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress1}
-                                className="shop-select w-150"
+                                className="shop-select"
                                 size='small'
                             >
                                 <MenuItem disabled value="">
@@ -536,12 +517,12 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress2}
-                                className="shop-select w-150"
+                                className="shop-select"
                                 size='small'
                             >
                                 {filteredCities.map((item, key) => (
@@ -550,21 +531,21 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">住所詳細</div>
                         <div className="input-value">
                             <TextInput
                                 id="address3"
                                 type="text"
                                 name="address3"
-                                className="mt-1 block w-full"
+                                className="mt-1 block w-full w-100-pro"
                                 onChange={(e) => setAddress3(e.target.value)}
                                 required
                                 placeholder="住所詳細"
                             />
                         </div>
                     </div>
-                    <div className="flex-base mt-10 min-w-400">
+                    <div className="flex-left mt-10">
                         <div className="input-label">本人確認書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -612,7 +593,7 @@ let FormCustomerRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-center mt-10 min-w-400">
+                    <div className="mt-10">
                         <div className="input-label">特記事項</div>
                         <div className="input-value">
                             <textarea
@@ -624,7 +605,7 @@ let FormCustomerRegister = (props) => {
                         </div>
                     </div>
                 </div>
-                <div>
+                <div className='screen-div'>
                 </div>
                 <div className='hidden'>
                     <div>
@@ -678,7 +659,22 @@ let FormCustomerRegister = (props) => {
                     )}
                 </div>
             </div>
-            <TableCustomerVisitShop />
+
+            <div className='flex-center'
+                style={{
+                    marginTop: '50px',
+                    gap: '100px'
+                }}>
+                <div
+                    className="cancel-btn"
+                    onClick={handleCancelClick}
+                >キャンセル</div>
+                <div
+                    className="register-btn"
+                    onClick={handleRegisterClick}
+                >登録する</div>
+
+            </div>
             <Dialog
                 open={openImagePreview}
                 onClose={() => handleImagePreviewClose()}

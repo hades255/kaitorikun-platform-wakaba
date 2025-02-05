@@ -25,7 +25,7 @@ class Customer extends Model
         "phone_number2",
         "birthday",
         "gender",
-        "zipcode",
+        "job",
         "address1",
         "address2",
         "address3",
@@ -36,6 +36,10 @@ class Customer extends Model
         "identification_type2",
         "identification_path2",
         "note",
+        "check_plan_date",
+        "hearing_item1_id",
+        "hearing_item1_value",
+        "hearing_item2_value",
     ];
 
     public function user(): BelongsTo

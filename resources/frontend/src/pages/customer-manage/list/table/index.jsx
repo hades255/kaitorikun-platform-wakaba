@@ -26,11 +26,27 @@ const CustomerTable = (props) => {
             title: "氏名",
             dataIndex: "name",
             key: "name",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                        onClick={() => handleClick(row)}
+                    >{cell}</div>
+                );
+            },
         },
         {
             title: "カタカナ名",
             dataIndex: "name_kana",
             key: "name_kana",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                        onClick={() => handleClick(row)}
+                    >{cell}</div>
+                );
+            },
         },
         {
             title: "生年月日",
@@ -71,11 +87,6 @@ const CustomerTable = (props) => {
             title: "身分証",
             dataIndex: "identification1",
             key: "identification1",
-        },
-        {
-            title: "身分証NO.",
-            dataIndex: "identification_no1",
-            key: "identification_no1",
         },
         {
             title: "職業",
@@ -122,7 +133,7 @@ const CustomerTable = (props) => {
         },
     ];
     const handleClick = (data) => {
-        props.onHandleEdit(data); 
+        props.onHandleEdit(data);
     };
     return (
         <TableMaster
@@ -130,6 +141,8 @@ const CustomerTable = (props) => {
             disabledSearch="true"
             columns={columns}
             dataSource={props.dataSource}
+            pageSize={10}
+            scrollX={true}
         />
     );
 };

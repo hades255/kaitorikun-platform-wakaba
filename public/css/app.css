@@ -627,6 +627,9 @@ pre code {
   padding-left: 7.5px;
   margin-right: auto;
   margin-left: auto;
+  height: calc(100vh - 209px) !important;
+  overflow: auto;
+  scrollbar-width: none;
 }
 
 @media (min-width: 576px) {
@@ -11095,7 +11098,9 @@ body.sidebar-collapse:not(.sidebar-mini-xs):not(.sidebar-mini-md):not(.sidebar-m
 }
 
 .content-wrapper > .content {
-  padding: 0 0.5rem;
+  margin: 20px;
+  background-color: white;
+  padding: 20px;  
 }
 
 .main-sidebar, .main-sidebar::before {
@@ -50453,9 +50458,9 @@ input.password-hide-css {
 
 * {
     -webkit-overflow-scrolling: touch;
-    -webkit-scrollbar-width: none;
+    /* -webkit-scrollbar-width: none; */
     -ms-overflow-style: none;
-    scrollbar-width: none;
+    scrollbar-width: thin;
     transition: all ease-in-out;
 }
 
@@ -50477,23 +50482,24 @@ input.password-hide-css {
   width: 100%;
   border-bottom: 2px solid #ffffff;
   display: flex;
-  padding: 0 4px;
 }
 .sidebar-header .tabs a {
   width: 100px;
   padding: 2px 0;
-  border: 2px solid #ffffff;
   text-align: center;
-  border-radius: 8px 8px 0 0;
-  margin-bottom: -2px;
-  background-color: #fff;
   font-weight: bold;
-  color: #555557;
+  color: white;
+  border-bottom: solid 0px;
+  background-color: #313239;
 }
 .sidebar-header .tabs a.active {
-  background-color: #313239;
-  color: #ffffff;
-  border-bottom-color: transparent;
+  border-bottom-color: white;
+  border-bottom: solid 3px;
+}
+
+input {
+  height: 40px;
+  border: solid #D9D9D9 1px;
 }
 
 .flex-center {
@@ -50627,25 +50633,16 @@ input.password-hide-css {
 }
 
 .page-title {
-  text-align: center;
   font-size: 20px;
   font-weight: 700;
-  padding-top: 20px;
-  margin-bottom: 20px;
 }
 
 .input-label {
   font-size: 15px;
-  min-width: 150px;
-  max-width: 150px;
-  text-align: right;
-  padding-right: 20px;
 }
 
 .input-value {
   font-size: 15px;
-  min-width: 300px;
-  max-width: 300px;
 }
 
 .min-w-400 {
@@ -50653,10 +50650,29 @@ input.password-hide-css {
 }
 
 .shop-select {
-  width: 175px;
-  height: 30px;
+  width: 100%;
+  height: 40px;
   background: white;
-  border: solid 0.5px;
+  margin-top: 4px;
+}
+
+.zip-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.zip-left {
+  width: 30%;
+  border-radius: 5px;
+  border: solid 0.5px #D9D9D9;
+}
+
+.zip-right {
+  width: 70%;
+  border-radius: 5px;
+  border: solid 0.5px #D9D9D9;
 }
 
 .mt-10 {
@@ -50667,12 +50683,20 @@ input.password-hide-css {
   margin-top: 20px;
 }
 
+.mt-35 {
+  margin-top: 35px;
+}
+
 .w-150 {
   width: 150px !important;
 }
 
 .w-100 {
   width: 100px !important;
+}
+
+.w-90 {
+  width: 90px !important;
 }
 
 .w-70 {
@@ -50700,6 +50724,7 @@ input.password-hide-css {
 .menu-item {
   color: black;
   transition: background-color 0.3s, color 0.3s !important;
+  cursor: pointer;
 }
 
 .hidden {
@@ -50722,8 +50747,8 @@ input.password-hide-css {
 
 .image-show-btn {
   width: 150px;
-  height: 30px;
-  border: solid 1px black;
+  height: 40px;
+  border: solid 0.5px #D9D9D9;
   border-radius: 5px;
   background-color: white;
   color: black;
@@ -50733,7 +50758,6 @@ input.password-hide-css {
 @media (min-width: 1500px) {
   .staff-register-container {
     display: flex;
-    justify-content: center;
     gap: 100px;
   }
   .customer-register-container {
@@ -50746,12 +50770,17 @@ input.password-hide-css {
     justify-content: center;
     align-items: center;
     gap: 10px;
+  }
+  .screen-div2 {
+    width: 50%;
+  }
+  .screen-div3 {
+    width: 33%;
   }
 }
 @media (max-width: 1500px) {
   .staff-register-container {
     display: flex;
-    justify-content: center;
     gap: 0px;
     flex-direction: column;
   }
@@ -50767,12 +50796,19 @@ input.password-hide-css {
     align-items: center;
     gap: 10px;
     flex-direction: column;
+  }
+  .screen-div2 {
+    width: 100%;
+  }
+  .screen-div3 {
+    width: 100%;
   }
 }
 .customer-business {
   width: 100%;
   height: 100px;
   resize: none;
+  border: solid #B9B9B9 1px;
 }
 
 .text-left {
@@ -50787,11 +50823,7 @@ input.password-hide-css {
   max-width: 150px !important;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 85px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  padding: 0;
+  white-space: nowrap;
 }
 
 .pdf-viewer-container {
@@ -50814,4 +50846,72 @@ input.password-hide-css {
 
 .w-100-pro {
   width: 100% !important;
+}
+
+.register-btn {
+  width: 200px;
+  background-color: #313239;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  border-radius: 35px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  width: 200px;
+  background-color: #65558F;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  border-radius: 35px;
+  cursor: pointer;
+}
+
+.exit-btn {
+  width: 200px;
+  background-color: red;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  border-radius: 35px;
+  cursor: pointer;
+}
+
+.customer-name {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.hearing-container {
+  height: 330px;
+  border: solid #B9B9B9 1px;
+  border-radius: 5px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  padding: 10px;
+}
+
+.custom-radio-label {
+  height: 22px;
+}
+
+.free-input {
+  height: 25px;
+  margin-top: -2px;
+}
+
+.hearing-select {
+  width: 150px;
+  height: 25px;
+  background: white;
+  margin-top: 4px;
 }

@@ -3,8 +3,10 @@
 namespace App\Http\Requests\Store;
 
 use App\Enums\HasError;
+use App\Models\Staff;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 
 class StaffRequest extends FormRequest
 {

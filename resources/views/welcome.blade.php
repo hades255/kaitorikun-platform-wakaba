@@ -13,7 +13,7 @@
     <title>WAKABA</title>
 </head>
 
-<body id="body" class="sidebar-mini">
+<body id="body" class="sidebar-mini" style="overflow: hidden;">
     <div id="root" class="sidebar-mini wrapper"></div>
 </body>
 <script src="{{ mix('js/app.js') }}" type="text/javascript"></script>

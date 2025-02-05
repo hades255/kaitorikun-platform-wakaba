@@ -112,7 +112,7 @@ const CustomerList = (props) => {
                     </div>
                 </div>
                 <div className='pt-30'>この条件で</div>
-                <div className='mt-20 flex-center'>
+                <div className='mt-35 flex-center'>
                     <Button
                         loading
                         textLoading="Waiting"

@@ -68,10 +68,10 @@ export default forwardRef(function ZipcodeInput({value = "", inputClass='', clas
     };
 
     return (
-        <div className="zipcode flex gap-2 items-center" ref={input}>
+        <div className="zipcode zip-container" ref={input}>
             <input
                 type="text"
-                className={"shop-select w-70"}
+                className={"shop-select zip-left"}
                 value={zipcode.part1 || ""}
                 onChange={(e) => handleInputChange(e, "part1")}
                 onKeyDown={handleKeyDown}
@@ -81,7 +81,7 @@ export default forwardRef(function ZipcodeInput({value = "", inputClass='', clas
             <span>–</span>
             <input
                 type="text"
-                className={"shop-select w-100"}
+                className={"shop-select zip-right"}
                 value={zipcode.part2 || ""}
                 onChange={(e) => handleInputChange(e, "part2")}
                 onKeyDown={handleKeyDown}

@@ -38,10 +38,9 @@ const ResetPassword = (props) => {
                 password: data.newPassword,
             })
             if (feedback.status === 200) {
-                setTimeout(() => {
+                if (window.confirm("パスワードの設定が完了しました。ログインをお願いします。")) {
                     props.history.push("/");
-                    window.location.reload();
-                }, 500);
+                }
             }
         } catch (error) {
             ToastNotification("error", "処理中にエラーが発生しました。");

@@ -417,9 +417,10 @@ let FormCustomerEdit = (props) => {
                                     <span className="text-gray-500">種別</span>
                                 </MenuItem>
                                 <MenuItem value={2}>マネージャー</MenuItem>
-                                <MenuItem value={3}>店長</MenuItem>
-                                <MenuItem value={4}>社員</MenuItem>
-                                <MenuItem value={5}>アルバイト</MenuItem>
+                                <MenuItem value={3}>本部社員</MenuItem>
+                                <MenuItem value={4}>店長</MenuItem>
+                                <MenuItem value={5}>社員</MenuItem>
+                                <MenuItem value={6}>アルバイト</MenuItem>
                             </Select>
                         </div>
                     </div>

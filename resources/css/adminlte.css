@@ -561,6 +561,9 @@ pre code {
   padding-left: 7.5px;
   margin-right: auto;
   margin-left: auto;
+  height: calc(100vh - 209px) !important;
+  overflow: auto;
+  scrollbar-width: none;
 }
 
 @media (min-width: 576px) {
@@ -11755,7 +11758,9 @@ body.sidebar-collapse:not(.sidebar-mini-xs):not(.sidebar-mini-md):not(.sidebar-m
 }
 
 .content-wrapper > .content {
-  padding: 0 0.5rem;
+  margin: 20px;
+  background-color: white;
+  padding: 20px;  
 }
 
 .main-sidebar, .main-sidebar::before {

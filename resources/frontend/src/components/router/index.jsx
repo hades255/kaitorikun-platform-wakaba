@@ -12,6 +12,8 @@ import ChatsPage from "../../pages/chat";
 import CalendarPage from "../../pages/calendar";
 import CalendarPageTest from "../../pages/calendar/Calendar";
 import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
+import PurchaseRegister from "../../pages/purchase-manage/register"
+import PurchaseList from "../../pages/purchase-manage/list"
 
 const MenuRoutes = [
     {
@@ -66,6 +68,24 @@ const MenuRoutes = [
         path: "/customer/edit",
         exact: true,
         title: "顧客編集",
+        component: () => <CustomerEdit />,
+    },
+    {
+        path: "/purchase/list",
+        exact: true,
+        title: "買取計算書一覧",
+        component: () => <PurchaseList />,
+    },
+    {
+        path: "/purchase/register",
+        exact: true,
+        title: "買取計算書(新規)",
+        component: () => <PurchaseRegister />,
+    },
+    {
+        path: "/purchase/edit",
+        exact: true,
+        title: "買取計算書(顧客)",
         component: () => <CustomerEdit />,
     },
     {

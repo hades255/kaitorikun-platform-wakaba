@@ -15,12 +15,12 @@ const { Option } = Select;
 let TablePurchaseVisitShop = (props) => {
     const [categoryVisibility, setCategoryVisibility] = useState(false);
     const [companyVisibility, setCompanyVisibility] = useState(false);
-    const category1 = ["User", "Admin", "Guest"];
-    const category2 = ["User", "Admin", "Guest"];
-    const category3 = ["User", "Admin", "Guest"];
-    const category4 = ["User", "Admin", "Guest"];
-    const category5 = ["User", "Admin", "Guest"];
-    const category6 = ["User", "Admin", "Guest"];
+    const category1 = props.categories1;
+    const category2 = props.categories2;
+    const category3 = props.categories3;
+    const category4 = props.categories4;
+    const category5 = props.categories5;
+    const category6 = props.categories6;
     const agrees = ["申請", "許可", "変更", "基準外", "不可", "預り"];
     const results = ["買取", "不正約", "預り", "返品"];
     const [data, setData] = useState([{
@@ -574,6 +574,13 @@ let TablePurchaseVisitShop = (props) => {
             prevData.map((row) => (row.id === id ? { ...row, category_6: value } : row))
         );
     };
+    const handleItemNameChange = (id, value) => {
+        console.log(value);
+
+        setData((prevData) =>
+            prevData.map((row) => (row.id === id ? { ...row, item_name: value } : row))
+        );
+    };
     const handleAgreeSelectChange = (id, value) => {
         setData((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, agree: value } : row))
@@ -593,6 +600,7 @@ let TablePurchaseVisitShop = (props) => {
                 <Checkbox
                     checked={record.selected}
                     onChange={() => handleCheckboxChange(record.id)}
+                    style={{ width: 40 }}
                 >
                 </Checkbox>
             ),
@@ -601,6 +609,13 @@ let TablePurchaseVisitShop = (props) => {
             title: "商品番号",
             dataIndex: "item_no",
             key: "item_no",
+            render: (text, record) => (
+                <input
+                    value={record.item_no}
+                    onChange={(e) => handleItemNameChange(record.id, e.target.value)}
+                    style={{ width: 50 }}
+                />
+            ),
         },
         {
             title: (
@@ -624,7 +639,7 @@ let TablePurchaseVisitShop = (props) => {
                 >
                     {category1.map((category, i) => (
                         <Option key={i} value={i + 1}>
-                            {category}
+                            {category.name}
                         </Option>
                     ))}
                 </Select>
@@ -642,7 +657,7 @@ let TablePurchaseVisitShop = (props) => {
                 >
                     {category2.map((category, i) => (
                         <Option key={i} value={i + 1}>
-                            {category}
+                            {category.name}
                         </Option>
                     ))}
                 </Select>
@@ -660,7 +675,7 @@ let TablePurchaseVisitShop = (props) => {
                 >
                     {category3.map((category, i) => (
                         <Option key={i} value={i + 1}>
-                            {category}
+                            {category.name}
                         </Option>
                     ))}
                 </Select>
@@ -678,7 +693,7 @@ let TablePurchaseVisitShop = (props) => {
                 >
                     {category4.map((category, i) => (
                         <Option key={i} value={i + 1}>
-                            {category}
+                            {category.name}
                         </Option>
                     ))}
                 </Select>
@@ -696,7 +711,7 @@ let TablePurchaseVisitShop = (props) => {
                 >
                     {category5.map((category, i) => (
                         <Option key={i} value={i + 1}>
-                            {category}
+                            {category.name}
                         </Option>
                     ))}
                 </Select>
@@ -714,7 +729,7 @@ let TablePurchaseVisitShop = (props) => {
                 >
                     {category6.map((category, i) => (
                         <Option key={i} value={i + 1}>
-                            {category}
+                            {category.name}
                         </Option>
                     ))}
                 </Select>
@@ -729,6 +744,13 @@ let TablePurchaseVisitShop = (props) => {
             title: "商品名",
             dataIndex: "item_name",
             key: "item_name",
+            render: (text, record) => (
+                <input
+                    value={record.item_name}
+                    onChange={(e) => handleItemNameChange(record.id, e.target.value)}
+                    style={{ width: 120 }}
+                />
+            ),
         },
         {
             title: "個数",
@@ -739,6 +761,13 @@ let TablePurchaseVisitShop = (props) => {
             title: "申請の根拠",
             dataIndex: "application_basic",
             key: "application_basic",
+            render: (text, record) => (
+                <input
+                    value={record.application_basic}
+                    onChange={(e) => handleItemNameChange(record.id, e.target.value)}
+                    style={{ width: 120 }}
+                />
+            ),
         },
         {
             title: "利率",
@@ -835,6 +864,8 @@ let TablePurchaseVisitShop = (props) => {
             disabledSearch="true"
             columns={visibleColumns}
             dataSource={data}
+            scrollX={true}
+            pageSize={5}
         />
     );
 };

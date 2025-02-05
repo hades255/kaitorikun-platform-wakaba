@@ -42,6 +42,7 @@ class PostReplyController extends Controller
         $reply->post_id = $validatedData['post_id'];
         $reply->user_id = Auth::id();
         if ($reply->save()) {
+            ReplyToPostJob::dispatch($reply, Auth::user()->name, $validatedData['schannel']);
             if ($validatedData['schannel']) {
                 SchannelUser::firstOrCreate(
                     [
@@ -51,7 +52,6 @@ class PostReplyController extends Controller
                     []
                 );
             }
-            ReplyToPostJob::dispatch($reply, Auth::user()->name);
             return response()->json($reply, 201);
         }
         return response()->json(['error' => 'Failed to create reply'], 500);

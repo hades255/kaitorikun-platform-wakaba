@@ -15,13 +15,15 @@ class ReplyToPostJob implements ShouldQueue
 
     protected $reply;
     protected $name;
+    protected $schannel;
     /**
      * Create a new job instance.
      */
-    public function __construct($reply, $name)
+    public function __construct($reply, $name, $schannel = "")
     {
         $this->reply = $reply;
         $this->name = $name;
+        $this->schannel = $schannel;
     }
 
     /**
@@ -29,6 +31,6 @@ class ReplyToPostJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new ReplyToPost($this->reply, $this->name));
+        broadcast(new ReplyToPost($this->reply, $this->name, $this->schannel));
     }
 }

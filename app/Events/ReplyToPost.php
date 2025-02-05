@@ -16,14 +16,16 @@ class ReplyToPost implements ShouldBroadcast
 
     public $reply;
     public $name;
+    public $schannel;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($reply, $name)
+    public function __construct($reply, $name, $schannel)
     {
         $this->reply = $reply;
         $this->name = $name;
+        $this->schannel = $schannel;
     }
 
     /**

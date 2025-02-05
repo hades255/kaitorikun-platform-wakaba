@@ -15,14 +15,16 @@ class NewPostJob implements ShouldQueue
 
     protected $post;
     protected $name;
+    protected $schannel;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($post, $name)
+    public function __construct($post, $name, $schannel = "")
     {
         $this->post = $post;
         $this->name = $name;
+        $this->schannel = $schannel;
     }
 
     /**
@@ -30,6 +32,6 @@ class NewPostJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new NewPost($this->post, $this->name));
+        broadcast(new NewPost($this->post, $this->name, $this->schannel));
     }
 }

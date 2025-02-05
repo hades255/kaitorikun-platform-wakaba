@@ -16,14 +16,16 @@ class NewPost implements ShouldBroadcast
 
     public $post;
     public $name;
+    public $schannel;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($post, $name)
+    public function __construct($post, $name, $schannel)
     {
         $this->post = $post;
         $this->name = $name;
+        $this->schannel = $schannel;
     }
 
     /**

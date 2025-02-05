@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('posts', function (Blueprint $table) {
             $table->dropForeign(['channel_id']);
             $table->dropColumn('channel_id');
+            $table->unsignedBigInteger('channel_id')->nullable();
         });
     }
 
@@ -23,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->unsignedBigInteger('channel_id')->nullable();
+            $table->dropColumn('channel_id');
         });
     }
 };

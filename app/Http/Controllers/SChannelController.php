@@ -45,8 +45,7 @@ class SChannelController extends Controller
             ->get();
         $users = User::whereHas('schannelUsers', function ($query) use ($schannel) {
             $query->where('schannel_id', $schannel);
-        })->get();
-
+        })->select('id', 'name')->get();
         return response()->json(["posts" => $posts, "users" => $users]);
     }
 

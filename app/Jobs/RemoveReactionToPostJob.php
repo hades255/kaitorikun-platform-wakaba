@@ -15,13 +15,15 @@ class RemoveReactionToPostJob implements ShouldQueue
 
     protected $reaction;
     protected $name;
+    protected $schannel;
     /**
      * Create a new job instance.
      */
-    public function __construct($reaction, $name)
+    public function __construct($reaction, $name, $schannel)
     {
         $this->reaction = $reaction;
         $this->name = $name;
+        $this->schannel = $schannel;
     }
 
     /**
@@ -29,6 +31,6 @@ class RemoveReactionToPostJob implements ShouldQueue
      */
     public function handle(): void
     {
-        broadcast(new RemoveReactionToPost($this->reaction, $this->name));
+        broadcast(new RemoveReactionToPost($this->reaction, $this->name, $this->schannel));
     }
 }

@@ -50,7 +50,7 @@ class PostController extends Controller
         if ($validatedData['schannel']) $post->schannel = $validatedData['schannel'];
         $post->user_id = Auth::id();
         if ($post->save()) {
-            NewPostJob::dispatch($post, Auth::user()->name);
+            NewPostJob::dispatch($post, Auth::user()->name, $validatedData['schannel']);
             if ($validatedData['schannel']) {
                 SchannelUser::firstOrCreate(
                     [

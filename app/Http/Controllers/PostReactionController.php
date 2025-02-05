@@ -44,6 +44,7 @@ class PostReactionController extends Controller
         $reaction->post_id = $validatedData['post_id'];
         $reaction->user_id = Auth::id();
         if ($reaction->save()) {
+            AddReactionToPostJob::dispatch($reaction, Auth::user()->name, $validatedData['schannel']);
             if ($validatedData['schannel']) {
                 SchannelUser::firstOrCreate(
                     [
@@ -53,7 +54,6 @@ class PostReactionController extends Controller
                     []
                 );
             }
-            AddReactionToPostJob::dispatch($reaction, Auth::user()->name);
             return response()->json($reaction, 201);
         }
         return response()->json(['error' => 'Failed to create reaction'], 500);
@@ -73,7 +73,7 @@ class PostReactionController extends Controller
             ->where('user_id', Auth::id())
             ->first();
         if ($reaction) {
-            RemoveReactionToPostJob::dispatch($reaction, Auth::user()->name);
+            RemoveReactionToPostJob::dispatch($reaction, Auth::user()->name, $validatedData['schannel']);
             $reaction->delete();
             return response()->json($reaction, 201);
         }

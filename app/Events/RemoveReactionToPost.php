@@ -16,13 +16,15 @@ class RemoveReactionToPost implements ShouldBroadcast
 
     public $reaction;
     public $name;
+    public $schannel;
     /**
      * Create a new event instance.
      */
-    public function __construct($reaction, $name)
+    public function __construct($reaction, $name, $schannel)
     {
         $this->reaction = $reaction;
         $this->name = $name;
+        $this->schannel = $schannel;
     }
 
     /**

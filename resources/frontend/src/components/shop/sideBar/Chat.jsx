@@ -210,15 +210,18 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                 </div>
                 <div className={classes.detailsContainer}>
                     <div className={classes.detailsHeader}>
-                        <p className={classes.userName}>
-                            {user.name}
-                            {auth?.id === user.id && "(あなた)"}
-                        </p>
-                        <p className={classes.userTime}>
+                        <Box display={"flex"} flexDirection={"column"}>
+                            <div className={classes.userName}>
+                                {auth?.id === user.id ? "あなた" : user.name}
+                            </div>
+                            <div className={classes.lastMessage}>
+                                {lastChat?.content}
+                            </div>
+                        </Box>
+                        <div className={classes.userTime}>
                             {formatDate(lastChat?.updated_at)}
-                        </p>
+                        </div>
                     </div>
-                    <p className={classes.lastMessage}>{lastChat?.content}</p>
                 </div>
                 <div className={classes.pinWrapper}>
                     <button
@@ -282,12 +285,12 @@ const useStyles = makeStyles((theme) => ({
     detailsHeader: {
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
     },
     userName: {
         color: "#e5e7eb",
     },
     userTime: {
+        paddingTop: 4,
         color: "#9ca3af",
         fontSize: "12px",
         lineHeight: "16px",
@@ -298,6 +301,7 @@ const useStyles = makeStyles((theme) => ({
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
+        width: 100,
     },
     pinWrapper: {
         position: "absolute",

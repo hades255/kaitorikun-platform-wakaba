@@ -19,7 +19,7 @@ class RemoveReactionToPostJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($reaction, $name, $schannel)
+    public function __construct($reaction, $name, $schannel = "")
     {
         $this->reaction = $reaction;
         $this->name = $name;

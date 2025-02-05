@@ -61,42 +61,53 @@ const Notifications = () => {
                         showNotification("新しい投稿", {
                             message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                         });
-                    updateUnreadTab("com", true);
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
+                    updateUnreadTab("com", true);
                 } else if (data.schannel) {
-                    handleAddSChannels(data.schannel);
                     if (data.name)
                         showNotification("新しい投稿", {
                             message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                         });
+                    updateUnreadTab("todo", true);
+                    dispatch(actionChannel.handleAddPostToChannel(data.post));
+                    handleAddSChannels(data.schannel);
                 }
             }
         };
         const handleReplyToPost = (data) => {
-            if (data && data.reply) {
-                if (data.schannel) return;
-                if (auth?.id != data.reply.user_id) {
-                    updateUnreadTab("com", true);
-                    dispatch(actionChannel.handleReplyPost(data.reply));
-                }
+            if (data && data.reply && auth?.id != data.reply.user_id) {
+                // if (data.schannel) {
+                //     if (data.name)
+                //         showNotification("返信", {
+                //             message: `${data.name} さんが投稿に返信しました`,
+                //         });
+                //     updateUnreadTab("todo", true);
+                // } else updateUnreadTab("com", true);
+                dispatch(actionChannel.handleReplyPost(data.reply));
             }
         };
         const handleAddReactionToPost = (data) => {
-            if (data && data.reaction) {
-                if (data.schannel) return;
-                if (auth?.id != data.reaction.user_id) {
-                    updateUnreadTab("com", true);
-                    dispatch(actionChannel.handleAddREACTION(data.reaction));
-                }
+            if (data && data.reaction && auth?.id != data.reaction.user_id) {
+                // if (data.schannel) {
+                //     if (data.name)
+                //         showNotification("リアクションを設定しました", {
+                //             message: `${data.name} さんが投稿にリアクションを設定しました`,
+                //         });
+                //     updateUnreadTab("todo", true);
+                // } else updateUnreadTab("com", true);
+                dispatch(actionChannel.handleAddREACTION(data.reaction));
             }
         };
         const handleRemoveReactFromPost = (data) => {
-            if (data && data.reaction) {
-                if (data.schannel) return;
-                if (auth?.id != data.reaction.user_id) {
-                    updateUnreadTab("com", true);
-                    dispatch(actionChannel.handleRemoveREACTION(data.reaction));
-                }
+            if (data && data.reaction && auth?.id != data.reaction.user_id) {
+                // if (data.schannel) {
+                //     if (data.name)
+                //         showNotification("リアクションを削除しました", {
+                //             message: `${data.name} さんが投稿からリアクションを削除しました`,
+                //         });
+                //     updateUnreadTab("todo", true);
+                // } else updateUnreadTab("com", true);
+                dispatch(actionChannel.handleRemoveREACTION(data.reaction));
             }
         };
         // const handleCommunityCreated = (data) => {
@@ -137,15 +148,15 @@ const Notifications = () => {
         // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
         channel.listen(".channel.post.created", handlePostCreated);
-        channel.listen(".channel.post.reply", handleReplyToPost);
-        channel.listen(
-            ".channel.post.reaction.created",
-            handleAddReactionToPost
-        );
-        channel.listen(
-            ".channel.post.reaction.deleted",
-            handleRemoveReactFromPost
-        );
+        // channel.listen(".channel.post.reply", handleReplyToPost);
+        // channel.listen(
+        //     ".channel.post.reaction.created",
+        //     handleAddReactionToPost
+        // );
+        // channel.listen(
+        //     ".channel.post.reaction.deleted",
+        //     handleRemoveReactFromPost
+        // );
 
         channel.listen(".channel.chat.created", handleNewChat);
 
@@ -154,9 +165,9 @@ const Notifications = () => {
                 // channel.stopListening(".channel.community.created");
                 channel.stopListening(".channel.created");
                 channel.stopListening(".channel.post.created");
-                channel.stopListening(".channel.post.reply");
-                channel.stopListening(".channel.post.reaction.created");
-                channel.stopListening(".channel.post.reaction.deleted");
+                // channel.stopListening(".channel.post.reply");
+                // channel.stopListening(".channel.post.reaction.created");
+                // channel.stopListening(".channel.post.reaction.deleted");
 
                 channel.stopListening(".channel.chat.created");
             }

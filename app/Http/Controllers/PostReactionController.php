@@ -80,7 +80,7 @@ class PostReactionController extends Controller
             ->where('user_id', Auth::id())
             ->first();
         if ($reaction) {
-            RemoveReactionToPostJob::dispatch($reaction, Auth::user()->name, $validatedData['schannel']);
+            RemoveReactionToPostJob::dispatch($validatedData, Auth::user()->name, $validatedData['schannel']);
             $reaction->delete();
             return response()->json($reaction, 201);
         }

@@ -97,15 +97,16 @@ const Communities = () => {
                 try {
                     const response = await api.post("posts", {
                         ...post,
+                        channel_id: channel.id,
                         community_id: channel.community_id,
                     });
-                    ToastNotification("success", "投稿が正常に作成されました");
                     dispatch(
                         actionChannel.handleAddPostToChannel(response.data)
                     );
-                    dispatch(
-                        actionChannel.handleSetMyCommunity(channel.community_id)
-                    );
+                    // dispatch(
+                    //     actionChannel.handleSetMyCommunity(channel.community_id)
+                    // );
+                    ToastNotification("success", "投稿が正常に作成されました");
                     setShowPostEditor(false);
                 } catch (error) {
                     console.log(error);

@@ -19,7 +19,6 @@ const SCSidebarNavList = (props) => {
         () => schannels[props.data.id] || 0,
         [schannels, props]
     );
-    console.log(schannels, count);
 
     const [isMenuExtended, setIsMenuExtended] = useState(false);
     const [isExpandable, setIsExpandable] = useState(false);

@@ -35,11 +35,13 @@ class PostController extends Controller
     {
         $request->merge([
             'schannel' => $request->input('schannel', ''),
+            'channel_id' => $request->input('channel_id', 0),
         ]);
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
             'content' => 'required|string|max:1000',
+            'channel_id' => 'required|integer',
             'community_id' => 'required|integer',
             'notifyEmail' => 'required|boolean',
             'schannel' => 'nullable|string|max:255',
@@ -49,6 +51,7 @@ class PostController extends Controller
         $post->subject = $validatedData['subject'];
         $post->content = $validatedData['content'];
         $post->notifyEmail = $validatedData['notifyEmail'];
+        $post->channel_id = $validatedData['channel_id'];
         $post->community_id = $validatedData['community_id'];
         if ($validatedData['schannel']) $post->schannel = $validatedData['schannel'];
         $post->user_id = Auth::id();

@@ -30,8 +30,10 @@ moment.locale("ja");
 
 const Post = ({ post, users, channel }) => {
     const dispatch = useDispatch();
-    const auth = useAuth();
+    const { auth } = useAuth();
     const pickerRef = useRef(null);
+    const postId = post?.id;
+    const authId = auth?.id;
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
     const [reply, setReply] = useState("");
@@ -43,6 +45,78 @@ const Post = ({ post, users, channel }) => {
             setShowEmojiPicker(false);
         }
     };
+
+    useEffect(() => {
+        const channel = window.Echo.channel("channel");
+        const handleReplyToPost = (data) => {
+            if (
+                data &&
+                data.reply &&
+                data.reply.post_id == postId &&
+                authId != data.reply.user_id
+            ) {
+                // if (data.schannel) {
+                //     if (data.name)
+                //         showNotification("返信", {
+                //             message: `${data.name} さんが投稿に返信しました`,
+                //         });
+                //     updateUnreadTab("todo", true);
+                // } else updateUnreadTab("com", true);
+                dispatch(actionChannel.handleReplyPost(data.reply));
+            }
+        };
+        const handleAddReactionToPost = (data) => {
+            if (
+                data &&
+                data.reaction &&
+                data.reaction.post_id == postId &&
+                authId != data.reaction.user_id
+            ) {
+                // if (data.schannel) {
+                //     if (data.name)
+                //         showNotification("リアクションを設定しました", {
+                //             message: `${data.name} さんが投稿にリアクションを設定しました`,
+                //         });
+                //     updateUnreadTab("todo", true);
+                // } else updateUnreadTab("com", true);
+                dispatch(actionChannel.handleAddREACTION(data.reaction));
+            }
+        };
+        const handleRemoveReactFromPost = (data) => {
+            if (
+                data &&
+                data.reaction &&
+                data.reaction.post_id == postId &&
+                authId != data.reaction.user_id
+            ) {
+                // if (data.schannel) {
+                //     if (data.name)
+                //         showNotification("リアクションを削除しました", {
+                //             message: `${data.name} さんが投稿からリアクションを削除しました`,
+                //         });
+                //     updateUnreadTab("todo", true);
+                // } else updateUnreadTab("com", true);
+                dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+            }
+        };
+
+        channel.listen(".channel.post.reply", handleReplyToPost);
+        channel.listen(
+            ".channel.post.reaction.created",
+            handleAddReactionToPost
+        );
+        channel.listen(
+            ".channel.post.reaction.deleted",
+            handleRemoveReactFromPost
+        );
+        return () => {
+            if (channel) {
+                channel.stopListening(".channel.post.reply");
+                channel.stopListening(".channel.post.reaction.created");
+                channel.stopListening(".channel.post.reaction.deleted");
+            }
+        };
+    }, [dispatch, authId, postId]);
 
     useEffect(() => {
         if (showEmojiPicker) {
@@ -63,14 +137,13 @@ const Post = ({ post, users, channel }) => {
                 if (res[item.reaction]) {
                     res[item.reaction] = {
                         mine:
-                            res[item.reaction].mine ||
-                            item.user_id == auth.auth?.id,
+                            res[item.reaction].mine || item.user_id == auth?.id,
                         count: res[item.reaction].count + 1,
                         users: [...res[item.reaction].users, item.user_id],
                     };
                 } else {
                     res[item.reaction] = {
-                        mine: item.user_id == auth.auth?.id,
+                        mine: item.user_id == auth?.id,
                         count: 1,
                         users: [item.user_id],
                     };
@@ -91,7 +164,7 @@ const Post = ({ post, users, channel }) => {
                     schannel: post.schannel,
                 });
                 dispatch(actionChannel.handleReplyPost(response.data));
-                dispatch(actionChannel.handleSetMyCommunity(post.community_id));
+                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
                 setReply("");
                 setShowReplyInput(false);
             } catch (error) {
@@ -106,8 +179,7 @@ const Post = ({ post, users, channel }) => {
             Array.isArray(post.reactions) &&
             post.reactions.find(
                 (item) =>
-                    item.user_id == auth.auth?.id &&
-                    item.reaction == emojiData.emoji
+                    item.user_id == auth?.id && item.reaction == emojiData.emoji
             )
         ) {
             setShowEmojiPicker(false);
@@ -121,7 +193,7 @@ const Post = ({ post, users, channel }) => {
                     schannel: post.schannel,
                 });
                 dispatch(actionChannel.handleAddREACTION(response.data));
-                dispatch(actionChannel.handleSetMyCommunity(post.community_id));
+                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
             } catch (error) {
                 console.log(error);
             } finally {
@@ -141,7 +213,7 @@ const Post = ({ post, users, channel }) => {
                         post_id: post.id,
                         schannel: post.schannel,
                     });
-                    // dispatch(actionChannel.handleRemoveREACTION(response.data));
+                    dispatch(actionChannel.handleRemoveREACTION(response.data));
                 } catch (error) {
                     console.log(error);
                 }
@@ -156,7 +228,7 @@ const Post = ({ post, users, channel }) => {
                         post_id: post.id,
                         schannel: post.schannel,
                     });
-                    // dispatch(actionChannel.handleAddREACTION(response.data));
+                    dispatch(actionChannel.handleAddREACTION(response.data));
                 } catch (error) {
                     console.log(error);
                 }
@@ -225,7 +297,11 @@ const Post = ({ post, users, channel }) => {
                         {/* Reply */}返信
                     </Button>
                     <Button onClick={() => setShowReplies(!showReplies)}>
-                        {showReplies ? "会話を非表示" : "会話を表示"}
+                        {showReplies ? "会話を非表示" : "会話を表示"}{" "}
+                        {post.replies &&
+                            Array.isArray(post.replies) &&
+                            post.replies.length > 0 &&
+                            `(${post.replies.length} 返信)`}
                     </Button>
                 </Box>
                 {showReplyInput && (

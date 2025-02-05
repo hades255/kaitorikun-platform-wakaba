@@ -156,18 +156,13 @@ const Communities = () => {
     useEffect(() => setShowPostEditor(false), [channel]);
 
     return (
-        <PanelContent
-            headerContent
-            row
-            title={
-                <ComHeader
-                    community={community}
-                    channel={channel}
-                    handleClickSepCom={handleClickSepCom}
-                    sepCom={comSepType}
-                />
-            }
-        >
+        <PanelContent>
+            <ComHeader
+                community={community}
+                channel={channel}
+                handleClickSepCom={handleClickSepCom}
+                sepCom={comSepType}
+            />
             <Box display={"flex"} justifyContent={"center"}>
                 <Box width={"100%"} maxWidth={960}>
                     {channel ? (

@@ -130,7 +130,7 @@ const Calendar = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <PanelContent headerContent title="カレンダー">
+            <PanelContent title="カレンダー">
                 <Paper className={classes.root}>
                     <FullCalendar
                         ref={calendarRef}

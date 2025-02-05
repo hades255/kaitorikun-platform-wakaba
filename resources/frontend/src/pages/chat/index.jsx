@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "react-chat-elements";
 import { Box } from "@mui/material";
+import moment from "moment";
+import "moment/locale/ja";
+import clsx from "clsx";
 import "react-chat-elements/dist/main.css";
 import api from "../../api";
 import { makeStyles } from "@mui/styles";
@@ -11,10 +14,8 @@ import { actionChat } from "../../reduxStore/actions/chat_action";
 import ChatInput from "../../components/chat/ChatInput";
 import { PanelContent, useDispatch, useSelector } from "../../components";
 import { PUBLIC_HOST } from "../../config";
-import moment from "moment";
-import "moment/locale/ja"; // Import Japanese locale
 
-moment.locale("ja"); // Set locale globally
+moment.locale("ja");
 
 const ChatsPage = () => {
     const { auth } = useAuth();
@@ -67,14 +68,18 @@ const ChatsPage = () => {
 
     return (
         <PanelContent
-            headerContent
             // title="Messages"
             title="メッセージ"
         >
             <Box className={classes.container} pb={4}>
                 {selectedUser ? (
                     <>
-                        <Box className={classes.chatWrapper}>
+                        <Box
+                            className={clsx(
+                                "non-scrollbar",
+                                classes.chatWrapper
+                            )}
+                        >
                             {chats?.map((msg, index) => (
                                 <ChatItem
                                     key={index}
@@ -163,31 +168,33 @@ const ChatItem = ({ chat, selectedUser }) => {
 
     return (
         <div>
-            {
-                chat.to === selectedUser.id ? (
-                    <div style={{
+            {chat.to === selectedUser.id ? (
+                <div
+                    style={{
                         bottom: "-5px",
                         right: "10px",
                         fontSize: "12px",
                         color: "gray",
                         textAlign: "right",
-                        paddingRight: "20px"
-                    }}>
-                        {moment(chat.created_at).fromNow()} {/* Relative time */}
-                    </div>
-                ) : (
-                    <div style={{
+                        paddingRight: "20px",
+                    }}
+                >
+                    {moment(chat.created_at).fromNow()} {/* Relative time */}
+                </div>
+            ) : (
+                <div
+                    style={{
                         bottom: "-5px",
                         right: "10px",
                         fontSize: "12px",
                         color: "gray",
                         textAlign: "left",
-                        paddingLeft: "20px"
-                    }}>
-                        {moment(chat.created_at).fromNow()} {/* Relative time */}
-                    </div>
-                )
-            }
+                        paddingLeft: "20px",
+                    }}
+                >
+                    {moment(chat.created_at).fromNow()} {/* Relative time */}
+                </div>
+            )}
             <MessageBox
                 id={chat.id}
                 position={chat.to === selectedUser.id ? "right" : "left"}
@@ -210,14 +217,13 @@ const ChatItem = ({ chat, selectedUser }) => {
                 onRemoveMessageClick={handleClickRemove}
                 status={chat.status == "read" ? "read" : "sent"}
             />
-            
         </div>
     );
 };
 
 const useStyles = makeStyles((theme) => ({
     container: {
-        height: "calc(100vh - 200px)",
+        height: "100%",
         maxWidth: "768px",
         marginLeft: "auto",
         marginRight: "auto",

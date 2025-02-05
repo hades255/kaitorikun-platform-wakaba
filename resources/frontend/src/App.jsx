@@ -18,6 +18,7 @@ import {
     addWindowClass,
 } from "./components/index.jsx";
 import Notifications from "./components/Notifications/index.jsx";
+import "./index.css";
 //Tes
 const App = () => {
     const windowSize = useWindowSize();

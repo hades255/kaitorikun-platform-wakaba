@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
+import myEcho from "../helper/Echo";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCommunity } from "../../contexts/CommunityContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";
-import myEcho from "../helper/Echo";
 
 const Notifications = () => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
     const { updateUnreadTab, showNotification } = useNotification();
+    const { handleAddSChannels } = useCommunity();
     const coms = useSelector(selectorChannel.handleGetCommunities);
     // const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
@@ -53,14 +55,16 @@ const Notifications = () => {
             }
         };
         const handlePostCreated = (data) => {
-            if (
-                data &&
-                data.post &&
-                comIds?.includes(Number(data.post.community_id))
-            ) {
-                if (auth?.id != data.post.user_id) {
+            if (data && data.post && auth?.id != data.post.user_id) {
+                if (comIds?.includes(Number(data.post.community_id))) {
+                    if (data.name)
+                        showNotification("新しい投稿", {
+                            message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
+                        });
                     updateUnreadTab("com", true);
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
+                } else if (data.schannel) {
+                    handleAddSChannels(data.schannel);
                     if (data.name)
                         showNotification("新しい投稿", {
                             message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
@@ -70,6 +74,7 @@ const Notifications = () => {
         };
         const handleReplyToPost = (data) => {
             if (data && data.reply) {
+                if (data.schannel) return;
                 if (auth?.id != data.reply.user_id) {
                     updateUnreadTab("com", true);
                     dispatch(actionChannel.handleReplyPost(data.reply));
@@ -78,6 +83,7 @@ const Notifications = () => {
         };
         const handleAddReactionToPost = (data) => {
             if (data && data.reaction) {
+                if (data.schannel) return;
                 if (auth?.id != data.reaction.user_id) {
                     updateUnreadTab("com", true);
                     dispatch(actionChannel.handleAddREACTION(data.reaction));
@@ -86,6 +92,7 @@ const Notifications = () => {
         };
         const handleRemoveReactFromPost = (data) => {
             if (data && data.reaction) {
+                if (data.schannel) return;
                 if (auth?.id != data.reaction.user_id) {
                     updateUnreadTab("com", true);
                     dispatch(actionChannel.handleRemoveREACTION(data.reaction));
@@ -154,7 +161,14 @@ const Notifications = () => {
                 channel.stopListening(".channel.chat.created");
             }
         };
-    }, [dispatch, showNotification, updateUnreadTab, auth, comIds]);
+    }, [
+        dispatch,
+        handleAddSChannels,
+        showNotification,
+        updateUnreadTab,
+        auth,
+        comIds,
+    ]);
 
     useEffect(() => {
         if (auth) {

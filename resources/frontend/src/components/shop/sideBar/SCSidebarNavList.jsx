@@ -1,15 +1,25 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Link, Route } from "react-router-dom";
+import { makeStyles } from "@mui/styles";
+import { useCommunity } from "../../../contexts/CommunityContext";
+import clsx from "clsx";
 
 const SCSidebarNavList = (props) => {
+    const classes = useStyles();
+    const { schannels, handleClearSChannels } = useCommunity();
     const icon = props.data.icon && <i className={props.data.icon} />;
     const titlesub = props.data.title && (
         <p>
             {props.data.title} <i className="right fas fa-angle-left" />
         </p>
     );
-
     const title = props.data.title && <p>{props.data.title}</p>;
+
+    const count = useMemo(
+        () => schannels[props.data.id] || 0,
+        [schannels, props]
+    );
+    console.log(schannels, count);
 
     const [isMenuExtended, setIsMenuExtended] = useState(false);
     const [isExpandable, setIsExpandable] = useState(false);
@@ -20,8 +30,14 @@ const SCSidebarNavList = (props) => {
             return;
         }
     };
+
     const toggleMenu = () => {
         setIsMenuExtended(!isMenuExtended);
+    };
+
+    const handleClick = () => {
+        if (schannels[props.data.id] && schannels[props.data.id] > 0)
+            handleClearSChannels(props.data.id);
     };
 
     useEffect(() => {
@@ -42,9 +58,10 @@ const SCSidebarNavList = (props) => {
                         <li className="nav-header">{props.data.title}</li>
                     )}
                     <li
-                        className={`nav-item${
-                            isMenuExtended ? " menu-open" : ""
-                        }`}
+                        className={clsx("nav-item", classes.navItem, {
+                            "menu-open": isMenuExtended,
+                        })}
+                        onClick={handleClick}
                     >
                         {props.data.children ? (
                             <Link
@@ -81,6 +98,9 @@ const SCSidebarNavList = (props) => {
                                     ))}
                             </ul>
                         )}
+                        {count > 0 && (
+                            <div className={classes.countBox}>{count}</div>
+                        )}
                     </li>
                 </>
             )}
@@ -89,3 +109,24 @@ const SCSidebarNavList = (props) => {
 };
 
 export default memo(SCSidebarNavList);
+
+const useStyles = makeStyles((theme) => ({
+    navItem: {
+        position: "relative",
+    },
+    countBox: {
+        position: "absolute",
+        top: 8,
+        right: 8,
+        width: 16,
+        minWidth: 16,
+        height: 16,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 16,
+        backgroundColor: "red",
+        fontSize: 12,
+        color: "white",
+    },
+}));

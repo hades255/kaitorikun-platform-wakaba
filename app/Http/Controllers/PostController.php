@@ -33,6 +33,9 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'schannel' => $request->input('schannel', ''),
+        ]);
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'subject' => 'required|string|max:255',

@@ -32,6 +32,9 @@ class PostReplyController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'schannel' => $request->input('schannel', ''),
+        ]);
         $validatedData = $request->validate([
             'reply' => 'required|string|max:1000',
             'post_id' => 'required|integer',

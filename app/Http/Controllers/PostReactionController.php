@@ -34,6 +34,9 @@ class PostReactionController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'schannel' => $request->input('schannel', ''),
+        ]);
         $validatedData = $request->validate([
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
@@ -64,9 +67,13 @@ class PostReactionController extends Controller
      */
     public function toggle(Request $request)
     {
+        $request->merge([
+            'schannel' => $request->input('schannel', ''),
+        ]);
         $validatedData = $request->validate([
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
+            'schannel' => 'nullable|string|max:255',
         ]);
         $reaction = PostReaction::where('reaction', $validatedData['reaction'])
             ->where('post_id', $validatedData['post_id'])

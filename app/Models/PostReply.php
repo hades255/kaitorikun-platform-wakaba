@@ -9,7 +9,7 @@ class PostReply extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['post_id', 'reply', 'user_id', 'channel_id'];
+    protected $fillable = ['post_id', 'reply', 'user_id'];
 
     public function post() {
         return $this->belongsTo(Post::class);

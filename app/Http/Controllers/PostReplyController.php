@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\ReplyToPost;
 use App\Jobs\ReplyToPostJob;
 use App\Models\PostReply;
+use App\Models\SchannelUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,14 +35,22 @@ class PostReplyController extends Controller
         $validatedData = $request->validate([
             'reply' => 'required|string|max:1000',
             'post_id' => 'required|integer',
-            'channel_id' => 'required|integer',
+            'schannel' => 'nullable|string|max:255',
         ]);
         $reply = new PostReply();
         $reply->reply = $validatedData['reply'];
         $reply->post_id = $validatedData['post_id'];
-        $reply->channel_id = $validatedData['channel_id'];
         $reply->user_id = Auth::id();
         if ($reply->save()) {
+            if ($validatedData['schannel']) {
+                SchannelUser::firstOrCreate(
+                    [
+                        'schannel_id' => $validatedData['schannel'],
+                        'user_id' => Auth::id(),
+                    ],
+                    []
+                );
+            }
             ReplyToPostJob::dispatch($reply, Auth::user()->name);
             return response()->json($reply, 201);
         }

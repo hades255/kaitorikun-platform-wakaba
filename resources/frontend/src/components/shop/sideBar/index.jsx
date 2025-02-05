@@ -14,6 +14,7 @@ import ChatSidebar from "./Chat";
 import ChannelSidebar from "./Channel";
 import SidebarNavList from "./SidebarNavList";
 import { useNotification } from "../../../contexts/NotificationContext";
+import SCSidebarNavList from "./SCSidebarNavList";
 
 const tabs = [
     {
@@ -142,11 +143,11 @@ const Sidebar = (props) => {
                         >
                             {menu4.map((menu, i) => (
                                 <Route
-                                    path={menu.path}
+                                    path={`/schannel/${menu.id}`}
                                     exact={menu.exact}
                                     key={i}
                                     children={({ match }) => (
-                                        <SidebarNavList data={menu} key={i} />
+                                        <SCSidebarNavList data={menu} key={i} />
                                     )}
                                 />
                             ))}
@@ -159,11 +160,11 @@ const Sidebar = (props) => {
                         >
                             {menu5.map((menu, i) => (
                                 <Route
-                                    path={menu.path}
+                                    path={`/schannel/${menu.id}`}
                                     exact={menu.exact}
                                     key={i}
                                     children={({ match }) => (
-                                        <SidebarNavList data={menu} key={i} />
+                                        <SCSidebarNavList data={menu} key={i} />
                                     )}
                                 />
                             ))}
@@ -176,11 +177,11 @@ const Sidebar = (props) => {
                         >
                             {menu6.map((menu, i) => (
                                 <Route
-                                    path={menu.path}
+                                    path={`/schannel/${menu.id}`}
                                     exact={menu.exact}
                                     key={i}
                                     children={({ match }) => (
-                                        <SidebarNavList data={menu} key={i} />
+                                        <SCSidebarNavList data={menu} key={i} />
                                     )}
                                 />
                             ))}

@@ -7,6 +7,7 @@ use App\Events\RemoveReactionToPost;
 use App\Jobs\AddReactionToPostJob;
 use App\Jobs\RemoveReactionToPostJob;
 use App\Models\PostReaction;
+use App\Models\SchannelUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,14 +37,22 @@ class PostReactionController extends Controller
         $validatedData = $request->validate([
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
-            'channel_id' => 'required|integer',
+            'schannel' => 'nullable|string|max:255',
         ]);
         $reaction = new PostReaction();
         $reaction->reaction = $validatedData['reaction'];
         $reaction->post_id = $validatedData['post_id'];
-        $reaction->channel_id = $validatedData['channel_id'];
         $reaction->user_id = Auth::id();
         if ($reaction->save()) {
+            if ($validatedData['schannel']) {
+                SchannelUser::firstOrCreate(
+                    [
+                        'schannel_id' => $validatedData['schannel'],
+                        'user_id' => Auth::id(),
+                    ],
+                    []
+                );
+            }
             AddReactionToPostJob::dispatch($reaction, Auth::user()->name);
             return response()->json($reaction, 201);
         }
@@ -58,9 +67,11 @@ class PostReactionController extends Controller
         $validatedData = $request->validate([
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
-            'channel_id' => 'required|integer',
         ]);
-        $reaction = PostReaction::where('reaction', $validatedData['reaction'])->where('post_id', $validatedData['post_id'])->where('channel_id', $validatedData['channel_id'])->where('user_id', Auth::id())->first();
+        $reaction = PostReaction::where('reaction', $validatedData['reaction'])
+            ->where('post_id', $validatedData['post_id'])
+            ->where('user_id', Auth::id())
+            ->first();
         if ($reaction) {
             RemoveReactionToPostJob::dispatch($reaction, Auth::user()->name);
             $reaction->delete();

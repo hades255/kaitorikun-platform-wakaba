@@ -9,16 +9,11 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'subject', 'content', 'notifyEmail', 'channel_id'];
+    protected $fillable = ['title', 'subject', 'content', 'notifyEmail', 'community_id', 'schannel'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function channel()
-    {
-        return $this->belongsTo(Channel::class);
     }
 
     public function reactions()

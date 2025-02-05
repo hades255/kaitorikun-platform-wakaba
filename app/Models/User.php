@@ -33,11 +33,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function channels() {
+    public function channels()
+    {
         return $this->belongsToMany(Channel::class, 'channel_users');
     }
 
-    public function communities() {
+    public function communities()
+    {
         return $this->belongsToMany(Community::class, 'community_users');
+    }
+
+    public function schannelUsers()
+    {
+        return $this->hasMany('App\Models\SchannelUser', 'user_id');
     }
 }

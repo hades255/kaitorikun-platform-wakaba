@@ -97,7 +97,6 @@ const Communities = () => {
                 try {
                     const response = await api.post("posts", {
                         ...post,
-                        channel_id: channel.id,
                         community_id: channel.community_id,
                     });
                     ToastNotification("success", "投稿が正常に作成されました");
@@ -175,7 +174,14 @@ const Communities = () => {
                                             users={users}
                                         />
                                     </Box>
-                                    {!showPostEditor && (
+                                    {showPostEditor ? (
+                                        <PostEditor
+                                            onPost={handleCreatePost}
+                                            onClose={() =>
+                                                setShowPostEditor(false)
+                                            }
+                                        />
+                                    ) : (
                                         <Box
                                             display={"flex"}
                                             alignItems={"center"}
@@ -198,15 +204,6 @@ const Communities = () => {
                                                 人を招待
                                             </Button>
                                         </Box>
-                                    )}
-
-                                    {showPostEditor && (
-                                        <PostEditor
-                                            onPost={handleCreatePost}
-                                            onClose={() =>
-                                                setShowPostEditor(false)
-                                            }
-                                        />
                                     )}
                                 </CardContent>
                             </Card>

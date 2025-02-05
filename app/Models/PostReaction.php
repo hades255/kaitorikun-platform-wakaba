@@ -9,7 +9,7 @@ class PostReaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['post_id', 'reaction', 'user_id', 'channel_id'];
+    protected $fillable = ['post_id', 'reaction', 'user_id'];
 
     public function post() {
         return $this->belongsTo(Post::class);

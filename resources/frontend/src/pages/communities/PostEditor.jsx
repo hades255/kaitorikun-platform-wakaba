@@ -28,8 +28,6 @@ export default function PostEditor({ onPost, onClose }) {
         });
     };
 
-    console.log(content)
-
     return (
         <Box sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
             <form onSubmit={handlePost}>

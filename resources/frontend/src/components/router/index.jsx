@@ -12,8 +12,9 @@ import ChatsPage from "../../pages/chat";
 import CalendarPage from "../../pages/calendar";
 import CalendarPageTest from "../../pages/calendar/Calendar";
 import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
-import PurchaseRegister from "../../pages/purchase-manage/register"
-import PurchaseList from "../../pages/purchase-manage/list"
+import PurchaseRegister from "../../pages/purchase-manage/register";
+import PurchaseList from "../../pages/purchase-manage/list";
+import SChannel from "../../pages/schannel";
 
 const MenuRoutes = [
     {
@@ -126,6 +127,12 @@ const MenuRoutes = [
         component: () => <CalendarPage />,
     },
     /** channel&chat end */
+    {
+        path: "/schannel/:id",
+        exact: true,
+        title: "チャネル",
+        component: () => <SChannel />,
+    },
     {
         path: "/accept-invitation",
         exact: true,

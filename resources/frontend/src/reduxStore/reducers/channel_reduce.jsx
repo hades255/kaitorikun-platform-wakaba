@@ -93,7 +93,7 @@ const channels = (state = initialState, actions) => {
         case NEW_POST:
             return {
                 ...state,
-                posts: [...state.posts, data],
+                posts: [data, ...state.posts],
             };
         case REPLY_POST:
             return {

@@ -82,10 +82,7 @@ const Sidebar = (props) => {
                 ) : props.history.location.pathname === "/calendar" ? (
                     <></>
                 ) : (
-                    <nav
-                        className={clsx("mt-2")}
-                        style={{ overflowY: "scroll" }}
-                    >
+                    <nav className={clsx("mt-2")}>
                         <ul
                             className="nav nav-pills nav-sidebar flex-column"
                             data-widget="treeview"
@@ -266,5 +263,7 @@ const TabItem = ({ tab, props }) => {
 const useStyles = makeStyles((theme) => ({
     leftSideBar: {
         maxHeight: "calc(100vh - 120px) !important",
+        display: "flex",
+        flexDirection: "column",
     },
 }));

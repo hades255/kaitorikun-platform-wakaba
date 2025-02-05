@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import clsx from "clsx";
+import { Box } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
 import menu2 from "./menu2";
@@ -11,7 +13,6 @@ import menu6 from "./menu6";
 import ChatSidebar from "./Chat";
 import ChannelSidebar from "./Channel";
 import SidebarNavList from "./SidebarNavList";
-import { Box } from "@mui/material";
 import { useNotification } from "../../../contexts/NotificationContext";
 
 const tabs = [
@@ -36,6 +37,7 @@ const tabs = [
 const Sidebar = (props) => {
     const dispatch = useDispatch();
     const [roleMenu, setRoleMenu] = useState(menu1);
+    const classes = useStyles();
 
     useEffect(() => {
         let userData = getItem("userdata");
@@ -59,7 +61,12 @@ const Sidebar = (props) => {
     }, []);
 
     return (
-        <aside className="main-sidebar main-sidebar-top sidebar-dark-primary elevation-4">
+        <aside
+            className={clsx(
+                "main-sidebar main-sidebar-top sidebar-dark-primary elevation-4",
+                classes.leftSideBar
+            )}
+        >
             <div id="sidebar_tab" className="sidebar-header pt-3">
                 <div className="tabs">
                     {tabs.map((item) => (
@@ -75,7 +82,10 @@ const Sidebar = (props) => {
                 ) : props.history.location.pathname === "/calendar" ? (
                     <></>
                 ) : (
-                    <nav className="mt-2">
+                    <nav
+                        className={clsx("mt-2")}
+                        style={{ overflowY: "scroll" }}
+                    >
                         <ul
                             className="nav nav-pills nav-sidebar flex-column"
                             data-widget="treeview"
@@ -252,3 +262,9 @@ const TabItem = ({ tab, props }) => {
         </Link>
     );
 };
+
+const useStyles = makeStyles((theme) => ({
+    leftSideBar: {
+        maxHeight: "calc(100vh - 120px) !important",
+    },
+}));

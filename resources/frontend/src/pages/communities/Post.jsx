@@ -207,8 +207,7 @@ const Post = ({ post, users, channel }) => {
         if (reaction.mine) {
             const saveFunc = async () => {
                 try {
-                    // const response =
-                    await api.post("postreaction/toggle", {
+                    const response = await api.post("postreaction/toggle", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                         schannel: post.schannel,
@@ -222,8 +221,7 @@ const Post = ({ post, users, channel }) => {
         } else {
             const saveFunc = async () => {
                 try {
-                    // const response =
-                    await api.post("postreaction", {
+                    const response = await api.post("postreaction", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                         schannel: post.schannel,

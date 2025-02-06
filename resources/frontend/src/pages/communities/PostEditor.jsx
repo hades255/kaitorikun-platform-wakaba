@@ -9,23 +9,25 @@ import {
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-export default function PostEditor({ onPost, onClose }) {
-    const [title, setTitle] = useState("");
-    const [subject, setSubject] = useState("");
-    const [content, setContent] = useState("");
-    const [notifyEmail, setNotifyEmail] = useState(false);
+export default function PostEditor({ onPost, onClose, initPost }) {
+    const [title, setTitle] = useState(initPost ? initPost.title : "");
+    const [subject, setSubject] = useState(initPost ? initPost.subject : "");
+    const [content, setContent] = useState(initPost ? initPost.content : "");
+    const [notifyEmail, setNotifyEmail] = useState(
+        initPost && initPost.notifyEmail == 1 ? true : false
+    );
 
     const handlePost = (e) => {
         e.preventDefault();
-        onPost({
-            title,
-            subject,
-            content,
-            notifyEmail,
-            timestamp: new Date(),
-            reactions: [],
-            replies: [],
-        });
+        onPost(
+            {
+                title,
+                subject,
+                content,
+                notifyEmail,
+            },
+            initPost && initPost.id
+        );
     };
 
     return (
@@ -50,8 +52,8 @@ export default function PostEditor({ onPost, onClose }) {
                 />
                 <ReactQuill
                     value={content}
-                    onChange={(e)=>{
-                        setContent(e)
+                    onChange={(e) => {
+                        setContent(e);
                     }}
                     style={{ height: "200px", marginBottom: "50px" }}
                 />

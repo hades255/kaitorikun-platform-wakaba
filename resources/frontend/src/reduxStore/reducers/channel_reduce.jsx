@@ -1,5 +1,6 @@
 import {
     ADD_REACTION,
+    EDIT_POST,
     NEW_CHANNEL,
     NEW_COMMUNITY,
     NEW_POST,
@@ -100,6 +101,13 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 posts: state.posts.filter(({ id }) => id != data),
+            };
+        case EDIT_POST:
+            return {
+                ...state,
+                posts: state.posts.map((item) =>
+                    item.id == data.id ? { ...item, ...data } : item
+                ),
             };
         case REPLY_POST:
             return {

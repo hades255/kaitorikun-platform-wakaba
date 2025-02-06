@@ -78,6 +78,7 @@ const Communities = () => {
     const posts = useSelector(selectorChannel.handleGetPosts);
     const users = useSelector(selectorChannel.handleGetUsers);
     const [comSepType, setComSepType] = useState("posts");
+    const [post, setPost] = useState(null);
 
     const { auth } = useAuth();
     const {
@@ -92,8 +93,8 @@ const Communities = () => {
     const [inviteEmail, setInviteEmail] = useState("");
 
     const handleCreatePost = useCallback(
-        (post) => {
-            const createPostFunc = async () => {
+        (post, init) => {
+            const createPostFunc = async (post) => {
                 try {
                     const response = await api.post("posts", {
                         ...post,
@@ -103,9 +104,6 @@ const Communities = () => {
                     dispatch(
                         actionChannel.handleAddPostToChannel(response.data)
                     );
-                    // dispatch(
-                    //     actionChannel.handleSetMyCommunity(channel.community_id)
-                    // );
                     ToastNotification("success", "投稿が正常に作成されました");
                     setShowPostEditor(false);
                 } catch (error) {
@@ -118,7 +116,22 @@ const Communities = () => {
                     );
                 }
             };
-            createPostFunc();
+            const updatePostFunc = async (post, init) => {
+                try {
+                    const response = await api.put("posts/" + init, post);
+                    dispatch(actionChannel.handlePostEdited(response.post));
+                    ToastNotification("success", "投稿の更新に成功しました");
+                    setShowPostEditor(false);
+                } catch (error) {
+                    console.log(error);
+                    ToastNotification(
+                        "warning",
+                        "サーバーエラーです。しばらくしてからもう一度お試しください"
+                    );
+                }
+            };
+            if (init) updatePostFunc(post, init);
+            else createPostFunc(post);
         },
         [channel]
     );
@@ -153,7 +166,20 @@ const Communities = () => {
 
     const handleClickSepCom = useCallback((type) => setComSepType(type), []);
 
-    useEffect(() => setShowPostEditor(false), [channel]);
+    useEffect(() => {
+        setShowPostEditor(false);
+        setPost(null);
+    }, [channel]);
+
+    const handleClickNewPost = useCallback(() => {
+        setPost(null);
+        setShowPostEditor(true);
+    }, []);
+
+    const handleClickEditPost = useCallback((param) => {
+        setPost(param);
+        setShowPostEditor(true);
+    }, []);
 
     return (
         <PanelContent>
@@ -181,6 +207,7 @@ const Communities = () => {
                                             onClose={() =>
                                                 setShowPostEditor(false)
                                             }
+                                            initPost={post}
                                         />
                                     ) : (
                                         <Box
@@ -189,9 +216,7 @@ const Communities = () => {
                                         >
                                             <Button
                                                 variant="contained"
-                                                onClick={() =>
-                                                    setShowPostEditor(true)
-                                                }
+                                                onClick={handleClickNewPost}
                                                 sx={{ mr: 1 }}
                                             >
                                                 <PostAddIcon /> 新しい投稿を開始
@@ -215,6 +240,7 @@ const Communities = () => {
                                         post={post}
                                         channel={channel}
                                         users={users}
+                                        handleOpenEdit={handleClickEditPost}
                                     />
                                 ))}
                         </>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\NewPost;
 use App\Jobs\DeletePostJob;
+use App\Jobs\EditPostJob;
 use App\Jobs\NewPostJob;
 use App\Models\CommunityUser;
 use App\Models\Post;
@@ -99,9 +100,23 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string|max:1000',
+            'notifyEmail' => 'required|boolean',
+        ]);
+        $post->title = $validatedData['title'];
+        $post->subject = $validatedData['subject'];
+        $post->content = $validatedData['content'];
+        $post->notifyEmail = $validatedData['notifyEmail'];
+        if ($post->save()) {
+            EditPostJob::dispatch($post, Auth::user()->name, $post->schannel);
+            return response()->json($post, 201);
+        }
+        return response()->json(['error' => 'Failed to create post'], 500);
     }
 
     /**

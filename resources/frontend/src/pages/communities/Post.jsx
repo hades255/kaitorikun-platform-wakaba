@@ -36,7 +36,7 @@ import { ToastNotification } from "../../components";
 
 moment.locale("ja");
 
-const Post = ({ post, users, channel }) => {
+const Post = ({ post, users, channel, handleOpenEdit }) => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
     const pickerRef = useRef(null);
@@ -65,13 +65,6 @@ const Post = ({ post, users, channel }) => {
                 data.reply.post_id == postId &&
                 authId != data.reply.user_id
             ) {
-                // if (data.schannel) {
-                //     if (data.name)
-                //         showNotification("返信", {
-                //             message: `${data.name} さんが投稿に返信しました`,
-                //         });
-                //     updateUnreadTab("todo", true);
-                // } else updateUnreadTab("com", true);
                 dispatch(actionChannel.handleReplyPost(data.reply));
             }
         };
@@ -82,13 +75,6 @@ const Post = ({ post, users, channel }) => {
                 data.reaction.post_id == postId &&
                 authId != data.reaction.user_id
             ) {
-                // if (data.schannel) {
-                //     if (data.name)
-                //         showNotification("リアクションを設定しました", {
-                //             message: `${data.name} さんが投稿にリアクションを設定しました`,
-                //         });
-                //     updateUnreadTab("todo", true);
-                // } else updateUnreadTab("com", true);
                 dispatch(actionChannel.handleAddREACTION(data.reaction));
             }
         };
@@ -99,14 +85,17 @@ const Post = ({ post, users, channel }) => {
                 data.reaction.post_id == postId &&
                 authId != data.reaction.user_id
             ) {
-                // if (data.schannel) {
-                //     if (data.name)
-                //         showNotification("リアクションを削除しました", {
-                //             message: `${data.name} さんが投稿からリアクションを削除しました`,
-                //         });
-                //     updateUnreadTab("todo", true);
-                // } else updateUnreadTab("com", true);
                 dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+            }
+        };
+        const handlePostEdited = (data) => {
+            if (
+                data &&
+                data.post &&
+                data.post.id == postId &&
+                authId != data.post.user_id
+            ) {
+                dispatch(actionChannel.handlePostEdited(data.post));
             }
         };
 
@@ -119,11 +108,13 @@ const Post = ({ post, users, channel }) => {
             ".channel.post.reaction.deleted",
             handleRemoveReactFromPost
         );
+        channel.listen(".channel.post.edited", handlePostEdited);
         return () => {
             if (channel) {
                 channel.stopListening(".channel.post.reply");
                 channel.stopListening(".channel.post.reaction.created");
                 channel.stopListening(".channel.post.reaction.deleted");
+                channel.stopListening(".channel.post.edited");
             }
         };
     }, [dispatch, authId, postId]);
@@ -270,7 +261,9 @@ const Post = ({ post, users, channel }) => {
         }
     }, [dispatch, postId]);
 
-    const handleClickEditPost = useCallback(() => {}, []);
+    const handleClickEditPost = useCallback(() => {
+        handleOpenEdit(post);
+    }, [handleOpenEdit, post]);
 
     return (
         <>

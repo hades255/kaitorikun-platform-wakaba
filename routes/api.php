@@ -70,7 +70,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('channels', [ChannelController::class, 'store'])->name('channels.store');
 
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
-    Route::put('posts/{post}', [CalendarEventController::class, 'update'])->name('posts.update');
+    Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     Route::post('postreply', [PostReplyController::class, 'store'])->name('postreply.store');

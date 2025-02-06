@@ -42,6 +42,7 @@ const SChannel = ({ match, history }) => {
     const posts = useSelector(selectorChannel.handleGetPosts);
     const users = useSelector(selectorChannel.handleGetUsers);
     const [showPostEditor, setShowPostEditor] = useState(false);
+    const [post, setPost] = useState(null);
 
     const handleGetSChannel = useCallback(
         async ({ id }) => {
@@ -63,8 +64,8 @@ const SChannel = ({ match, history }) => {
     );
 
     const handleCreatePost = useCallback(
-        (post) => {
-            const createPostFunc = async () => {
+        (post, init) => {
+            const createPostFunc = async (post) => {
                 try {
                     const response = await api.post("posts", {
                         ...post,
@@ -72,7 +73,6 @@ const SChannel = ({ match, history }) => {
                         community_id: 0,
                         schannel: schannelId,
                     });
-                    // setPosts((prev) => [...prev, response.data]);
                     dispatch(
                         actionChannel.handleAddPostToChannel(response.data)
                     );
@@ -88,7 +88,22 @@ const SChannel = ({ match, history }) => {
                     );
                 }
             };
-            createPostFunc();
+            const updatePostFunc = async (post, init) => {
+                try {
+                    const response = await api.put("posts/" + init, post);
+                    dispatch(actionChannel.handlePostEdited(response.data));
+                    ToastNotification("success", "投稿の更新に成功しました");
+                    setShowPostEditor(false);
+                } catch (error) {
+                    console.log(error);
+                    ToastNotification(
+                        "warning",
+                        "サーバーエラーです。しばらくしてからもう一度お試しください"
+                    );
+                }
+            };
+            if (init) updatePostFunc(post, init);
+            else createPostFunc(post);
         },
         [schannelId]
     );
@@ -103,7 +118,19 @@ const SChannel = ({ match, history }) => {
             return;
         }
         handleGetSChannel(menu);
+        setPost(null);
+        setShowPostEditor(false);
     }, [handleGetSChannel, menu, history]);
+
+    const handleClickNewPost = useCallback(() => {
+        setPost(null);
+        setShowPostEditor(true);
+    }, []);
+
+    const handleClickEditPost = useCallback((param) => {
+        setPost(param);
+        setShowPostEditor(true);
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
@@ -118,14 +145,13 @@ const SChannel = ({ match, history }) => {
                                     <PostEditor
                                         onPost={handleCreatePost}
                                         onClose={() => setShowPostEditor(false)}
+                                        initPost={post}
                                     />
                                 ) : (
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Button
                                             variant="contained"
-                                            onClick={() =>
-                                                setShowPostEditor(true)
-                                            }
+                                            onClick={handleClickNewPost}
                                             sx={{ mr: 1 }}
                                         >
                                             <PostAddIcon /> 新しい投稿を開始
@@ -141,6 +167,7 @@ const SChannel = ({ match, history }) => {
                                     post={post}
                                     channel={menu}
                                     users={users}
+                                    handleOpenEdit={handleClickEditPost}
                                 />
                             ))}
                     </Box>

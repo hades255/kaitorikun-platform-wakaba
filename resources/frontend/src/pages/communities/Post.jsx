@@ -32,6 +32,7 @@ import { getUserStatusColor } from "../../feature/action";
 import { useAuth } from "../../contexts/AuthContext";
 import { actionChannel } from "../../reduxStore";
 import Creator from "../../components/community/Creator";
+import { ToastNotification } from "../../components";
 
 moment.locale("ja");
 
@@ -255,13 +256,18 @@ const Post = ({ post, users, channel }) => {
     const handleAcceptDeleteModal = useCallback(async () => {
         try {
             const postId = post.id;
-            const response = await api.delete("posts/" + postId);
+            await api.delete("posts/" + postId);
+            ToastNotification("success", "投稿が正常に削除されました");
             dispatch(actionChannel.handleRemovePost(postId));
-            console.log(response);
         } catch (error) {
             console.log(error);
+            ToastNotification(
+                "warning",
+                "サーバーエラーです。しばらくしてからもう一度お試しください"
+            );
+        } finally {
+            setOpenDeleteModal(false);
         }
-        setOpenDeleteModal(false);
     }, [dispatch, postId]);
 
     return (

@@ -7,7 +7,6 @@ use App\Events\RemoveReactionToPost;
 use App\Jobs\AddReactionToPostJob;
 use App\Jobs\RemoveReactionToPostJob;
 use App\Models\PostReaction;
-use App\Models\SchannelUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,29 +33,16 @@ class PostReactionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->merge([
-            'schannel' => $request->input('schannel', ''),
-        ]);
         $validatedData = $request->validate([
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
-            'schannel' => 'nullable|string|max:255',
         ]);
         $reaction = new PostReaction();
         $reaction->reaction = $validatedData['reaction'];
         $reaction->post_id = $validatedData['post_id'];
         $reaction->user_id = Auth::id();
         if ($reaction->save()) {
-            AddReactionToPostJob::dispatch($reaction, Auth::user()->name, $validatedData['schannel']);
-            if ($validatedData['schannel']) {
-                SchannelUser::firstOrCreate(
-                    [
-                        'schannel_id' => $validatedData['schannel'],
-                        'user_id' => Auth::id(),
-                    ],
-                    []
-                );
-            }
+            AddReactionToPostJob::dispatch($reaction, Auth::user()->name);
             return response()->json($reaction, 201);
         }
         return response()->json(['error' => 'Failed to create reaction'], 500);
@@ -67,20 +53,16 @@ class PostReactionController extends Controller
      */
     public function toggle(Request $request)
     {
-        $request->merge([
-            'schannel' => $request->input('schannel', ''),
-        ]);
         $validatedData = $request->validate([
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
-            'schannel' => 'nullable|string|max:255',
         ]);
         $reaction = PostReaction::where('reaction', $validatedData['reaction'])
             ->where('post_id', $validatedData['post_id'])
             ->where('user_id', Auth::id())
             ->first();
         if ($reaction) {
-            RemoveReactionToPostJob::dispatch(["id" => $reaction->id, "post_id" => $reaction->post_id], Auth::user()->name, $validatedData['schannel']);
+            RemoveReactionToPostJob::dispatch(["id" => $reaction->id, "post_id" => $reaction->post_id], Auth::user()->name);
             $reaction->delete();
             return response()->json(["id" => $reaction->id, "post_id" => $reaction->post_id], 201);
         }

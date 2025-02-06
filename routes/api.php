@@ -14,7 +14,6 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\InvitationController;
-use App\Http\Controllers\SChannelController;
 use App\Http\Controllers\UserController;
 use App\Mail\CommunityInvitationEmail;
 use Illuminate\Support\Facades\Mail;
@@ -89,6 +88,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('events', [CalendarEventController::class, 'store'])->name('events.store');
     Route::put('events/{event}', [CalendarEventController::class, 'update'])->name('events.update');
     Route::delete('events/{event}', [CalendarEventController::class, 'destroy'])->name('events.edit');
-
-    Route::get('schannels/{schannel}', [SChannelController::class, 'show'])->name('schannels.show')->where('schannel', '^sc[0-9]+$');
 });

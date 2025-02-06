@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->string('reaction'); // e.g., like, love, etc.
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('channel_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

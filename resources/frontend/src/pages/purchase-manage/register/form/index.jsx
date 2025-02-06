@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import {
     React,
     Button,
     multiPostData,
     previewThumbnail,
     getData,
+    getItem,
     ToastNotification,
     useDispatch
 } from "../../../../components";
@@ -13,6 +14,7 @@ import DateInput from "../../../../components/DateInput";
 import DateTimeInput from "../../../../components/DateTimeInput";
 import TextInput from '../../../../components/TextInput';
 import InputLabel from '../../../../components/InputLabel';
+import DataContext from '../../../../components/DataContext';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
@@ -23,6 +25,12 @@ import { pdfjs, Document, Page } from "react-pdf";
 import { actionTheme, utilityAction } from "../../../../reduxStore";
 import Tesseract from 'tesseract.js';
 import TablePurchaseVisitShop from '../table';
+import PrintPurchaseVisitShop from '../print';
+import LeaveItemsDialog from '../leave-items';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import moment from 'moment';
+moment.locale("ja");
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -69,6 +77,8 @@ let FormPurchaseRegister = (props) => {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
+
+    const [purchaseId, setPurchaseId] = useState(0)
 
     const [items, setItems] = useState([{
         'id': 1,
@@ -550,6 +560,11 @@ let FormPurchaseRegister = (props) => {
         'purchase_price': 10000,
         'result': 1
     }]);
+    const [leaveItemDeadline, setLeaveItemDeadline] = useState();
+    const [leaveItemDate, setLeaveItemDate] = useState();
+    const [openImageSlider, setOpenImageSlider] = useState(false)
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [openLeaveItemDialog, setOpenLeaveItemDialog] = useState(false);
 
     const hearingNews = [
         'さきがけ',
@@ -613,9 +628,20 @@ let FormPurchaseRegister = (props) => {
                 setCategories6(data.categories6);
             }
         };
+        fetchData();
+    }, []);
 
-        fetchData(); // Execute API call
-    }, []); // Empty dependency array means it runs once when mounted
+    useEffect(() => {
+        // API Call
+        const initRegisterAPI = async () => {
+            let result = await getData("purchase/init-register")
+            if (result.status === 200) {
+                let data = result.data;
+                setPurchaseId(data.purchase.id);
+            }
+        };
+        initRegisterAPI();
+    }, []);
 
     // Start the camera when the component mounts
     useEffect(() => {
@@ -780,6 +806,14 @@ let FormPurchaseRegister = (props) => {
         setPreviewImage("")
     }
 
+    const handleImageSliderClose = () => {
+        setOpenImageSlider(false)
+    }
+
+    const handleLeaveItemsClose = () => {
+        setOpenLeaveItemDialog(false)
+    }
+
     const handlePdfPreview = async (file) => {
         setOpenPdfPreview(true)
         const previewPdf = await file
@@ -801,61 +835,61 @@ let FormPurchaseRegister = (props) => {
         setZipCode(e);
     }
 
+    const handleLeaveItemsClick = () => {
+        // check validate
+        // if (leaveItemDeadline === undefined) {
+        //     ToastNotification("error", "お預かり期限は必須です。");
+        //     return;
+        // }
+        // if (name === undefined) {
+        //     ToastNotification("error", "名前は必須です。");
+        //     return;
+        // }
+        // if (phoneNumber1 === undefined && phoneNumber2 === undefined) {
+        //     ToastNotification("error", "電話番号は必須です。");
+        //     return;
+        // }
+        // if (!checkSelectedItems()) {
+        //     ToastNotification("error", "現在、選択されている商品はありません。");
+        //     return;
+        // }
+        setOpenLeaveItemDialog(true)
+    }
+
+    const handleDeleteItemsClick = () => {
+        if (window.confirm("一括削除してもよろしいですか？")) {
+        } else {
+        }
+    }
+
     const handleRegisterClick = async () => {
         // check validate
-        if (shop === undefined) {
-            ToastNotification("error", "店舗名は必須です。");
-            return;
-        }
-        if (type === undefined) {
-            ToastNotification("error", "種別は必須です。");
-            return;
-        }
         if (name === undefined) {
             ToastNotification("error", "名前は必須です。");
             return;
         }
-        if (nameKana === undefined) {
-            ToastNotification("error", "カタカナ名は必須です。");
+        if (phoneNumber1 === undefined && phoneNumber2 === undefined) {
+            ToastNotification("error", "電話番号は必須です。");
             return;
         }
-        if (phoneNumber1 === undefined) {
-            ToastNotification("error", "電話番号(自宅)は必須です。");
+        if (checkPlanDate === undefined) {
+            ToastNotification("error", "査定完了予定日時は必須です。");
             return;
         }
-        if (phoneNumber2 === undefined) {
-            ToastNotification("error", "電話番号(携帯)は必須です。");
+        if (hearingItem1Id === undefined || hearingItem2Value === undefined) {
+            ToastNotification("error", "全体ヒアリングは必須です。");
             return;
         }
-        if (birthday === undefined) {
-            ToastNotification("error", "生年月日は必須です。");
+        if (hearingItem1Id > 2 || hearingItem1Value === undefined) {
+            ToastNotification("error", "全体ヒアリングは必須です。");
             return;
         }
-        if (gender === undefined) {
-            ToastNotification("error", "性別は必須です。");
-            return;
-        }
-        if (address1 === undefined) {
-            ToastNotification("error", "都道府県は必須です。");
+        if (items.length == 0) {
+            ToastNotification("error", "商品は必須です。");
             return;
         }
         if (address2 === undefined) {
             ToastNotification("error", "市町村は必須です。");
-            return;
-        }
-        if (address3 === undefined) {
-            ToastNotification("error", "住所詳細は必須です。");
-            return;
-        }
-        let exist = false
-        if (identificationId1 !== undefined && identificationType1 !== undefined) {
-            exist = true;
-        }
-        if (identificationId2 !== undefined && identificationType2 !== undefined) {
-            exist = true;
-        }
-        if (!exist) {
-            ToastNotification("error", "本人確認書類は必須です。");
             return;
         }
 
@@ -888,13 +922,14 @@ let FormPurchaseRegister = (props) => {
             formData.append("hearing_item1_id", hearingItem1Id);
             formData.append("hearing_item1_value", hearingItem1Value);
             formData.append("hearing_item2_value", hearingItem2Value);
+            formData.append("items", items);
 
-            let feedback = await multiPostData("Purchase/register", formData)
-            if (feedback.status === 200) {
-                setTimeout(() => {
-                    window.history.back();
-                }, 300);
-            }
+            // let feedback = await multiPostData("Purchase/register", formData)
+            // if (feedback.status === 200) {
+            //     setTimeout(() => {
+            //         window.history.back();
+            //     }, 300);
+            // }
             dispatch(utilityAction.stopLoading());
         } catch (error) {
             console.log(error)
@@ -911,10 +946,34 @@ let FormPurchaseRegister = (props) => {
         }
     };
 
-    const handleHearingItem1IdChange = (e) => {
-        setHearingItem1Id(e.target.value)
-        console.log(items);
+    const handleHearingItem1IdChange = (ind) => {
+        setHearingItem1Id(ind)
+        switch (ind) {
+            case 1:
+                setType('顧客')
+                break;
+            case 2:
+                setType('店舗前')
+                break;
+            case 3:
+                setType('ポスティング')
+                break;
+            case 4:
+                setType('折込')
+                break;
+            case 5:
+                setType('ＨＰ')
+                break;
+            case 6:
+                setType('紹介')
+                break;
+            case 7:
+                setType('その他')
+                break;
 
+            default:
+                break;
+        }
     };
 
     const handleHearingItem1ValueChange = (e) => {
@@ -922,35 +981,114 @@ let FormPurchaseRegister = (props) => {
     };
 
     const handleHearingItem2ValueChange = (e) => {
-        setHearingItem2Value(e.target.value);
+        setHearingItem2Value(e);
     };
 
     const handleHearingItem1SelectValueChange = (e) => {
         setHearingItem1Value(e.target.value)
     }
 
+    const checkSelectedItems = () => {
+        let selected = false;
+        setSelectedItems([])
+        let list = []
+        items.forEach(item => {
+            if (item.selected == true) {
+                selected = true
+                list.push(item)
+            }
+        });
+        setSelectedItems(list)
+        return selected;
+    }
     return (
         <div>
-            <div className='flex-center'>
+            <div style={{ position: 'relative' }}>
+                <div className='flex-left' style={{ alignItems: 'baseline' }}>
+                    <label className='flex-right'>No.<div>{purchaseId.toString().padStart(6, '0')}</div></label>
+                    <div>
+                        <label className='flex-right' style={{ marginBottom: '0px' }}>支払い担当<div>{getItem("userdata").name}</div></label>
+                        <label className='flex-right'>接客担当<div>{getItem("userdata").name}</div></label>
+                    </div>
+                </div>
+                <div className='customer-header-name'>
+                    <label className='flex-right'>来店時間<div>{moment().format('YYYY/MM/DD(ddd) HH:mm')}</div></label>
+                    {leaveItemDate && (<label className='flex-right'>お預かり日時<div>{moment(leaveItemDate).format('YYYY/MM/DD(ddd) HH:mm')}</div></label>)}
+                </div>
+            </div>
+            <div className='customer-register-container'>
+                <div className='screen-div2'>
+                    <div className='screen-div2'>
+                    </div>
+                    <div className='screen-div2'>
+                    </div>
+                </div>
+                <div className='screen-div2'>
+                    <div className='screen-div2'>
+                    </div>
+                    <div className='screen-div2'>
+                    </div>
+                </div>
+            </div>
+            <div className='flex-left'>
+                <div className='flex-left'>
+                    <div>期限</div>
+                    <DateInput
+                        className="shop-select"
+                        onChange={(e) => setLeaveItemDeadline(e)}
+                    />
+                    <div>で</div>
+                    <Button
+                        loading
+                        textLoading="Waiting"
+                        type="submit"
+                        color="secondary"
+                        title="お預かり証発行"
+                        className="w-100"
+                        onClick={handleLeaveItemsClick}
+                    />
+                </div>
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="success"
+                    title="全体撮影"
+                    className="w-100"
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="info"
+                    title="紙書類撮影"
+                    className="w-100"
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="warning"
+                    title="決済申請"
+                    className="w-100"
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="outline-secondary"
+                    title="全て決裁を許可"
+                    className="w-100"
+                />
                 <Button
                     loading
                     textLoading="Waiting"
                     type="submit"
                     color="primary"
-                    title="登録する"
+                    title="お客様提示画面"
                     className="w-100"
-                    onClick={handleRegisterClick}
+                    disabled={true}
                 />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="secondary"
-                    title="キャンセル"
-                    className="w-100"
-                    onClick={handleCancelClick}
-                />
-
             </div>
             <div className='customer-register-container'>
                 <div className='screen-div2 customer-register-container'>
@@ -974,23 +1112,15 @@ let FormPurchaseRegister = (props) => {
                             </div>
                         </div>
                         <div className="mt-10">
-                            <div className="input-label">種別</div>
+                            <div className="input-label">来店経緯</div>
                             <div className="input-value">
-                                <Select
-                                    onChange={(e) => setType(e.target.value)}
-                                    displayEmpty
-                                    className="shop-select"
-                                    size='small'
-                                >
-                                    <MenuItem disabled value="">
-                                        <span className="text-gray-500">種別</span>
-                                    </MenuItem>
-                                    <MenuItem value={2}>マネージャー</MenuItem>
-                                    <MenuItem value={3}>本部社員</MenuItem>
-                                    <MenuItem value={4}>店長</MenuItem>
-                                    <MenuItem value={5}>社員</MenuItem>
-                                    <MenuItem value={6}>アルバイト</MenuItem>
-                                </Select>
+                                <TextInput
+                                    type="text"
+                                    name="type"
+                                    value={type}
+                                    className="mt-1 block w-full w-100-pro"
+                                    readOnly
+                                />
                             </div>
                         </div>
                         <div className="mt-10">
@@ -1099,9 +1229,9 @@ let FormPurchaseRegister = (props) => {
                             <div className="input-label">本人確認書類</div>
                             <div className="input-value">
                                 <div className='flex-left'>
-                                    <div>
+                                    {/* <div>
                                         <div><AddIcon className='add-icon' onClick={handleAddIdentification} /></div>
-                                    </div>
+                                    </div> */}
                                     <div>
                                         <div className='flex-center'>
                                             <Select
@@ -1210,40 +1340,37 @@ let FormPurchaseRegister = (props) => {
                             <div className="hearing-container">
                                 <div>
                                     <div className="input-label">来店経緯</div>
-                                    <div>
+                                    <div className='ml-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="1"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(1)}
                                             />
                                             以前も利用したことがある
                                         </label>
                                     </div>
-                                    <div>
+                                    <div className='ml-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="2"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(2)}
                                             />
                                             店舗を見て
                                         </label>
                                     </div>
-                                    <div>
+                                    <div className='ml-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="3"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(3)}
                                             />
-                                            店舗以外の看板・広告を見て折込チラシを見て
+                                            店舗以外の看板・広告を見て
                                         </label>
                                         <div className='flex-left' style={{ marginLeft: '20px' }}>
-                                            <label className='mt-1'>(</label>
+                                            <label className='mt-1 custom-radio-label'>(</label>
                                             <TextInput
                                                 type="text"
                                                 name="hearing_item2"
@@ -1252,16 +1379,15 @@ let FormPurchaseRegister = (props) => {
                                                 placeholder="場所"
                                                 readOnly={hearingItem1Id != 3}
                                             />
-                                            <label className='mt-1'>)の場所で見ました</label>
+                                            <label className='mt-1 custom-radio-label'>)の場所で見ました</label>
                                         </div>
                                     </div>
-                                    <div>
+                                    <div className='ml-10 mt-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="4"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(4)}
                                             />
                                             折込チラシを見て
                                             {
@@ -1279,13 +1405,12 @@ let FormPurchaseRegister = (props) => {
                                             }
                                         </label>
                                     </div>
-                                    <div>
+                                    <div className='ml-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="5"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(5)}
                                             />
                                             インターネットを見て
                                             {
@@ -1303,13 +1428,12 @@ let FormPurchaseRegister = (props) => {
                                             }
                                         </label>
                                     </div>
-                                    <div>
+                                    <div className='ml-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="6"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(6)}
                                             />
                                             紹介されて
                                             <label className='mt-1'>(</label>
@@ -1323,13 +1447,12 @@ let FormPurchaseRegister = (props) => {
                                             <label className='mt-1'>)</label>
                                         </label>
                                     </div>
-                                    <div>
+                                    <div className='ml-10'>
                                         <label className='flex-left custom-radio-label'>
                                             <input
                                                 type="radio"
                                                 name="hearing_item1"
-                                                value="7"
-                                                onChange={handleHearingItem1IdChange}
+                                                onChange={() => handleHearingItem1IdChange(7)}
                                             />
                                             その他
                                             <TextInput
@@ -1347,7 +1470,7 @@ let FormPurchaseRegister = (props) => {
                                             <TextInput
                                                 type="text"
                                                 name="hearing_item2"
-                                                className="mt-1 block w-full w-100-pro"
+                                                className="mt-1 ml-10 block w-full w-100-pro"
                                                 onChange={(e) => handleHearingItem2ValueChange(e.target.value)}
                                             />
                                         </div>
@@ -1413,15 +1536,61 @@ let FormPurchaseRegister = (props) => {
                     )}
                 </div>
             </div>
-            <TablePurchaseVisitShop
-                categories1={categories1}
-                categories2={categories2}
-                categories3={categories3}
-                categories4={categories4}
-                categories5={categories5}
-                categories6={categories6}
-            // dataSource={items}
-            />
+            <div className='flex-left mt-10' style={{ position: 'relative' }}>
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="danger"
+                    title="一括削除"
+                    className="w-100"
+                    disabled={!(selectedItems.length > 0)}
+                    onClick={handleDeleteItemsClick}
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="success"
+                    title="切手査定シート"
+                    className="w-100"
+                    disabled={true}
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="info"
+                    title="一括許可"
+                    className="w-100"
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="warning"
+                    title="一括ステータス変更"
+                    className="w-100"
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
+                    color="outline-secondary"
+                    title="商品を追加"
+                    className="w-100"
+                />
+            </div>
+            <DataContext.Provider value={{ items, setItems }}>
+                <TablePurchaseVisitShop
+                    categories1={categories1}
+                    categories2={categories2}
+                    categories3={categories3}
+                    categories4={categories4}
+                    categories5={categories5}
+                    categories6={categories6}
+                />
+            </DataContext.Provider>
             <Dialog
                 open={openImagePreview}
                 onClose={() => handleImagePreviewClose()}
@@ -1457,7 +1626,31 @@ let FormPurchaseRegister = (props) => {
                     )}
                 </DialogContent>
             </Dialog>
+            <Dialog
+                open={openLeaveItemDialog}
+                onClose={() => handleLeaveItemsClose()}
+            >
+                <LeaveItemsDialog />
+            </Dialog>
+
+            <Dialog
+                open={openImageSlider}
+                onClose={() => handleImageSliderClose()}
+            >
+                <div className=''>
+                    <Swiper spaceBetween={0} slidesPerView={1} autoplay={{ delay: 300 }} loop={true} style={{ textAlign: 'center' }}>
+                        <SwiperSlide><img src="https://picsum.photos/id/237/200/300" alt="1" /></SwiperSlide>
+                        <SwiperSlide><img src="https://picsum.photos/seed/picsum/200/300" alt="2" /></SwiperSlide>
+                        <SwiperSlide><img src="https://picsum.photos/200/300?grayscale" alt="3" /></SwiperSlide>
+                        <SwiperSlide><img src="https://fastly.picsum.photos/id/193/200/300.jpg?hmac=b5ZG1TfdndbrnQ8UJbIu-ykB2PRWv0QpHwehH0pqMgE" alt="3" /></SwiperSlide>
+                        <SwiperSlide><img src="https://fastly.picsum.photos/id/638/200/300.jpg?hmac=oYRYfxaIBKyb10YHb6-3AGadeAdyEWX91vrVrqdTnGE" alt="3" /></SwiperSlide>
+                    </Swiper>
+                </div>
+            </Dialog>
         </div>
     );
 };
 export default FormPurchaseRegister;
+// setOpenImageSlider(true)
+// const number = 120;
+// console.log(number.toString().padStart(6, '0'));

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import {
     React,
     Button,
@@ -9,6 +9,7 @@ import {
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowRight";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowLeft";
 import { Table, Checkbox, Select } from "antd";
+import DataContext from '../../../../components/DataContext';
 
 const { Option } = Select;
 
@@ -18,491 +19,13 @@ let TablePurchaseVisitShop = (props) => {
     const category1 = props.categories1;
     const category2 = props.categories2;
     const category3 = props.categories3;
-    const category4 = props.categories4;
+    const category4 = props.categories4
     const category5 = props.categories5;
     const category6 = props.categories6;
     const agrees = ["申請", "許可", "変更", "基準外", "不可", "預り"];
     const results = ["買取", "不正約", "預り", "返品"];
-    const [data, setData] = useState([{
-        'id': 1,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 2,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 3,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 4,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 5,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 6,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 7,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 8,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 9,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 10,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 11,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 12,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 13,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 14,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 15,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 16,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 17,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 18,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 19,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    },
-    {
-        'id': 20,
-        'selected': false,
-        'item_no': 1,
-        'category_1': 1,
-        'category_2': 2,
-        'category_3': 1,
-        'category_4': 2,
-        'category_5': 3,
-        'category_6': 2,
-        'images': 2,
-        'item_name': '商品名商品名商品名商品名商品名',
-        'item_num': 10,
-        'application_basic': '申請の根拠申請の根拠申請の根拠',
-        'rate': 1000,
-        'max_valuation': 1000000,
-        'company_num': 5,
-        'company_valuation': 30000,
-        'boss_amount': 5000000,
-        'application_amount': 1000,
-        'agree': 1,
-        'purchase_price': 10000,
-        'result': 1
-    }]);
+    const { items, setItems } = useContext(DataContext); 
+
     const [categoryColumnsVisibility, setCategoryColumnsVisibility] = useState({
         category_2: false,
         category_3: false,
@@ -538,56 +61,54 @@ let TablePurchaseVisitShop = (props) => {
         );
     };
     const handleCheckboxChange = (id) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) =>
                 row.id === id ? { ...row, selected: !row.selected } : row
             )
         );
     };
     const handleCategorySelectChange1 = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, category_1: value } : row))
         );
     };
     const handleCategorySelectChange2 = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, category_2: value } : row))
         );
     };
     const handleCategorySelectChange3 = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, category_3: value } : row))
         );
     };
     const handleCategorySelectChange4 = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, category_4: value } : row))
         );
     };
     const handleCategorySelectChange5 = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, category_5: value } : row))
         );
     };
     const handleCategorySelectChange6 = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, category_6: value } : row))
         );
     };
     const handleItemNameChange = (id, value) => {
-        console.log(value);
-
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, item_name: value } : row))
         );
     };
     const handleAgreeSelectChange = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, agree: value } : row))
         );
     };
     const handleResultSelectChange = (id, value) => {
-        setData((prevData) =>
+        setItems((prevData) =>
             prevData.map((row) => (row.id === id ? { ...row, result: value } : row))
         );
     };
@@ -863,7 +384,7 @@ let TablePurchaseVisitShop = (props) => {
             rowKey="id"
             disabledSearch="true"
             columns={visibleColumns}
-            dataSource={data}
+            dataSource={items}
             scrollX={true}
             pageSize={5}
         />

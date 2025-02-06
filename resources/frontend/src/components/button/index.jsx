@@ -4,11 +4,11 @@ import React from 'react'
 const Button = (props) => {
   const isLoading = useSelector(selectorUtility.loading);
 
-  const { icon, title, onClick,textLoading, loading, type, color, block } = props;
+  const { icon, title, onClick, disabled, loading, type, color, block } = props;
 
   return (
     <button
-      disabled={loading ? (isLoading.button ? "disabled" : "") : ""}
+      disabled={disabled}
       type={type}
       onClick={onClick}
       className={`btn btn-${color} ${block === undefined ? "" : "btn-block"}`}

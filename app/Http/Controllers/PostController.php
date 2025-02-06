@@ -109,16 +109,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        // $request->validate([
-        //     'reactionIds' => 'array',
-        //     'reactionIds.*' => 'integer|exists:reactions,id',
-        //     'replyIds' => 'array',
-        //     'replyIds.*' => 'integer|exists:replies,id',
-        // ]);
         $post->reactions()->delete();
         $post->replies()->delete();
-        // Reaction::whereIn('id', $request->reactionIds)->delete();
-        // Reply::whereIn('id', $request->replyIds)->delete();
         DeletePostJob::dispatch(["id" => $post->id, "user_id" => $post->user_id, "community_id" => $post->community_id], Auth::user()->name, $post->schannel);
         $post->delete();
         return response()->noContent();

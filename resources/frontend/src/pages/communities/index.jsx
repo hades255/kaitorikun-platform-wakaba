@@ -119,7 +119,7 @@ const Communities = () => {
             const updatePostFunc = async (post, init) => {
                 try {
                     const response = await api.put("posts/" + init, post);
-                    dispatch(actionChannel.handlePostEdited(response.post));
+                    dispatch(actionChannel.handlePostEdited(response.data));
                     ToastNotification("success", "投稿の更新に成功しました");
                     setShowPostEditor(false);
                 } catch (error) {

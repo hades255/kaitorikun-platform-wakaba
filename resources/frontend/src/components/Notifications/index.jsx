@@ -12,7 +12,6 @@ const Notifications = () => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
     const { updateUnreadTab, showNotification } = useNotification();
-    const { handleAddSChannels } = useCommunity();
     const coms = useSelector(selectorChannel.handleGetCommunities);
     // const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
@@ -69,20 +68,6 @@ const Notifications = () => {
                     );
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
                     updateUnreadTab("com", true);
-                } else if (data.schannel) {
-                    if (data.name)
-                        showNotification("新しい投稿", {
-                            message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
-                        });
-                    updateUnreadTab("todo", true);
-                    dispatch(
-                        actionChannel.handleAddUser({
-                            id: data.post.user_id,
-                            name: data.name,
-                        })
-                    );
-                    dispatch(actionChannel.handleAddPostToChannel(data.post));
-                    handleAddSChannels(data.schannel);
                 }
             }
         };
@@ -91,8 +76,7 @@ const Notifications = () => {
                 data &&
                 data.post &&
                 auth?.id != data.post.user_id &&
-                (comIds?.includes(Number(data.post.community_id)) ||
-                    data.schannel)
+                comIds?.includes(Number(data.post.community_id))
             ) {
                 dispatch(actionChannel.handleRemovePost(data.post.id));
             }
@@ -129,14 +113,7 @@ const Notifications = () => {
                 channel.stopListening(".channel.chat.created");
             }
         };
-    }, [
-        dispatch,
-        handleAddSChannels,
-        showNotification,
-        updateUnreadTab,
-        auth,
-        comIds,
-    ]);
+    }, [dispatch, showNotification, updateUnreadTab, auth, comIds]);
 
     useEffect(() => {
         if (auth) {

@@ -174,7 +174,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 const response = await api.post("postreply", {
                     reply,
                     post_id: post.id,
-                    schannel: post.schannel,
                 });
                 dispatch(actionChannel.handleReplyPost(response.data));
                 // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
@@ -203,7 +202,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 const response = await api.post("postreaction", {
                     reaction: emojiData.emoji,
                     post_id: post.id,
-                    schannel: post.schannel,
                 });
                 dispatch(actionChannel.handleAddREACTION(response.data));
                 // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
@@ -223,7 +221,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     const response = await api.post("postreaction/toggle", {
                         reaction: reaction.reaction,
                         post_id: post.id,
-                        schannel: post.schannel,
                     });
                     dispatch(actionChannel.handleRemoveREACTION(response.data));
                 } catch (error) {
@@ -237,7 +234,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     const response = await api.post("postreaction", {
                         reaction: reaction.reaction,
                         post_id: post.id,
-                        schannel: post.schannel,
                     });
                     dispatch(actionChannel.handleAddREACTION(response.data));
                 } catch (error) {

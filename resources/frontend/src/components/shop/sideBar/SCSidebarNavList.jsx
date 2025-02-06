@@ -6,7 +6,6 @@ import clsx from "clsx";
 
 const SCSidebarNavList = (props) => {
     const classes = useStyles();
-    const { schannels, handleClearSChannels } = useCommunity();
     const icon = props.data.icon && <i className={props.data.icon} />;
     const titlesub = props.data.title && (
         <p>
@@ -15,10 +14,7 @@ const SCSidebarNavList = (props) => {
     );
     const title = props.data.title && <p>{props.data.title}</p>;
 
-    const count = useMemo(
-        () => schannels[props.data.id] || 0,
-        [schannels, props]
-    );
+    const count = 0;
 
     const [isMenuExtended, setIsMenuExtended] = useState(false);
     const [isExpandable, setIsExpandable] = useState(false);
@@ -34,10 +30,7 @@ const SCSidebarNavList = (props) => {
         setIsMenuExtended(!isMenuExtended);
     };
 
-    const handleClick = () => {
-        if (schannels[props.data.id] && schannels[props.data.id] > 0)
-            handleClearSChannels(props.data.id);
-    };
+    const handleClick = () => {};
 
     useEffect(() => {
         setIsExpandable(
@@ -49,7 +42,7 @@ const SCSidebarNavList = (props) => {
 
     return (
         <Route
-            path={`/schannel/${props.data.id}`}
+            path={`/channels/${props.data.id}`}
             exact={props.data.exact}
             children={({ match }) => (
                 <>
@@ -64,7 +57,7 @@ const SCSidebarNavList = (props) => {
                     >
                         {props.data.children ? (
                             <Link
-                                to={`/schannel/${props.data.id}`}
+                                to={`/channels/${props.data.id}`}
                                 className="nav-link nav-link-font"
                                 onClick={handleMainMenuAction}
                                 style={{ cursor: "pointer" }}
@@ -73,7 +66,7 @@ const SCSidebarNavList = (props) => {
                             </Link>
                         ) : props.data.navheader !== true ? (
                             <Link
-                                to={`/schannel/${props.data.id}`}
+                                to={`/channels/${props.data.id}`}
                                 className="nav-link nav-link-font"
                                 onClick={handleMainMenuAction}
                                 style={{ cursor: "pointer" }}

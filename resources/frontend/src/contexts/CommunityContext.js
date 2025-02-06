@@ -7,15 +7,6 @@ export const CommunityProvider = ({ children }) => {
     const [preSetCommunityName, setPreSetCommunityName] = useState("");
     const [showChannelEditor, setShowChannelEditor] = useState(false);
     const [preSetCommunityId, setPreSetCommunityId] = useState(0);
-    const [schannels, setSchannels] = useState({})
-
-    const handleAddSChannels = useCallback((id) => {
-        if (schannels[id] && Number.isInteger(schannels[id])) setSchannels({ ...schannels, [id]: schannels[id] + 1 })
-        else setSchannels({ ...schannels, [id]: 1 })
-    }, [schannels])
-    const handleClearSChannels = useCallback((id) => {
-        if (schannels[id] && Number.isInteger(schannels[id])) setSchannels({ ...schannels, [id]: 0 })
-    }, [schannels])
 
     return (
         <CommunityContext.Provider
@@ -28,10 +19,6 @@ export const CommunityProvider = ({ children }) => {
                 setShowChannelEditor,
                 preSetCommunityId,
                 setPreSetCommunityId,
-                schannels,
-                setSchannels,
-                handleAddSChannels,
-                handleClearSChannels
             }}
         >
             {children}

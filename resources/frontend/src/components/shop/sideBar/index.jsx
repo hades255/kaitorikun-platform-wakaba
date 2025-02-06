@@ -141,9 +141,19 @@ const Sidebar = (props) => {
                             role="menu"
                             data-accordion="false"
                         >
+                            <Route
+                                children={({ match }) => (
+                                    <SCSidebarNavList
+                                        data={{
+                                            navheader: true,
+                                            title: "生駒OOOOOOOO店",
+                                        }}
+                                    />
+                                )}
+                            />
                             {menu4.map((menu, i) => (
                                 <Route
-                                    path={`/schannel/${menu.id}`}
+                                    path={`/channels/${menu.id}`}
                                     exact={menu.exact}
                                     key={i}
                                     children={({ match }) => (
@@ -160,7 +170,7 @@ const Sidebar = (props) => {
                         >
                             {menu5.map((menu, i) => (
                                 <Route
-                                    path={`/schannel/${menu.id}`}
+                                    path={`/channels/${menu.id}`}
                                     exact={menu.exact}
                                     key={i}
                                     children={({ match }) => (
@@ -177,7 +187,7 @@ const Sidebar = (props) => {
                         >
                             {menu6.map((menu, i) => (
                                 <Route
-                                    path={`/schannel/${menu.id}`}
+                                    path={`/channels/${menu.id}`}
                                     exact={menu.exact}
                                     key={i}
                                     children={({ match }) => (

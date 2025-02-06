@@ -14,7 +14,6 @@ import CalendarPageTest from "../../pages/calendar/Calendar";
 import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
 import PurchaseRegister from "../../pages/purchase-manage/register";
 import PurchaseList from "../../pages/purchase-manage/list";
-import SChannel from "../../pages/schannel";
 
 const MenuRoutes = [
     {
@@ -128,10 +127,10 @@ const MenuRoutes = [
     },
     /** channel&chat end */
     {
-        path: "/schannel/:id",
+        path: "/channels/:id",
         exact: true,
         title: "チャネル",
-        component: () => <SChannel />,
+        component: () => <Communities />,
     },
     {
         path: "/accept-invitation",

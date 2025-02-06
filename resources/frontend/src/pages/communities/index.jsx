@@ -384,7 +384,7 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
                             alt={community.name}
                             src={community.icon}
                             variant="rounded"
-                            sx={{ color: "black", width: 48, height: 48 }}
+                            sx={{ color: "black", width: 32, height: 32 }}
                         />
                         <Typography variant="h5" color="black">
                             {community.name}

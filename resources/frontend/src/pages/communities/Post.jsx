@@ -348,6 +348,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                                 ref={pickerRef}
                             >
                                 <EmojiPicker
+                                    searchPlaceholder="検索"
                                     onEmojiClick={handleNewEmojiClick}
                                 />
                             </Box>

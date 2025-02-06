@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewPost;
+use App\Jobs\DeletePostJob;
 use App\Jobs\NewPostJob;
 use App\Models\CommunityUser;
 use App\Models\Post;
@@ -118,6 +119,7 @@ class PostController extends Controller
         $post->replies()->delete();
         // Reaction::whereIn('id', $request->reactionIds)->delete();
         // Reply::whereIn('id', $request->replyIds)->delete();
+        DeletePostJob::dispatch(["id" => $post->id, "user_id" => $post->user_id, "community_id" => $post->community_id], Auth::user()->name, $post->schannel);
         $post->delete();
         return response()->noContent();
     }

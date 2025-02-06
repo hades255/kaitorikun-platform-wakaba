@@ -74,7 +74,17 @@ const Notifications = () => {
                 }
             }
         };
-
+        const handleDeletePost = (data) => {
+            if (
+                data &&
+                data.post &&
+                auth?.id != data.post.user_id &&
+                (comIds?.includes(Number(data.post.community_id)) ||
+                    data.schannel)
+            ) {
+                dispatch(actionChannel.handleRemovePost(data.post.id));
+            }
+        };
         const handleNewChat = (data) => {
             if (
                 auth &&
@@ -95,7 +105,7 @@ const Notifications = () => {
         // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
         channel.listen(".channel.post.created", handlePostCreated);
-
+        channel.listen(".channel.post.deleted", handleDeletePost);
         channel.listen(".channel.chat.created", handleNewChat);
 
         return () => {
@@ -103,7 +113,7 @@ const Notifications = () => {
                 // channel.stopListening(".channel.community.created");
                 channel.stopListening(".channel.created");
                 channel.stopListening(".channel.post.created");
-
+                channel.stopListening(".channel.post.deleted");
                 channel.stopListening(".channel.chat.created");
             }
         };

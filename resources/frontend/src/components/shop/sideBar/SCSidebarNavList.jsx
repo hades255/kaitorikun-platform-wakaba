@@ -124,8 +124,8 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 16,
-        backgroundColor: "red",
+        backgroundColor: "#FFA",
         fontSize: 12,
-        color: "white",
+        color: "#333",
     },
 }));

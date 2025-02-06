@@ -25,7 +25,7 @@ const ChannelSidebar = ({ page = true }) => {
                             path: "#",
                             title: cha.name,
                             icon: null,
-                            children: cha.children,
+                            type: "cha",
                         });
                     });
                 }
@@ -34,6 +34,7 @@ const ChannelSidebar = ({ page = true }) => {
                     path: "#",
                     title: item.name,
                     icon: item.icon,
+                    type: "com",
                     children,
                 });
             });
@@ -57,7 +58,7 @@ const ChannelSidebar = ({ page = true }) => {
     return (
         <>
             {page && (
-                <Box sx={{ px: 2, py: 1 }}>
+                <Box sx={{ px: 1, py: 1 }}>
                     <AddNewCommunityButton />
                 </Box>
             )}

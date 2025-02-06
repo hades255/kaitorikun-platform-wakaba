@@ -15,9 +15,15 @@ const Notifications = () => {
     // const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
     const [comIds, setComIds] = useState([]);
+    const [scomIds, setSComIds] = useState([]);
 
     useEffect(() => {
         setComIds(Array.isArray(coms) ? coms.map(({ id }) => id) : []);
+        setSComIds(
+            Array.isArray(coms)
+                ? coms.filter(({ type }) => type).map(({ id }) => id)
+                : []
+        );
     }, [coms]);
 
     // useEffect(() => {
@@ -43,12 +49,23 @@ const Notifications = () => {
                 comIds?.includes(Number(data.channel.community_id))
             ) {
                 if (auth?.id != data.channel.user_id) {
-                    updateUnreadTab("com", true);
-                    dispatch(actionChannel.handleAddChannel(data.channel));
                     if (data.name)
                         showNotification("新しいチャンネル", {
                             message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
                         });
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.channel.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(actionChannel.handleAddChannel(data.channel));
+                    if (scomIds?.includes(Number(data.channel.community_id)))
+                        updateUnreadTab("scom", {
+                            com: data.channel.community_id,
+                            cha: data.channel.id,
+                        });
+                    else updateUnreadTab("com", true);
                 }
             }
         };
@@ -66,7 +83,12 @@ const Notifications = () => {
                         })
                     );
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
-                    updateUnreadTab("com", true);
+                    if (scomIds?.includes(Number(data.post.community_id)))
+                        updateUnreadTab("scom", {
+                            com: data.post.community_id,
+                            cha: data.post.channel_id,
+                        });
+                    else updateUnreadTab("com", true);
                 }
             }
         };
@@ -112,7 +134,7 @@ const Notifications = () => {
                 channel.stopListening(".channel.chat.created");
             }
         };
-    }, [dispatch, showNotification, updateUnreadTab, auth, comIds]);
+    }, [dispatch, showNotification, updateUnreadTab, auth, comIds, scomIds]);
 
     useEffect(() => {
         if (auth) {

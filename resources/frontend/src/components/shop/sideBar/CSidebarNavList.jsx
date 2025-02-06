@@ -5,12 +5,19 @@ import clsx from "clsx";
 import { Avatar } from "@mui/material";
 import { stringAvatar } from "../../helper/func";
 import { useCommunity } from "../../../contexts/CommunityContext";
+import { useNotification } from "../../../contexts/NotificationContext";
 
 const CSidebarNavList = (props) => {
+    const dataId = props.data.id;
     const classes = useStyles();
+    const { unreadTab, clearScomUnreadTab } = useNotification();
     const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
 
-    const count = 0;
+    const count = Array.isArray(unreadTab.scom)
+        ? props.data.type == "com"
+            ? unreadTab.scom.filter(({ com }) => com == dataId).length
+            : unreadTab.scom.filter(({ cha }) => cha == dataId).length
+        : 0;
 
     const [isMenuExtended, setIsMenuExtended] = useState(false);
 
@@ -20,12 +27,13 @@ const CSidebarNavList = (props) => {
 
     const handleMainSubMenuAction = useCallback(() => {
         setShowChannelEditor(false);
-    }, [setShowChannelEditor]);
+        clearScomUnreadTab("cha", dataId);
+    }, [setShowChannelEditor, clearScomUnreadTab, dataId]);
 
     const handleClickNew = useCallback(() => {
-        setPreSetCommunityId(props.data.id);
+        setPreSetCommunityId(dataId);
         setShowChannelEditor(true);
-    }, [setPreSetCommunityId, setShowChannelEditor, props]);
+    }, [setPreSetCommunityId, setShowChannelEditor, dataId]);
 
     return (
         <li
@@ -33,7 +41,7 @@ const CSidebarNavList = (props) => {
                 "menu-open": isMenuExtended,
             })}
         >
-            {props.data.children ? (
+            {props.data.type == "com" ? (
                 <div
                     className={clsx("nav-link nav-link-font", classes.menuItem)}
                     onClick={handleMainMenuAction}
@@ -57,7 +65,7 @@ const CSidebarNavList = (props) => {
                 </div>
             ) : (
                 <Link
-                    to={`/${props.path}/${props.data.id}`}
+                    to={`/${props.path}/${dataId}`}
                     className={clsx("nav-link nav-link-font", classes.menuItem)}
                     onClick={handleMainSubMenuAction}
                 >
@@ -70,7 +78,8 @@ const CSidebarNavList = (props) => {
             )}
             {isMenuExtended && (
                 <ul className="nav nav-treeview">
-                    {props.data.children &&
+                    {props.data.type == "com" &&
+                        props.data.children &&
                         props.data.children.map((submenu, i) => (
                             <CSidebarNavList
                                 data={submenu}
@@ -108,8 +117,8 @@ const useStyles = makeStyles((theme) => ({
     },
     countBox: {
         position: "absolute",
-        top: 8,
-        right: 8,
+        top: 10,
+        right: 32,
         width: 16,
         minWidth: 16,
         height: 16,

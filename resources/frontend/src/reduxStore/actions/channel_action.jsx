@@ -14,6 +14,7 @@ export const NEW_PUBLIC_COMMUNITY = "@CHANNELS/NEW_PUBLIC_COMMUNITY";
 export const SET_COMMUNITY_AS_MINE = "@CHANNELS/SET_COMMUNITY_AS_MINE";
 export const REMOVE_POST = "@CHANNELS/REMOVE_POST";
 export const EDIT_POST = "@CHANNELS/EDIT_POST";
+export const ADD_USER = "@CHANNELS/ADD_USER";
 
 export const handler = (data, action) => (dispatch) => {
     dispatch({
@@ -42,6 +43,7 @@ const handleAddPublicCommunity = (data) => handler(data, NEW_PUBLIC_COMMUNITY);
 const handleSetMyCommunity = (data) => handler(data, SET_COMMUNITY_AS_MINE);
 const handleRemovePost = (data) => handler(data, REMOVE_POST);
 const handlePostEdited = (data) => handler(data, EDIT_POST);
+const handleAddUser = (data) => handler(data, ADD_USER);
 
 const actionChannel = {
     handleSetChannel,
@@ -60,5 +62,6 @@ const actionChannel = {
     handleSetMyCommunity,
     handleRemovePost,
     handlePostEdited,
+    handleAddUser,
 };
 export { actionChannel };

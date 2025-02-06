@@ -61,6 +61,12 @@ const Notifications = () => {
                         showNotification("新しい投稿", {
                             message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                         });
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.post.user_id,
+                            name: data.name,
+                        })
+                    );
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
                     updateUnreadTab("com", true);
                 } else if (data.schannel) {
@@ -69,6 +75,12 @@ const Notifications = () => {
                             message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                         });
                     updateUnreadTab("todo", true);
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.post.user_id,
+                            name: data.name,
+                        })
+                    );
                     dispatch(actionChannel.handleAddPostToChannel(data.post));
                     handleAddSChannels(data.schannel);
                 }

@@ -65,6 +65,12 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 data.reply.post_id == postId &&
                 authId != data.reply.user_id
             ) {
+                dispatch(
+                    actionChannel.handleAddUser({
+                        id: data.reply.user_id,
+                        name: data.name,
+                    })
+                );
                 dispatch(actionChannel.handleReplyPost(data.reply));
             }
         };
@@ -75,6 +81,12 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 data.reaction.post_id == postId &&
                 authId != data.reaction.user_id
             ) {
+                dispatch(
+                    actionChannel.handleAddUser({
+                        id: data.reaction.user_id,
+                        name: data.name,
+                    })
+                );
                 dispatch(actionChannel.handleAddREACTION(data.reaction));
             }
         };

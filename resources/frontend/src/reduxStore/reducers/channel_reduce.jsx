@@ -1,5 +1,6 @@
 import {
     ADD_REACTION,
+    ADD_USER,
     EDIT_POST,
     NEW_CHANNEL,
     NEW_COMMUNITY,
@@ -30,6 +31,13 @@ const initialState = {
 const channels = (state = initialState, actions) => {
     const data = actions.payload?.data;
     switch (actions.type) {
+        case ADD_USER:
+            return {
+                ...state,
+                users: state.users.find((user) => user.id == data.id)
+                    ? state.users
+                    : [...state.users, data],
+            };
         case SET_COMMUNITY:
             return {
                 ...state,
@@ -63,7 +71,6 @@ const channels = (state = initialState, actions) => {
         case NEW_CHANNEL:
             return {
                 ...state,
-                // channels: [...state.channels, data],
                 communities: state.communities?.map((item) => ({
                     ...item,
                     channels:

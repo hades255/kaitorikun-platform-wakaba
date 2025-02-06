@@ -27,6 +27,7 @@ import {
     useDispatch,
     useSelector,
 } from "../../components";
+import { useAuth } from "../../contexts/AuthContext";
 
 const theme = createTheme();
 const menus = [...menu4, ...menu5, ...menu6];
@@ -34,6 +35,7 @@ const menus = [...menu4, ...menu5, ...menu6];
 const SChannel = ({ match, history }) => {
     const dispatch = useDispatch();
     const classes = useStyles();
+    const { auth } = useAuth();
 
     const schannelId = match.params.id;
     const menu = menus.find((item) => item.id == schannelId);
@@ -56,11 +58,12 @@ const SChannel = ({ match, history }) => {
                         users: response.data.users,
                     })
                 );
+                dispatch(actionChannel.handleAddUser(auth));
             } catch (error) {
                 console.log(error);
             }
         },
-        [dispatch]
+        [dispatch, auth]
     );
 
     const handleCreatePost = useCallback(

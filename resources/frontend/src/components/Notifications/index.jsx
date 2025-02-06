@@ -74,59 +74,6 @@ const Notifications = () => {
                 }
             }
         };
-        const handleReplyToPost = (data) => {
-            if (data && data.reply && auth?.id != data.reply.user_id) {
-                // if (data.schannel) {
-                //     if (data.name)
-                //         showNotification("返信", {
-                //             message: `${data.name} さんが投稿に返信しました`,
-                //         });
-                //     updateUnreadTab("todo", true);
-                // } else updateUnreadTab("com", true);
-                dispatch(actionChannel.handleReplyPost(data.reply));
-            }
-        };
-        const handleAddReactionToPost = (data) => {
-            if (data && data.reaction && auth?.id != data.reaction.user_id) {
-                // if (data.schannel) {
-                //     if (data.name)
-                //         showNotification("リアクションを設定しました", {
-                //             message: `${data.name} さんが投稿にリアクションを設定しました`,
-                //         });
-                //     updateUnreadTab("todo", true);
-                // } else updateUnreadTab("com", true);
-                dispatch(actionChannel.handleAddREACTION(data.reaction));
-            }
-        };
-        const handleRemoveReactFromPost = (data) => {
-            if (data && data.reaction && auth?.id != data.reaction.user_id) {
-                // if (data.schannel) {
-                //     if (data.name)
-                //         showNotification("リアクションを削除しました", {
-                //             message: `${data.name} さんが投稿からリアクションを削除しました`,
-                //         });
-                //     updateUnreadTab("todo", true);
-                // } else updateUnreadTab("com", true);
-                dispatch(actionChannel.handleRemoveREACTION(data.reaction));
-            }
-        };
-        // const handleCommunityCreated = (data) => {
-        //     if (data && data.community && data.channel) {
-        //         if (auth?.id != data.community.user_id) {
-        //             updateUnreadTab("com", true);
-        //             dispatch(
-        //                 actionChannel.handleAddPublicCommunity({
-        //                     ...data.community,
-        //                     channels: [data.channel],
-        //                 })
-        //             );
-        //             if (data.name)
-        //                 showNotification("新しいコミュニティ", {
-        //                     message: `${data.name} が新しいコミュニティを作成しました.\n${data.community.name}`,
-        //                 });
-        //         }
-        //     }
-        // };
 
         const handleNewChat = (data) => {
             if (
@@ -148,15 +95,6 @@ const Notifications = () => {
         // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
         channel.listen(".channel.post.created", handlePostCreated);
-        // channel.listen(".channel.post.reply", handleReplyToPost);
-        // channel.listen(
-        //     ".channel.post.reaction.created",
-        //     handleAddReactionToPost
-        // );
-        // channel.listen(
-        //     ".channel.post.reaction.deleted",
-        //     handleRemoveReactFromPost
-        // );
 
         channel.listen(".channel.chat.created", handleNewChat);
 
@@ -165,9 +103,6 @@ const Notifications = () => {
                 // channel.stopListening(".channel.community.created");
                 channel.stopListening(".channel.created");
                 channel.stopListening(".channel.post.created");
-                // channel.stopListening(".channel.post.reply");
-                // channel.stopListening(".channel.post.reaction.created");
-                // channel.stopListening(".channel.post.reaction.deleted");
 
                 channel.stopListening(".channel.chat.created");
             }

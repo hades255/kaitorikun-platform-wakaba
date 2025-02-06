@@ -5,6 +5,7 @@ import {
     NEW_POST,
     NEW_PUBLIC_CHANNEL,
     NEW_PUBLIC_COMMUNITY,
+    REMOVE_POST,
     REMOVE_REACTION,
     REPLY_POST,
     SELECT_CHANNEL,
@@ -94,6 +95,11 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 posts: [data, ...state.posts],
+            };
+        case REMOVE_POST:
+            return {
+                ...state,
+                posts: state.posts.filter(({ id }) => id != data),
             };
         case REPLY_POST:
             return {

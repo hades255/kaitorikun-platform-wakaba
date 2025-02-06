@@ -1,17 +1,18 @@
-export const SET_CHANNEL = "SET_CHANNEL";
-export const SET_PUBLIC_CHANNEL = "SET_PUBLIC_CHANNEL";
-export const NEW_CHANNEL = "NEW_CHANNEL";
-export const NEW_PUBLIC_CHANNEL = "NEW_PUBLIC_CHANNEL";
-export const SELECT_CHANNEL = "SELECT_CHANNEL";
-export const NEW_POST = "NEW_POST";
-export const REPLY_POST = "REPLY_POST";
-export const ADD_REACTION = "ADD_REACTION";
-export const REMOVE_REACTION = "REMOVE_REACTION";
-export const SET_COMMUNITY = "SET_COMMUNITY";
-export const SET_PUBLIC_COMMUNITY = "SET_PUBLIC_COMMUNITY";
-export const NEW_COMMUNITY = "NEW_COMMUNITY";
-export const NEW_PUBLIC_COMMUNITY = "NEW_PUBLIC_COMMUNITY";
-export const SET_COMMUNITY_AS_MINE = "SET_COMMUNITY_AS_MINE";
+export const SET_CHANNEL = "@CHANNELS/SET_CHANNEL";
+export const SET_PUBLIC_CHANNEL = "@CHANNELS/SET_PUBLIC_CHANNEL";
+export const NEW_CHANNEL = "@CHANNELS/NEW_CHANNEL";
+export const NEW_PUBLIC_CHANNEL = "@CHANNELS/NEW_PUBLIC_CHANNEL";
+export const SELECT_CHANNEL = "@CHANNELS/SELECT_CHANNEL";
+export const NEW_POST = "@CHANNELS/NEW_POST";
+export const REPLY_POST = "@CHANNELS/REPLY_POST";
+export const ADD_REACTION = "@CHANNELS/ADD_REACTION";
+export const REMOVE_REACTION = "@CHANNELS/REMOVE_REACTION";
+export const SET_COMMUNITY = "@CHANNELS/SET_COMMUNITY";
+export const SET_PUBLIC_COMMUNITY = "@CHANNELS/SET_PUBLIC_COMMUNITY";
+export const NEW_COMMUNITY = "@CHANNELS/NEW_COMMUNITY";
+export const NEW_PUBLIC_COMMUNITY = "@CHANNELS/NEW_PUBLIC_COMMUNITY";
+export const SET_COMMUNITY_AS_MINE = "@CHANNELS/SET_COMMUNITY_AS_MINE";
+export const REMOVE_POST = "@CHANNELS/REMOVE_POST";
 
 export const handler = (data, action) => (dispatch) => {
     dispatch({
@@ -38,6 +39,7 @@ const handleAddCommunity = (data) => handler(data, NEW_COMMUNITY);
 const handleAddPublicCommunity = (data) => handler(data, NEW_PUBLIC_COMMUNITY);
 
 const handleSetMyCommunity = (data) => handler(data, SET_COMMUNITY_AS_MINE);
+const handleRemovePost = (data) => handler(data, REMOVE_POST);
 
 const actionChannel = {
     handleSetChannel,
@@ -54,5 +56,6 @@ const actionChannel = {
     handleAddCommunity,
     handleAddPublicCommunity,
     handleSetMyCommunity,
+    handleRemovePost,
 };
 export { actionChannel };

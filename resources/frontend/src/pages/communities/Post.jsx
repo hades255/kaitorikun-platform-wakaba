@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import EmojiPicker from "emoji-picker-react";
-import { formatDistanceToNow } from "date-fns";
 import {
     Card,
     CardContent,
@@ -13,9 +12,17 @@ import {
     Badge,
     Chip,
     Popover,
+    ButtonGroup,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import MoodIcon from "@mui/icons-material/Mood";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
@@ -33,12 +40,14 @@ const Post = ({ post, users, channel }) => {
     const { auth } = useAuth();
     const pickerRef = useRef(null);
     const postId = post?.id;
+    const creatorId = post?.user_id;
     const authId = auth?.id;
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
     const [reply, setReply] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [reactions, setReactions] = useState([]);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
     const handleClickOutside = (event) => {
         if (pickerRef.current && !pickerRef.current.contains(event.target)) {
@@ -235,102 +244,176 @@ const Post = ({ post, users, channel }) => {
         }
     };
 
+    const handleClickOpenDeleteModal = useCallback(() => {
+        setOpenDeleteModal(true);
+    }, []);
+
+    const handleCloseDeleteModal = useCallback(() => {
+        setOpenDeleteModal(false);
+    }, []);
+
+    const handleAcceptDeleteModal = useCallback(async () => {
+        try {
+            const postId = post.id;
+            const response = await api.delete("posts/" + postId);
+            dispatch(actionChannel.handleRemovePost(postId));
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+        setOpenDeleteModal(false);
+    }, [dispatch, postId]);
+
     return (
-        <Card sx={{ mb: 2 }}>
-            <CardContent>
-                <Box display={"flex"} alignItems={"center"} gap={1}>
+        <>
+            <Card sx={{ mb: 2 }}>
+                <CardContent>
                     <Box
-                        height={32}
-                        width={8}
-                        borderRadius={2}
-                        bgcolor={"#4a55aa"}
-                    ></Box>
-                    <Creator creature={post} users={users} />
-                    {channel?.user_id == post?.user_id && (
-                        <Chip
-                            variant="outlined"
-                            color="secondary"
-                            size="small"
-                            label="所有者"
-                            icon={<WorkspacePremiumIcon />}
-                        />
-                    )}
-                    <Typography variant="subtitle1">
-                        {moment(post.created_at).fromNow()}
-                    </Typography>
-                </Box>
-                <Typography variant="h6">{post.title}</Typography>
-                <Typography variant="subtitle1" color="text.secondary">
-                    {post.subject}
-                </Typography>
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                <Box display={"flex"} alignItems={"center"} gap={1}>
-                    {Array.isArray(reactions) &&
-                        reactions?.map((item) => (
-                            <EmojiItem
-                                key={item.reaction}
-                                reaction={item}
-                                users={users}
-                                onClick={handleEmojiClick}
-                            />
-                        ))}
-                    <IconButton
-                        color="primary"
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        display={"flex"}
+                        alignItems={"center"}
+                        justifyContent={"space-between"}
+                        gap={4}
                     >
-                        <MoodIcon />
-                        <AddIcon />
-                    </IconButton>
-                    {showEmojiPicker && (
-                        <Box
-                            sx={{ position: "absolute", zIndex: 1 }}
-                            ref={pickerRef}
-                        >
-                            <EmojiPicker onEmojiClick={handleNewEmojiClick} />
+                        <Box display={"flex"} alignItems={"center"} gap={1}>
+                            <Box
+                                height={32}
+                                width={8}
+                                borderRadius={2}
+                                bgcolor={"#4a55aa"}
+                            ></Box>
+                            <Creator creature={post} users={users} />
+                            {channel?.user_id == post?.user_id && (
+                                <Chip
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    label="所有者"
+                                    icon={<WorkspacePremiumIcon />}
+                                />
+                            )}
+                            <Typography
+                                variant="subtitle1"
+                                fontSize={14}
+                                color="text.secondary"
+                            >
+                                {moment(post.created_at).fromNow()}
+                            </Typography>
                         </Box>
-                    )}
-                </Box>
-                <Box>
-                    <Button onClick={() => setShowReplyInput(!showReplyInput)}>
-                        {/* Reply */}返信
-                    </Button>
-                    <Button onClick={() => setShowReplies(!showReplies)}>
-                        {showReplies ? "会話を非表示" : "会話を表示"}{" "}
-                        {post.replies &&
-                            Array.isArray(post.replies) &&
-                            post.replies.length > 0 &&
-                            `(${post.replies.length} 返信)`}
-                    </Button>
-                </Box>
-                {showReplyInput && (
-                    <Box sx={{ mt: 2 }}>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={2}
-                            value={reply}
-                            onChange={(e) => setReply(e.target.value)}
-                            sx={{ mb: 1 }}
-                        />
-                        <Button variant="contained" onClick={handleReply}>
-                            {/* Send Reply */}返信を送信
-                        </Button>
+                        {creatorId == authId && (
+                            <ButtonGroup
+                                variant="text"
+                                aria-label="post options"
+                            >
+                                <IconButton color="primary">
+                                    <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleClickOpenDeleteModal}
+                                >
+                                    <DeleteOutlineIcon />
+                                </IconButton>
+                            </ButtonGroup>
+                        )}
                     </Box>
-                )}
-                {showReplies && (
-                    <Box display="flex" flexDirection="column" gap={2}>
-                        {Array.isArray(post.replies) &&
-                            post.replies?.map((item) => (
-                                <ReplyItem
-                                    key={item.id}
-                                    reply={item}
+                    <Typography variant="h6">{post.title}</Typography>
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {post.subject}
+                    </Typography>
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                    <Box display={"flex"} alignItems={"center"} gap={1}>
+                        {Array.isArray(reactions) &&
+                            reactions?.map((item) => (
+                                <EmojiItem
+                                    key={item.reaction}
+                                    reaction={item}
                                     users={users}
+                                    onClick={handleEmojiClick}
                                 />
                             ))}
+                        <IconButton
+                            color="primary"
+                            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        >
+                            <MoodIcon />
+                            <AddIcon />
+                        </IconButton>
+                        {showEmojiPicker && (
+                            <Box
+                                sx={{ position: "absolute", zIndex: 1 }}
+                                ref={pickerRef}
+                            >
+                                <EmojiPicker
+                                    onEmojiClick={handleNewEmojiClick}
+                                />
+                            </Box>
+                        )}
                     </Box>
-                )}
-            </CardContent>
-        </Card>
+                    <Box>
+                        <Button
+                            onClick={() => setShowReplyInput(!showReplyInput)}
+                        >
+                            {/* Reply */}返信
+                        </Button>
+                        <Button onClick={() => setShowReplies(!showReplies)}>
+                            {showReplies ? "会話を非表示" : "会話を表示"}{" "}
+                            {post.replies &&
+                                Array.isArray(post.replies) &&
+                                post.replies.length > 0 &&
+                                `(${post.replies.length} 返信)`}
+                        </Button>
+                    </Box>
+                    {showReplyInput && (
+                        <Box sx={{ mt: 2 }}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                value={reply}
+                                onChange={(e) => setReply(e.target.value)}
+                                sx={{ mb: 1 }}
+                            />
+                            <Button variant="contained" onClick={handleReply}>
+                                {/* Send Reply */}返信を送信
+                            </Button>
+                        </Box>
+                    )}
+                    {showReplies && (
+                        <Box display="flex" flexDirection="column" gap={2}>
+                            {Array.isArray(post.replies) &&
+                                post.replies?.map((item) => (
+                                    <ReplyItem
+                                        key={item.id}
+                                        reply={item}
+                                        users={users}
+                                    />
+                                ))}
+                        </Box>
+                    )}
+                </CardContent>
+            </Card>
+            <Dialog
+                open={openDeleteModal}
+                onClose={handleCloseDeleteModal}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    本当にこの投稿を削除しますか?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {post.title}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteModal}>反対</Button>
+                    <Button onClick={handleAcceptDeleteModal} autoFocus>
+                        賛成
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 };
 

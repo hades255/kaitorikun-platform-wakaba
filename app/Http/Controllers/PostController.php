@@ -106,8 +106,19 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
-        //
+        // $request->validate([
+        //     'reactionIds' => 'array',
+        //     'reactionIds.*' => 'integer|exists:reactions,id',
+        //     'replyIds' => 'array',
+        //     'replyIds.*' => 'integer|exists:replies,id',
+        // ]);
+        $post->reactions()->delete();
+        $post->replies()->delete();
+        // Reaction::whereIn('id', $request->reactionIds)->delete();
+        // Reply::whereIn('id', $request->replyIds)->delete();
+        $post->delete();
+        return response()->noContent();
     }
 }

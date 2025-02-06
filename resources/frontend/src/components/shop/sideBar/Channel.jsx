@@ -108,7 +108,7 @@ const CommunityItem = ({ com }) => {
             >
                 <ListItemAvatar>
                     <Avatar
-                        sx={{ color: "black", width: 48, height: 48 }}
+                        sx={{ color: "black", width: 32, height: 32 }}
                         alt={com.name}
                         src={com.icon}
                         variant="rounded"
@@ -168,7 +168,7 @@ const ChannelItem = ({ channel, active, handleClickChannel }) => {
             }}
         >
             <ListItemAvatar>
-                <Avatar variant="rounded" sx={{ color: "black" }}>
+                <Avatar sx={{width: 32, height: 32, color: "black"}} variant="rounded">
                     {channel.name[0]}
                 </Avatar>
             </ListItemAvatar>

@@ -270,6 +270,8 @@ const Post = ({ post, users, channel }) => {
         }
     }, [dispatch, postId]);
 
+    const handleClickEditPost = useCallback(() => {}, []);
+
     return (
         <>
             <Card sx={{ mb: 2 }}>
@@ -310,7 +312,10 @@ const Post = ({ post, users, channel }) => {
                                 variant="text"
                                 aria-label="post options"
                             >
-                                <IconButton color="primary">
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleClickEditPost}
+                                >
                                     <EditIcon />
                                 </IconButton>
                                 <IconButton

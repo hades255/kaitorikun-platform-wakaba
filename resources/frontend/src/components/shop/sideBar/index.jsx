@@ -3,18 +3,15 @@ import { withRouter } from "react-router-dom";
 import clsx from "clsx";
 import { Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { useNotification } from "../../../contexts/NotificationContext";
 import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
 import menu2 from "./menu2";
 import menu3 from "./menu3";
-import menu4 from "./menu4";
-import menu5 from "./menu5";
-import menu6 from "./menu6";
 import ChatSidebar from "./Chat";
-import ChannelSidebar from "./Channel";
+import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
 import SidebarNavList from "./SidebarNavList";
-import { useNotification } from "../../../contexts/NotificationContext";
-import SCSidebarNavList from "./SCSidebarNavList";
+import CSidebarNavList from "./CSidebarNavList";
 
 const tabs = [
     {
@@ -77,7 +74,9 @@ const Sidebar = (props) => {
             </div>
             <div className="sidebar">
                 {props.history.location.pathname.includes("/communities") ? (
-                    <ChannelSidebar />
+                    <nav className={clsx("mt-2")}>
+                        <ChannelSidebar />
+                    </nav>
                 ) : props.history.location.pathname === "/chat" ? (
                     <ChatSidebar />
                 ) : props.history.location.pathname === "/calendar" ? (
@@ -141,61 +140,22 @@ const Sidebar = (props) => {
                             role="menu"
                             data-accordion="false"
                         >
-                            <Route
-                                children={({ match }) => (
-                                    <SCSidebarNavList
-                                        data={{
-                                            navheader: true,
-                                            title: "生駒OOOOOOOO店",
-                                        }}
-                                    />
-                                )}
-                            />
-                            {menu4.map((menu, i) => (
-                                <Route
-                                    path={`/channels/${menu.id}`}
-                                    exact={menu.exact}
-                                    key={i}
-                                    children={({ match }) => (
-                                        <SCSidebarNavList data={menu} key={i} />
-                                    )}
-                                />
-                            ))}
+                            <li className="nav-item">
+                                <div
+                                    className="nav-link nav-link-font"
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 4,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    <AddNewCommunityButton page={false} />
+                                    <p>生駒OOOOOOOO店</p>
+                                </div>
+                            </li>
                         </ul>
-                        <ul
-                            className="nav nav-pills nav-sidebar flex-column side-menu-separate"
-                            data-widget="treeview"
-                            role="menu"
-                            data-accordion="false"
-                        >
-                            {menu5.map((menu, i) => (
-                                <Route
-                                    path={`/channels/${menu.id}`}
-                                    exact={menu.exact}
-                                    key={i}
-                                    children={({ match }) => (
-                                        <SCSidebarNavList data={menu} key={i} />
-                                    )}
-                                />
-                            ))}
-                        </ul>
-                        <ul
-                            className="nav nav-pills nav-sidebar flex-column side-menu-separate"
-                            data-widget="treeview"
-                            role="menu"
-                            data-accordion="false"
-                        >
-                            {menu6.map((menu, i) => (
-                                <Route
-                                    path={`/channels/${menu.id}`}
-                                    exact={menu.exact}
-                                    key={i}
-                                    children={({ match }) => (
-                                        <SCSidebarNavList data={menu} key={i} />
-                                    )}
-                                />
-                            ))}
-                        </ul>
+                        <ChannelSidebar page={false} />
                     </nav>
                 )}
             </div>

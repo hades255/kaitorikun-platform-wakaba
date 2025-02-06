@@ -62,7 +62,7 @@ class ChannelController extends Controller
         // $users = $channel->community->users->select('users.id', 'users.name', 'users.email')->get();
         $users = $channel->community->users;
         // return response()->json(["chennel" => $channel, "posts" => $posts, "users" => $users]);
-        return response()->json(["posts" => $posts, "users" => $users]);
+        return response()->json(["posts" => $posts, "users" => $users, "channel" => $channel, "community" => $channel->community]);
     }
 
     // Update a specific channel 

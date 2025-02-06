@@ -41,6 +41,7 @@ class CommunityController extends Controller
                     'icon' => 'nullable|string',
                     'requireApproval' => 'required|boolean',
                     'isPublic' => 'required|boolean',
+                    'type' => 'required|boolean',
                 ]);
 
                 $community = new Community();
@@ -50,6 +51,7 @@ class CommunityController extends Controller
                 $community->icon = $validatedData['icon'] ?? null;
                 $community->requireApproval = $validatedData['requireApproval'];
                 $community->isPublic = $validatedData['isPublic'];
+                $community->type = $validatedData['type'];
                 $community->user_id = Auth::id();
                 $community->save();
 

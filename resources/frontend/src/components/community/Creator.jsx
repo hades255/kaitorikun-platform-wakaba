@@ -1,4 +1,5 @@
 import { Avatar, Box, Typography } from "@mui/material";
+import { stringAvatar } from "../helper/func";
 
 const Creator = ({ creature, users }) => {
     const user =
@@ -8,13 +9,15 @@ const Creator = ({ creature, users }) => {
     return (
         <Box display={"flex"} alignItems={"center"} gap={1}>
             <Avatar
-                alt={user?.name}
-                src={user?.icon || "avatar"}
-                sx={{
-                    color: "black",
-                    width: 36,
-                    height: 36,
-                }}
+                {...stringAvatar({
+                    name: user.name,
+                    src: user.icon,
+                    sx: {
+                        color: "black",
+                        width: 36,
+                        height: 36,
+                    },
+                })}
             />
             <Typography>{user?.name}</Typography>
         </Box>

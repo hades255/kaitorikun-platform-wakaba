@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { withRouter } from "react-router-dom";
 import {
     Avatar,
     Box,
@@ -71,7 +72,9 @@ import PostEditor from "./PostEditor";
 //     { type: "photos", title: "写真" },
 // ];
 
-const Communities = () => {
+const Communities = ({ match }) => {
+    const channelId = match.params.id;
+
     const dispatch = useDispatch();
     const channel = useSelector(selectorChannel.handleGetChannel);
     const community = useSelector(selectorChannel.handleGetCommunity);
@@ -81,16 +84,36 @@ const Communities = () => {
     const [post, setPost] = useState(null);
 
     const { auth } = useAuth();
-    const {
-        showCommunityEditor,
-        setShowCommunityEditor,
-        showChannelEditor,
-        setShowChannelEditor,
-    } = useCommunity();
 
     const [showPostEditor, setShowPostEditor] = useState(false);
     const [showInviteDialog, setShowInviteDialog] = useState(false);
     const [inviteEmail, setInviteEmail] = useState("");
+
+    const getChannel = useCallback(
+        (param) => {
+            const fetchPosts = async () => {
+                try {
+                    const response = await api.get(`channels/${param}`);
+                    dispatch(
+                        actionChannel.handleSelectChannel({
+                            community: response.data.community,
+                            channel: response.data.channel,
+                            posts: response.data.posts,
+                            users: response.data.users,
+                        })
+                    );
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            fetchPosts();
+        },
+        [dispatch]
+    );
+
+    useEffect(() => {
+        if (channelId) getChannel(channelId);
+    }, [getChannel, channelId, history]);
 
     const handleCreatePost = useCallback(
         (post, init) => {
@@ -321,28 +344,11 @@ const Communities = () => {
                     </div>
                 </Dialog>
             )}
-            {showCommunityEditor && (
-                <Dialog
-                    open={showCommunityEditor}
-                    onClose={() => setShowCommunityEditor(false)}
-                    maxWidth="md"
-                >
-                    <CreateCommunity />
-                </Dialog>
-            )}
-            {showChannelEditor && (
-                <Dialog
-                    open={showChannelEditor}
-                    onClose={() => setShowChannelEditor(false)}
-                >
-                    <CreateChannel />
-                </Dialog>
-            )}
         </PanelContent>
     );
 };
 
-export default Communities;
+export default withRouter(Communities);
 
 // const PreNamedItems = ({ community }) => {
 //     const { setShowCommunityEditor, setPreSetCommunityName } = useCommunity();
@@ -382,7 +388,7 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
                     <Box display={"flex"} alignItems={"center"} gap={2}>
                         <Avatar
                             alt={community.name}
-                            src={community.icon}
+                            src={community.icon || "avatar"}
                             variant="rounded"
                             sx={{ color: "black", width: 32, height: 32 }}
                         />

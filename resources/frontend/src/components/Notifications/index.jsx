@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
 import myEcho from "../helper/Echo";
 import { useAuth } from "../../contexts/AuthContext";
-import { useCommunity } from "../../contexts/CommunityContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";

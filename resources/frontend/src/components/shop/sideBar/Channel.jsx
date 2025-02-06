@@ -1,28 +1,45 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-    Box,
-    IconButton,
-    List,
-    ListItem,
-    ListItemText,
-    Typography,
-    Menu,
-    MenuItem,
-    Divider,
-    ListItemAvatar,
-    Avatar,
-} from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
-import { format } from "date-fns";
-import { API_ROUTE } from "../../../config";
-import api from "../../../api";
+import React, { useEffect, useMemo } from "react";
+import { Box, Dialog, Menu, MenuItem } from "@mui/material";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
-import { useDispatch, useSelector } from "../../../components";
+import { Route, useDispatch, useSelector } from "../../../components";
+import CreateCommunity from "../../community/New";
+import CreateChannel from "../../community/NewChannel";
+import CSidebarNavList from "./CSidebarNavList";
 
-const ChannelSidebar = () => {
+const ChannelSidebar = ({ page = true }) => {
     const dispatch = useDispatch();
     const communities = useSelector(selectorChannel.handleGetCommunities);
+
+    const communityItems = useMemo(() => {
+        if (communities && Array.isArray(communities)) {
+            let res = [];
+            communities.forEach((item) => {
+                if (!page && !item.type) return;
+                if (page && item.type) return;
+                let children = [];
+                if (item.channels && Array.isArray(item.channels)) {
+                    item.channels.forEach((cha) => {
+                        children.push({
+                            id: cha.id,
+                            path: "#",
+                            title: cha.name,
+                            icon: null,
+                            children: cha.children,
+                        });
+                    });
+                }
+                res.push({
+                    id: item.id,
+                    path: "#",
+                    title: item.name,
+                    icon: item.icon,
+                    children,
+                });
+            });
+            return res;
+        } else return [];
+    }, [communities, page]);
 
     useEffect(() => {
         return () => {
@@ -39,183 +56,45 @@ const ChannelSidebar = () => {
 
     return (
         <>
-            <List>
-                <AddNewButton />
-                {Array.isArray(communities) && (
-                    <>
-                        {communities.map((item, index) => (
-                            <CommunityItem key={index} com={item} />
-                        ))}
-                    </>
-                )}
-            </List>
-            {/* <PublicCommunities /> */}
-        </>
-    );
-};
-
-const CommunityItem = ({ com }) => {
-    const dispatch = useDispatch();
-    const channel = useSelector(selectorChannel.handleGetChannel);
-    const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
-    const [show, setShow] = useState(false);
-
-    const handleClick = () => {
-        if (!show) {
-            const generalCom = com.channels.find((item) => item.type == 0);
-            if (generalCom) {
-                handleClickChannel(generalCom);
-            }
-        }
-        setShow(!show);
-    };
-
-    const handleClickNew = useCallback(() => {
-        setPreSetCommunityId(com.id);
-        setShowChannelEditor(true);
-    }, [dispatch, setShowChannelEditor, setPreSetCommunityId, com, channel]);
-
-    const handleClickChannel = (param) => {
-        const fetchPosts = async () => {
-            try {
-                const response = await api.get(
-                    `${API_ROUTE}channels/${param.id}`
-                );
-                dispatch(
-                    actionChannel.handleSelectChannel({
-                        community: com,
-                        channel: param,
-                        posts: response.data.posts,
-                        users: response.data.users,
-                    })
-                );
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        fetchPosts();
-    };
-
-    return (
-        <>
-            <ListItem
-                onClick={handleClick}
-                sx={{
-                    bgcolor: "#0000",
-                    color: "white",
-                    cursor: "pointer",
-                }}
-            >
-                <ListItemAvatar>
-                    <Avatar
-                        sx={{ color: "black", width: 32, height: 32 }}
-                        alt={com.name}
-                        src={com.icon}
-                        variant="rounded"
-                    />
-                </ListItemAvatar>
-                <ListItemText
-                    primary={com.name}
-                    secondary={
-                        <Typography
-                            component="span"
-                            variant="subtitle2"
-                            sx={{ color: "white", display: "inline" }}
-                        >
-                            {format(com.created_at, "yyyy/MM/dd")}
-                        </Typography>
-                    }
-                />
-            </ListItem>
-            {show && (
-                <List>
-                    {Array.isArray(com.channels) &&
-                        com.channels.map((item) => (
-                            <ChannelItem
-                                key={item.id}
-                                channel={item}
-                                active={item.id == channel?.id}
-                                handleClickChannel={handleClickChannel}
-                            />
-                        ))}
-                    <ListItem
-                        onClick={handleClickNew}
-                        sx={{ color: "white", cursor: "pointer", pl: 4 }}
-                    >
-                        <AddIcon color="!white" />
-                        <ListItemText primary="チャンネルを作成" />
-                    </ListItem>
-                </List>
+            {page && (
+                <Box sx={{ px: 2, py: 1 }}>
+                    <AddNewCommunityButton />
+                </Box>
             )}
-            <Divider sx={{ borderColor: "#AAF4" }} />
+            <ul
+                className="nav nav-pills nav-sidebar flex-column"
+                data-widget="treeview"
+                role="menu"
+                data-accordion="false"
+            >
+                {communityItems.map((menu, i) => (
+                    <Route
+                        path={menu.path}
+                        exact={menu.exact}
+                        key={i}
+                        children={({ match }) => (
+                            <CSidebarNavList
+                                data={menu}
+                                page={page}
+                                path={page ? "communities" : "channels"}
+                                key={i}
+                            />
+                        )}
+                    />
+                ))}
+            </ul>
         </>
     );
 };
 
-const ChannelItem = ({ channel, active, handleClickChannel }) => {
-    const handleClick = () => {
-        handleClickChannel(channel);
-    };
-
-    return (
-        <ListItem
-            onClick={handleClick}
-            sx={{
-                pl: 4,
-                py: 0,
-                bgcolor: active ? "#0004" : "#0000",
-                cursor: "pointer",
-            }}
-        >
-            <ListItemAvatar>
-                <Avatar sx={{width: 32, height: 32, color: "black"}} variant="rounded">
-                    {channel.name[0]}
-                </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-                sx={{ color: "white" }}
-                primary={channel.name}
-                secondary={
-                    <Typography
-                        component="span"
-                        variant="subtitle2"
-                        sx={{ color: "white", display: "inline" }}
-                    >
-                        {format(channel.created_at, "yyyy/MM/dd")}
-                    </Typography>
-                }
-            />
-        </ListItem>
-    );
-};
-
-// const PublicCommunities = () => {
-//     const { auth } = useAuth();
-//     const communities = useSelector(selectorChannel.handleGetPublicCommunities);
-
-//     return (
-//         Array.isArray(communities) &&
-//         communities.length > 0 && (
-//             <List>
-//                 <Typography variant="p" fontSize={12} color="white" pl={2}>
-//                     公開チャンネル
-//                 </Typography>
-//                 <List>
-//                     {communities.map((item) => (
-//                         <CommunityItem key={item.id} com={item} />
-//                     ))}
-//                 </List>
-//             </List>
-//         )
-//     );
-// };
-
-const AddNewButton = () => {
+export const AddNewCommunityButton = ({ page = true }) => {
     const {
         setShowCommunityEditor,
         setPreSetCommunityName,
         setPreSetCommunityId,
         setShowChannelEditor,
+        showCommunityEditor,
+        showChannelEditor,
     } = useCommunity();
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -242,37 +121,59 @@ const AddNewButton = () => {
     };
 
     return (
-        <Box display="flex" justifyContent="flex-end" paddingX={2} paddingY={1}>
-            <IconButton
-                id="basic-button"
-                aria-controls={open ? "basic-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-                onClick={handleClick}
-                sx={{ color: "white" }}
-            >
-                <AddIcon color="!white" />
-            </IconButton>
-            <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                    "aria-labelledby": "basic-button",
-                }}
-            >
-                <MenuItem onClick={handleNewCommunity}>
-                    {/* Add Community */}コミュニティを追加
-                </MenuItem>
-                <MenuItem onClick={handleNewChannel}>
-                    {/* Add Channel */}チャンネルを追加
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                    {/* Join Community */}コミュニティに参加
-                </MenuItem>
-            </Menu>
-        </Box>
+        <>
+            <Box display="flex" justifyContent="flex-end">
+                <div
+                    id="basic-button"
+                    aria-controls={open ? "basic-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    onClick={handleClick}
+                    sx={{ color: "white" }}
+                >
+                    <i
+                        className="far fa-plus nav-icon text-white"
+                        style={{ minWidth: 24, width: 24 }}
+                    />
+                </div>
+                <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    MenuListProps={{
+                        "aria-labelledby": "basic-button",
+                    }}
+                >
+                    <MenuItem onClick={handleNewCommunity}>
+                        {/* Add Community */}コミュニティを追加
+                    </MenuItem>
+                    <MenuItem onClick={handleNewChannel}>
+                        {/* Add Channel */}チャンネルを追加
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        {/* Join Community */}コミュニティに参加
+                    </MenuItem>
+                </Menu>
+            </Box>
+            {showCommunityEditor && (
+                <Dialog
+                    open={showCommunityEditor}
+                    onClose={() => setShowCommunityEditor(false)}
+                    maxWidth="md"
+                >
+                    <CreateCommunity page={page} />
+                </Dialog>
+            )}
+            {showChannelEditor && (
+                <Dialog
+                    open={showChannelEditor}
+                    onClose={() => setShowChannelEditor(false)}
+                >
+                    <CreateChannel />
+                </Dialog>
+            )}
+        </>
     );
 };
 

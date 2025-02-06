@@ -133,6 +133,12 @@ const MenuRoutes = [
         component: () => <Communities />,
     },
     {
+        path: "/communities/:id",
+        exact: true,
+        title: "チャネル",
+        component: () => <Communities />,
+    },
+    {
         path: "/accept-invitation",
         exact: true,
         title: "招待を受け入れる",

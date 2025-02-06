@@ -16,7 +16,7 @@ import { ToastNotification, useDispatch } from "..";
 import CommunityGuideline from "./CommunityGuideline";
 import CommunityIconUrl from "./CommunityIconUrl";
 
-const CreateCommunity = () => {
+const CreateCommunity = ({ page = true }) => {
     const dispatch = useDispatch();
 
     const { preSetCommunityName, setShowCommunityEditor } = useCommunity();
@@ -35,7 +35,10 @@ const CreateCommunity = () => {
         e.preventDefault();
         const saveChannel = async () => {
             try {
-                const response = await api.post("communities", comData);
+                const response = await api.post("communities", {
+                    ...comData,
+                    type: page ? false : true,
+                });
                 ToastNotification(
                     "success",
                     "コミュニティが正常に作成されました"

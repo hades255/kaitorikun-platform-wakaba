@@ -1244,7 +1244,7 @@ let FormPurchaseRegister = (props) => {
                                                 <MenuItem value={3}>健康保険証</MenuItem>
                                                 <MenuItem value={4}>パスポート</MenuItem>
                                             </Select>
-                                            <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
+                                            <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
                                                 <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
                                                 <ImageIcon className='file-icon' />
                                             </label>
@@ -1262,7 +1262,7 @@ let FormPurchaseRegister = (props) => {
                                                     <MenuItem value={3}>健康保険証</MenuItem>
                                                     <MenuItem value={4}>パスポート</MenuItem>
                                                 </Select>
-                                                <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
+                                                <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
                                                     <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
                                                     <ImageIcon className='file-icon' />
                                                 </label>

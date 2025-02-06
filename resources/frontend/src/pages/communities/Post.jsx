@@ -153,7 +153,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
             let res_a = [];
             for (let r in res) res_a.push({ reaction: r, ...res[r] });
             setReactions(res_a);
-        }
+        } else setReactions([]);
     }, [post, auth]);
 
     const handleReply = () => {
@@ -342,9 +342,14 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                             <MoodIcon />
                             <AddIcon />
                         </IconButton>
-                        {showEmojiPicker && (
+                    </Box>
+                    <Dialog
+                        open={showEmojiPicker}
+                        onClose={() => setShowEmojiPicker(false)}
+                    >
+                        <DialogContent>
                             <Box
-                                sx={{ position: "absolute", zIndex: 1 }}
+                                sx={{ position: "sticky", zIndex: 1 }}
                                 ref={pickerRef}
                             >
                                 <EmojiPicker
@@ -352,8 +357,8 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                                     onEmojiClick={handleNewEmojiClick}
                                 />
                             </Box>
-                        )}
-                    </Box>
+                        </DialogContent>
+                    </Dialog>
                     <Box>
                         <Button
                             onClick={() => setShowReplyInput(!showReplyInput)}

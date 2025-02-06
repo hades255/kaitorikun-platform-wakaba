@@ -54,6 +54,13 @@ input {
     gap: 10px;
 }
 
+.flex-right {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    gap: 10px;
+}
+
 .staff-menu-items {
     height: 40px;
     border-bottom: solid 1px #bcb7b7;
@@ -219,6 +226,14 @@ input {
     margin-top: 35px;
 }
 
+.ml-10 {
+    margin-left: 10px;
+}
+
+.ml-20 {
+    margin-left: 20px;
+}
+
 .w-150 {
     width: 150px !important;
 }
@@ -296,8 +311,7 @@ input {
     .customer-register-container {
         display: flex;
         justify-content: flex-start;
-        ;
-        gap: 100px;
+        gap: 30px;
     }
 
     .search-container {
@@ -326,7 +340,6 @@ input {
     .customer-register-container {
         display: flex;
         justify-content: flex-start;
-        ;
         gap: 0px;
         flex-direction: column;
     }
@@ -346,6 +359,10 @@ input {
     .screen-div3 {
         width: 100%;
     }
+}
+
+.customer-register-container input, .shop-select {
+    height: 30px;
 }
 
 .customer-business {
@@ -435,7 +452,7 @@ input {
 }
 
 .hearing-container {
-    height: 330px;
+    height: 300px;
     border: solid #B9B9B9 1px;
     border-radius: 5px;
     overflow-y: auto;
@@ -446,6 +463,8 @@ input {
 
 .custom-radio-label {
     height: 22px;
+    font-size: 15px;
+    cursor: pointer;
 }
 
 .free-input {
@@ -458,4 +477,10 @@ input {
     height: 25px;
     background: white;
     margin-top: 4px;
+}
+
+.customer-header-name {
+    position: absolute;
+    right: 20px;
+    top: -35px;
 }

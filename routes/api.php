@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CustomerManage\CustomerController;
+use App\Http\Controllers\CustomerManage\PurchaseController;
 use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChannelController;
@@ -49,6 +50,10 @@ Route::post('/staff/exit', [StaffController::class, 'destroy']);
 Route::post('/customer/register', [CustomerController::class, 'createOrUpdate']);
 Route::post('/customer/list', [CustomerController::class, 'index']);
 Route::post('/customer/delete', [CustomerController::class, 'destroy']);
+
+Route::get('/purchase/init-register', [PurchaseController::class, 'initRegister']);
+Route::post('/purchase/leave-items-register', [PurchaseController::class, 'leaveItemsRegister']);
+Route::post('/purchase/update', [PurchaseController::class, 'update']);
 
 Route::post('/invitations/{id}/view', [InvitationController::class, 'view'])->name('invitations.view');
 Route::post('/invitations/{id}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');

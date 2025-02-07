@@ -1,17 +1,15 @@
 import { useCallback, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import InputEmoji from "react-input-emoji";
 import axios from "axios";
 import { Box } from "@mui/material";
 import { AttachFileOutlined } from "@mui/icons-material";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import SendIcon from "@mui/icons-material/Send";
+import { API_ROUTE } from "../../config";
 import api from "../../api";
 import { actionChat } from "../../reduxStore/actions/chat_action";
-import "./ChatInput.css";
-import { API_ROUTE } from "../../config";
-import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import SendIcon from '@mui/icons-material/Send';
 
 const ChatInput = ({ sending, setSending, selectedUser }) => {
     const dispatch = useDispatch();
@@ -114,36 +112,42 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
     return (
         <Box sx={{ position: "relative" }}>
             <form onSubmit={handleSubmit}>
-                
-                <Box display="flex" height={"100%"} marginTop={4}>
-                    <Paper
-                        component="div"
-                        sx={{ p: '8px 4px', display: 'flex', alignItems: 'center', width: "100%", border: "1px solid #ccc" }}
-                        >
-                        <IconButton onClick={handleClickFileInput} sx={{ p: '10px' }} aria-label="menu">
-                            <AttachFileOutlined />
-                            <input
-                                type="file"
-                                onChange={handleFileSelect}
-                                multiple
-                                ref={fileInput}
-                                className="file-input"
-                                disabled={sending}
-                            />
-                        </IconButton>
-                        <InputBase
-                            sx={{ ml: 1, flex: 1 }}
-                            placeholder="メッセージを入力..."
-                            inputProps={{ 'aria-label': 'メッセージを入力' }}
-                            onChange={(e) => setMessage(e.target.value)}
-                            value={message}
+                <Box display="flex" alignItems={"center"} width={"100%"} mt={1}>
+                    <IconButton
+                        onClick={handleClickFileInput}
+                        sx={{ p: "10px" }}
+                        aria-label="menu"
+                    >
+                        <AttachFileOutlined />
+                        <input
+                            type="file"
+                            onChange={handleFileSelect}
+                            multiple
+                            ref={fileInput}
+                            style={{ display: "none" }}
                             disabled={sending}
                         />
-                        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                        <IconButton type="submit" disabled={sending} color="primary" sx={{ p: '10px' }} aria-label="directions">
-                            <SendIcon />
-                        </IconButton>
-                    </Paper>
+                    </IconButton>
+                    <InputEmoji
+                        onChange={(e) => setMessage(e)}
+                        value={message}
+                        theme="auto"
+                        placeholder="メッセージを入力してください"
+                        language="ja"
+                    />
+                    <Divider
+                        sx={{ height: 28, m: 0.5 }}
+                        orientation="vertical"
+                    />
+                    <IconButton
+                        type="submit"
+                        disabled={sending}
+                        color="primary"
+                        sx={{ p: "10px" }}
+                        aria-label="directions"
+                    >
+                        <SendIcon />
+                    </IconButton>
                 </Box>
             </form>
         </Box>

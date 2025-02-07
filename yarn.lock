@@ -1236,6 +1236,16 @@
   resolved "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.6.3.tgz"
   integrity sha512-4B4OijXeVNOPZlYA2oEwWOTkzyltLao+xbotHQeqN++Rv27Y6s818+n2Qkp8q+Fxhn0t/5lA5X1Mxktud8eayQ==
 
+"@emoji-mart/data@1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@emoji-mart/data/-/data-1.2.1.tgz#0ad70c662e3bc603e23e7d98413bd1e64c4fcb6c"
+  integrity sha512-no2pQMWiBy6gpBEiqGeU77/bFejDqUTRY7KX+0+iur13op3bqUsXdnwoZs6Xb1zbv0gAj5VvS1PWoUUckSr5Dw==
+
+"@emoji-mart/react@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@emoji-mart/react/-/react-1.1.1.tgz#ddad52f93a25baf31c5383c3e7e4c6e05554312a"
+  integrity sha512-NMlFNeWgv1//uPsvLxvGQoIerPuVdXwK/EUek8OOkJ6wVOWPUizRBJU0hDqWZCOROVpfBgCemaC3m6jDOXi03g==
+
 "@emotion/babel-plugin@^11.13.5":
   version "11.13.5"
   resolved "https://registry.npmjs.org/@emotion/babel-plugin/-/babel-plugin-11.13.5.tgz"
@@ -5181,6 +5191,11 @@ emittery@^0.8.1:
   version "0.8.1"
   resolved "https://registry.npmjs.org/emittery/-/emittery-0.8.1.tgz"
   integrity sha512-uDfvUjVrfGJJhymx/kz6prltenw1u7WrCg1oa94zYY8xxVpLLUu045LAT0dhDZdXG58/EpPL/5kA180fQ/qudg==
+
+emoji-mart@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-5.6.0.tgz#71b3ed0091d3e8c68487b240d9d6d9a73c27f023"
+  integrity sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==
 
 emoji-picker-react@^4.12.0:
   version "4.12.0"
@@ -10389,6 +10404,13 @@ react-dom@^18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
+react-easy-emoji@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/react-easy-emoji/-/react-easy-emoji-1.8.1.tgz#29fce29ca03fe0e4976f9e3ff2beb984c69f45f1"
+  integrity sha512-wAf2x+cjwtOlLfXnjc0J3k5B2PDZdoxd1BjtfKr5tq2AL7t2ygvByJQWgFOyN28xg3qe8EKBM6pKxGP+qrGWuQ==
+  dependencies:
+    string-replace-to-array "^2.1.0"
+
 react-error-overlay@^6.0.11:
   version "6.0.11"
   resolved "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.11.tgz"
@@ -10407,6 +10429,16 @@ react-icons@^4.3.1:
   version "4.12.0"
   resolved "https://registry.npmjs.org/react-icons/-/react-icons-4.12.0.tgz"
   integrity sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==
+
+react-input-emoji@^5.9.0:
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/react-input-emoji/-/react-input-emoji-5.9.0.tgz#8768b9ba8392d6fe7dc1665b8143f8654af98c2d"
+  integrity sha512-37Bbg4DEI4UXQ/tNSG3shIA0iFqk3vkhvfTZSQxi/oweeB/870G/6lvp65Ebex2rNM+UlwjMmR80rlJQwl78lQ==
+  dependencies:
+    "@emoji-mart/data" "1.2.1"
+    "@emoji-mart/react" "1.1.1"
+    emoji-mart "5.6.0"
+    react-easy-emoji "^1.8.1"
 
 react-is@^16.13.1, react-is@^16.4.2, react-is@^16.6.0, react-is@^16.7.0:
   version "16.13.1"
@@ -11654,6 +11686,11 @@ string-natural-compare@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/string-natural-compare/-/string-natural-compare-3.0.1.tgz"
   integrity sha512-n3sPwynL1nwKi3WJ6AIsClwBMa0zTi54fn2oLU6ndfTSIO05xaznjSf15PcBZU6FNWbmN5Q6cxT4V5hGvB4taw==
+
+string-replace-to-array@^2.1.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/string-replace-to-array/-/string-replace-to-array-2.1.1.tgz#93aef1530d269721f0022e53a503a7ec8b2076a2"
+  integrity sha512-i31csTEoIrcB8pusAF72Z0WsF04sbdiH4s0egpcmFj30SgHYdYd1swmZ7Zb1qFryJ5DbZR6z4rSjOzoUcrWUWw==
 
 string-width@^1.0.1:
   version "1.0.2"

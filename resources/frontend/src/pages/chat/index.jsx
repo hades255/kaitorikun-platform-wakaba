@@ -8,12 +8,12 @@ import "react-chat-elements/dist/main.css";
 import api from "../../api";
 import { makeStyles } from "@mui/styles";
 import { AnimTypingIcon } from "../../assets/loader";
+import { PUBLIC_HOST } from "../../config";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 import ChatInput from "../../components/chat/ChatInput";
 import { PanelContent, useDispatch, useSelector } from "../../components";
-import { PUBLIC_HOST } from "../../config";
 
 moment.locale("ja");
 
@@ -68,10 +68,9 @@ const ChatsPage = () => {
 
     return (
         <PanelContent
-            // title="Messages"
             title="メッセージ"
         >
-            <Box className={classes.container} pb={4}>
+            <Box className={classes.container}>
                 {selectedUser ? (
                     <>
                         <Box
@@ -224,13 +223,13 @@ const ChatItem = ({ chat, selectedUser }) => {
 const useStyles = makeStyles((theme) => ({
     container: {
         height: "100%",
-        maxWidth: "768px",
+        maxWidth: "1024px",
         marginLeft: "auto",
         marginRight: "auto",
     },
     chatWrapper: {
-        height: "calc(100% - 80px)",
-        maxHeight: "calc(100% - 80px)",
+        height: "calc(100% - 56px)",
+        maxHeight: "calc(100% - 56px)",
         overflowY: "scroll",
     },
 }));

@@ -36,7 +36,7 @@ const CommunityGuideline = ({ comData, setComData }) => {
                     />
                 ) : (
                     <Box maxWidth={600}>
-                        <Typography variant="subtitle1">
+                        <Typography variant="subtitle1" fontWeight={600}>
                             コミュニティ ガイドライン
                         </Typography>
                         <Typography>

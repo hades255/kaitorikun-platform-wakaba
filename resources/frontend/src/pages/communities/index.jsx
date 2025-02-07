@@ -11,18 +11,6 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-// import { makeStyles } from "@mui/styles";
-// import SchoolIcon from "@mui/icons-material/School";
-// import BusinessIcon from "@mui/icons-material/Business";
-// import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-// import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-// import NightlifeIcon from "@mui/icons-material/Nightlife";
-// import PaletteIcon from "@mui/icons-material/Palette";
-// import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-// import GrassIcon from "@mui/icons-material/Grass";
-// import HouseIcon from "@mui/icons-material/House";
-// import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
-// import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import LinkIcon from "@mui/icons-material/Link";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -30,41 +18,15 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import api from "../../api";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { useAuth } from "../../contexts/AuthContext";
-import { useCommunity } from "../../contexts/CommunityContext";
 import {
     PanelContent,
     ToastNotification,
     useDispatch,
     useSelector,
 } from "../../components";
-import CreateCommunity from "../../components/community/New";
-import CreateChannel from "../../components/community/NewChannel";
 import Creator from "../../components/community/Creator";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
-
-// const preNamedCommunities = [
-//     { title: "自分で作成", value: "", icon: null },
-//     { title: "学校", value: "学校", icon: <SchoolIcon /> },
-//     { title: "ビジネス", value: "ビジネス", icon: <BusinessIcon /> },
-//     { title: "スポーツ", value: "スポーツ", icon: <EmojiEventsIcon /> },
-//     { title: "専門職", value: "専門職", icon: <BusinessCenterIcon /> },
-//     {
-//         title: "ライフイベント",
-//         value: "ライフイベント",
-//         icon: <NightlifeIcon />,
-//     },
-//     { title: "芸術と文化", value: "芸術と文化", icon: <PaletteIcon /> },
-//     { title: "ゲーム", value: "ゲーム", icon: <SportsEsportsIcon /> },
-//     { title: "青少年団体", value: "青少年団体", icon: <GrassIcon /> },
-//     { title: "近所", value: "近所", icon: <HouseIcon /> },
-//     { title: "親", value: "親", icon: <FamilyRestroomIcon /> },
-//     {
-//         title: "ボランティア",
-//         value: "ボランティア",
-//         icon: <VolunteerActivismIcon />,
-//     },
-// ];
 
 const sepItems = [
     { type: "posts", title: "投稿" },
@@ -351,28 +313,6 @@ const Communities = ({ match }) => {
 
 export default withRouter(Communities);
 
-// const PreNamedItems = ({ community }) => {
-//     const { setShowCommunityEditor, setPreSetCommunityName } = useCommunity();
-//     const classes = useStyles();
-
-//     const handleClick = () => {
-//         setPreSetCommunityName(community.value);
-//         setShowCommunityEditor(true);
-//     };
-
-//     return (
-//         <Box
-//             onClick={handleClick}
-//             className={`${classes.preNamesItem} ${
-//                 community.value ? classes.active : classes.inactive
-//             }`}
-//         >
-//             {community.icon}
-//             {community.title}
-//         </Box>
-//     );
-// };
-
 const ComHeader = ({
     community,
     channel,
@@ -457,33 +397,3 @@ const SepItems = ({ children, type, onClick, active }) => {
         </Button>
     );
 };
-
-// const useStyles = makeStyles((theme) => ({
-//     preNamesItem: {
-//         paddingLeft: "1rem",
-//         paddingRight: "1rem",
-//         paddingTop: "0.5rem",
-//         paddingBottom: "0.5rem",
-//         borderRadius: "999px",
-//         border: "2px solid #212229",
-//         color: "white",
-//         fontWeight: 600,
-//         cursor: "pointer",
-//         transition: "all 0.3s ease",
-//         display: "flex",
-//         alignItems: "center",
-//         gap: 4,
-//     },
-//     active: {
-//         backgroundColor: "#313239",
-//         "&:hover": {
-//             backgroundColor: "#212229",
-//         },
-//     },
-//     inactive: {
-//         backgroundColor: "#5a65ba",
-//         "&:hover": {
-//             backgroundColor: "#4a55aa",
-//         },
-//     },
-// }));

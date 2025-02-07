@@ -50,15 +50,6 @@ const CreateCommunity = ({ page = true }) => {
                     })
                 );
                 setShowCommunityEditor(false);
-                // setTimeout(() => {
-                //     dispatch(
-                //         actionChannel.handleSelectChannel({
-                //             channel: response.data.channel,
-                //             posts: [],
-                //             users: [response.data.user],
-                //         })
-                //     );
-                // }, 300);
             } catch (error) {
                 console.log(error);
                 ToastNotification(
@@ -79,7 +70,7 @@ const CreateCommunity = ({ page = true }) => {
 
     return (
         <>
-            <DialogTitle>新しいコミュニティを作る</DialogTitle>
+            <DialogTitle fontWeight={700}>新しいコミュニティを作る</DialogTitle>
             <DialogContent>
                 <form onSubmit={handleSubmit}>
                     <Box
@@ -138,7 +129,7 @@ const CreateCommunity = ({ page = true }) => {
                         }}
                     >
                         <Box sx={{ width: "100%" }}>
-                            <Typography variant="subtitle1">
+                            <Typography variant="subtitle1" fontWeight={600}>
                                 参加するには承認が必要です
                             </Typography>
                             <Typography variant="subtitle2">
@@ -169,7 +160,9 @@ const CreateCommunity = ({ page = true }) => {
                         }}
                     >
                         <Box sx={{ width: "100%" }}>
-                            <Typography variant="subtitle1">公開</Typography>
+                            <Typography variant="subtitle1" fontWeight={600}>
+                                公開
+                            </Typography>
                             <Typography variant="subtitle2">
                                 オンにすると、このコミュニティが検索に表示され、おすすめに表示される場合があります。
                                 <span>詳細</span>

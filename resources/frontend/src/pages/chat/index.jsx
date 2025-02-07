@@ -67,9 +67,7 @@ const ChatsPage = () => {
     }, [handleReadChat, chats, selectedUser, sending]);
 
     return (
-        <PanelContent
-            title="メッセージ"
-        >
+        <PanelContent title="メッセージ">
             <Box className={classes.container}>
                 {selectedUser ? (
                     <>
@@ -144,12 +142,6 @@ const ChatItem = ({ chat, selectedUser }) => {
                   PUBLIC_HOST + "/storage/" + JSON.parse(chat.other)?.path,
               audioType: chat.type,
               size: JSON.parse(chat.other)?.size,
-              status: {
-                  click: true,
-                  loading: 0,
-                  download: true,
-                  autoDownload: true,
-              },
           }
         : null;
 
@@ -165,48 +157,33 @@ const ChatItem = ({ chat, selectedUser }) => {
         removefunc();
     }, [dispatch, chat]);
 
+    const handleDownload = (_) => {
+        if (type != "text" && data.uri) {
+            const link = document.createElement("a");
+            link.href = data.uri;
+            link.download = chat.content;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     return (
         <div>
-            {chat.to === selectedUser.id ? (
-                <div
-                    style={{
-                        bottom: "-5px",
-                        right: "10px",
-                        fontSize: "12px",
-                        color: "gray",
-                        textAlign: "right",
-                        paddingRight: "20px",
-                    }}
-                >
-                    {moment(chat.created_at).fromNow()} {/* Relative time */}
-                </div>
-            ) : (
-                <div
-                    style={{
-                        bottom: "-5px",
-                        right: "10px",
-                        fontSize: "12px",
-                        color: "gray",
-                        textAlign: "left",
-                        paddingLeft: "20px",
-                    }}
-                >
-                    {moment(chat.created_at).fromNow()} {/* Relative time */}
-                </div>
-            )}
             <MessageBox
                 id={chat.id}
                 position={chat.to === selectedUser.id ? "right" : "left"}
                 type={type}
                 // title={chat.content}
                 text={chat.content}
-                // date={chat.created_at}
                 data={data}
                 // replyButton={true}
                 removeButton={true}
-                // onClick={(e) => {
-                //     console.log(e);
-                // }}
+                download={true}
+                date={chat.created_at}
+                status={chat.status == "read" ? "read" : "sent"} //  'waiting' | 'sent' | 'received' | 'read'
+                dateString={moment(chat.created_at).fromNow()}
+                onClick={handleDownload}
                 // onDownload={(e) => {
                 //     console.log(e);
                 // }}
@@ -214,8 +191,12 @@ const ChatItem = ({ chat, selectedUser }) => {
                 //     console.log(e);
                 // }}
                 onRemoveMessageClick={handleClickRemove}
-                status={chat.status == "read" ? "read" : "sent"}
             />
+            {/* {type != "text" && data.uri && (
+                <button onClick={() => handleDownload(data.uri)}>
+                    Download Image
+                </button>
+            )} */}
         </div>
     );
 };

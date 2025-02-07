@@ -66,11 +66,11 @@ import PostEditor from "./PostEditor";
 //     },
 // ];
 
-// const sepItems = [
-//     { type: "posts", title: "投稿" },
-//     { type: "files", title: "ファイル" },
-//     { type: "photos", title: "写真" },
-// ];
+const sepItems = [
+    { type: "posts", title: "投稿" },
+    { type: "files", title: "ファイル" },
+    { type: "photos", title: "写真" },
+];
 
 const Communities = ({ match }) => {
     const channelId = match.params.id;
@@ -211,9 +211,10 @@ const Communities = ({ match }) => {
                 channel={channel}
                 handleClickSepCom={handleClickSepCom}
                 sepCom={comSepType}
+                setShowInviteDialog={setShowInviteDialog}
             />
             <Box display={"flex"} justifyContent={"center"}>
-                <Box width={"100%"} maxWidth={960}>
+                <Box width={"100%"} maxWidth={1024}>
                     {channel ? (
                         <>
                             <Card sx={{ mb: 2 }}>
@@ -372,7 +373,17 @@ export default withRouter(Communities);
 //     );
 // };
 
-const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
+const ComHeader = ({
+    community,
+    channel,
+    handleClickSepCom,
+    sepCom,
+    setShowInviteDialog,
+}) => {
+    const handleClickInvite = useCallback(() => {
+        setShowInviteDialog(true);
+    }, [setShowInviteDialog]);
+
     return (
         <>
             {community && (
@@ -395,7 +406,7 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
                         <Typography variant="h5" color="black">
                             {community.name}
                         </Typography>
-                        {/* <ButtonGroup
+                        <ButtonGroup
                             size="small"
                             variant="text"
                             aria-label="sep community settings"
@@ -410,7 +421,7 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
                                     {item.title}
                                 </SepItems>
                             ))}
-                        </ButtonGroup> */}
+                        </ButtonGroup>
                     </Box>
                     <Box>
                         <ButtonGroup
@@ -418,7 +429,7 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
                             variant="text"
                             aria-label="community settings"
                         >
-                            <Button>
+                            <Button onClick={handleClickInvite}>
                                 <GroupAddIcon />
                             </Button>
                             <Button>
@@ -435,17 +446,17 @@ const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
     );
 };
 
-// const SepItems = ({ children, type, onClick, active }) => {
-//     const handleClick = () => {
-//         onClick(type);
-//     };
+const SepItems = ({ children, type, onClick, active }) => {
+    const handleClick = () => {
+        onClick(type);
+    };
 
-//     return (
-//         <Button onClick={handleClick} variant={active ? "outlined" : "text"}>
-//             {children}
-//         </Button>
-//     );
-// };
+    return (
+        <Button onClick={handleClick} variant={active ? "outlined" : "text"}>
+            {children}
+        </Button>
+    );
+};
 
 // const useStyles = makeStyles((theme) => ({
 //     preNamesItem: {

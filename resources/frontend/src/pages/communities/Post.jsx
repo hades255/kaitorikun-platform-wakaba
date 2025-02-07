@@ -39,22 +39,134 @@ moment.locale("ja");
 const Post = ({ post, users, channel, handleOpenEdit }) => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
+    const contentRef = useRef(null);
     const pickerRef = useRef(null);
     const postId = post?.id;
     const creatorId = post?.user_id;
     const authId = auth?.id;
+    const [reply, setReply] = useState("");
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
-    const [reply, setReply] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [reactions, setReactions] = useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [showFull, setShowFull] = useState(false);
+    const [showFullButton, setShowFullButton] = useState(false);
+
+    const handleClickHideContent = useCallback(() => {
+        setShowFull(!showFull);
+    }, [showFull]);
 
     const handleClickOutside = (event) => {
         if (pickerRef.current && !pickerRef.current.contains(event.target)) {
             setShowEmojiPicker(false);
         }
     };
+
+    const handleReply = () => {
+        const saveFunc = async () => {
+            try {
+                const response = await api.post("postreply", {
+                    reply,
+                    post_id: post.id,
+                });
+                dispatch(actionChannel.handleReplyPost(response.data));
+                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
+                setReply("");
+                setShowReplyInput(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        saveFunc();
+    };
+
+    const handleNewEmojiClick = (emojiData) => {
+        if (
+            Array.isArray(post.reactions) &&
+            post.reactions.find(
+                (item) =>
+                    item.user_id == auth?.id && item.reaction == emojiData.emoji
+            )
+        ) {
+            setShowEmojiPicker(false);
+            return;
+        }
+        const saveFunc = async () => {
+            try {
+                const response = await api.post("postreaction", {
+                    reaction: emojiData.emoji,
+                    post_id: post.id,
+                });
+                dispatch(actionChannel.handleAddREACTION(response.data));
+                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setShowEmojiPicker(false);
+            }
+        };
+        saveFunc();
+    };
+
+    const handleEmojiClick = (reaction) => {
+        if (reaction.mine) {
+            const saveFunc = async () => {
+                try {
+                    const response = await api.post("postreaction/toggle", {
+                        reaction: reaction.reaction,
+                        post_id: post.id,
+                    });
+                    dispatch(actionChannel.handleRemoveREACTION(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            saveFunc();
+        } else {
+            const saveFunc = async () => {
+                try {
+                    const response = await api.post("postreaction", {
+                        reaction: reaction.reaction,
+                        post_id: post.id,
+                    });
+                    dispatch(actionChannel.handleAddREACTION(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            saveFunc();
+        }
+    };
+
+    const handleClickOpenDeleteModal = useCallback(() => {
+        setOpenDeleteModal(true);
+    }, []);
+
+    const handleCloseDeleteModal = useCallback(() => {
+        setOpenDeleteModal(false);
+    }, []);
+
+    const handleAcceptDeleteModal = useCallback(async () => {
+        try {
+            const postId = post.id;
+            await api.delete("posts/" + postId);
+            ToastNotification("success", "投稿が正常に削除されました");
+            dispatch(actionChannel.handleRemovePost(postId));
+        } catch (error) {
+            console.log(error);
+            ToastNotification(
+                "warning",
+                "サーバーエラーです。しばらくしてからもう一度お試しください"
+            );
+        } finally {
+            setOpenDeleteModal(false);
+        }
+    }, [dispatch, postId]);
+
+    const handleClickEditPost = useCallback(() => {
+        handleOpenEdit(post);
+    }, [handleOpenEdit, post]);
 
     useEffect(() => {
         const channel = window.Echo.channel("channel");
@@ -168,110 +280,11 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
         } else setReactions([]);
     }, [post, auth]);
 
-    const handleReply = () => {
-        const saveFunc = async () => {
-            try {
-                const response = await api.post("postreply", {
-                    reply,
-                    post_id: post.id,
-                });
-                dispatch(actionChannel.handleReplyPost(response.data));
-                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
-                setReply("");
-                setShowReplyInput(false);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        saveFunc();
-    };
-
-    const handleNewEmojiClick = (emojiData) => {
-        if (
-            Array.isArray(post.reactions) &&
-            post.reactions.find(
-                (item) =>
-                    item.user_id == auth?.id && item.reaction == emojiData.emoji
-            )
-        ) {
-            setShowEmojiPicker(false);
-            return;
+    useEffect(() => {
+        if (contentRef && contentRef.current) {
+            if (contentRef.current.offsetHeight > 100) setShowFullButton(true);
         }
-        const saveFunc = async () => {
-            try {
-                const response = await api.post("postreaction", {
-                    reaction: emojiData.emoji,
-                    post_id: post.id,
-                });
-                dispatch(actionChannel.handleAddREACTION(response.data));
-                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setShowEmojiPicker(false);
-            }
-        };
-        saveFunc();
-    };
-
-    const handleEmojiClick = (reaction) => {
-        if (reaction.mine) {
-            const saveFunc = async () => {
-                try {
-                    const response = await api.post("postreaction/toggle", {
-                        reaction: reaction.reaction,
-                        post_id: post.id,
-                    });
-                    dispatch(actionChannel.handleRemoveREACTION(response.data));
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-            saveFunc();
-        } else {
-            const saveFunc = async () => {
-                try {
-                    const response = await api.post("postreaction", {
-                        reaction: reaction.reaction,
-                        post_id: post.id,
-                    });
-                    dispatch(actionChannel.handleAddREACTION(response.data));
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-            saveFunc();
-        }
-    };
-
-    const handleClickOpenDeleteModal = useCallback(() => {
-        setOpenDeleteModal(true);
-    }, []);
-
-    const handleCloseDeleteModal = useCallback(() => {
-        setOpenDeleteModal(false);
-    }, []);
-
-    const handleAcceptDeleteModal = useCallback(async () => {
-        try {
-            const postId = post.id;
-            await api.delete("posts/" + postId);
-            ToastNotification("success", "投稿が正常に削除されました");
-            dispatch(actionChannel.handleRemovePost(postId));
-        } catch (error) {
-            console.log(error);
-            ToastNotification(
-                "warning",
-                "サーバーエラーです。しばらくしてからもう一度お試しください"
-            );
-        } finally {
-            setOpenDeleteModal(false);
-        }
-    }, [dispatch, postId]);
-
-    const handleClickEditPost = useCallback(() => {
-        handleOpenEdit(post);
-    }, [handleOpenEdit, post]);
+    }, [contentRef]);
 
     return (
         <>
@@ -332,7 +345,30 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     <Typography variant="subtitle1" color="text.secondary">
                         {post.subject}
                     </Typography>
-                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                    <Box
+                        height={showFull ? "100%" : 100}
+                        overflow={"hidden"}
+                        position={"relative"}
+                    >
+                        <div
+                            ref={contentRef}
+                            dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
+                        {showFullButton && (
+                            <Button
+                                size="small"
+                                variant="text"
+                                sx={{
+                                    position: "absolute",
+                                    right: 0,
+                                    bottom: 0,
+                                }}
+                                onClick={handleClickHideContent}
+                            >
+                                {showFull ? "非表示" : "もっと見る"}
+                            </Button>
+                        )}
+                    </Box>
                     <Box display={"flex"} alignItems={"center"} gap={1}>
                         {Array.isArray(reactions) &&
                             reactions?.map((item) => (

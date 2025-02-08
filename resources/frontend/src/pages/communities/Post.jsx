@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
@@ -35,6 +35,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { actionChannel } from "../../reduxStore";
 import Creator from "../../components/community/Creator";
 import { ToastNotification } from "../../components";
+import { PUBLIC_HOST } from "../../config";
 
 moment.locale("ja");
 
@@ -339,6 +340,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     <Typography variant="subtitle1" color="text.secondary">
                         {post.subject}
                     </Typography>
+                    {post.attachment && <PostMedia file={post.attachment} />}
                     <Box
                         height={showFull ? "100%" : 100}
                         overflow={"hidden"}
@@ -346,16 +348,33 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     >
                         <div
                             ref={contentRef}
-                            dangerouslySetInnerHTML={{ __html: post.content }}
+                            dangerouslySetInnerHTML={{
+                                __html: post.content,
+                            }}
                         />
+                        {showFullButton && !showFull && (
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    left: 0,
+                                    bottom: 0,
+                                    height: 70,
+                                    width: "100%",
+                                    bgcolor: "transparent",
+                                    background:
+                                        "linear-gradient(to bottom, transparent, #f4f6f9 90%, #f4f6f9 100%)",
+                                }}
+                            ></Box>
+                        )}
                         {showFullButton && (
                             <Button
                                 size="small"
-                                variant="text"
+                                variant="outlined"
                                 sx={{
                                     position: "absolute",
-                                    right: 0,
-                                    bottom: 0,
+                                    right: 1,
+                                    bottom: 1,
+                                    borderRadius: 8,
                                 }}
                                 onClick={handleClickHideContent}
                             >
@@ -594,5 +613,47 @@ const EmojiItem = ({ reaction, onClick, users }) => {
                     </Popover>
                 )}
         </div>
+    );
+};
+
+const PostMedia = ({ file }) => {
+    const [data, setData] = useState(null);
+
+    const convertFileStr = useCallback(async () => {
+        try {
+            const fileObj = JSON.parse(file);
+            if (fileObj) setData(fileObj);
+        } catch (error) {
+            console.log(error);
+        }
+    }, [file]);
+
+    useEffect(() => {
+        convertFileStr();
+    }, [convertFileStr]);
+
+    return (
+        data && (
+            <Box p={2} bgcolor={"white"} borderRadius={2} width={"100%"}>
+                {data.type && data.type.includes("image") && (
+                    <img
+                        alt={data.content}
+                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
+                        width={"100%"}
+                        style={{ borderRadius: 8 }}
+                    />
+                )}
+                {data.type && data.type.includes("video") && (
+                    <video
+                        controls
+                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
+                        width={"100%"}
+                        style={{ borderRadius: 8 }}
+                    >
+                        Your browser does not support the video tag.
+                    </video>
+                )}
+            </Box>
+        )
     );
 };

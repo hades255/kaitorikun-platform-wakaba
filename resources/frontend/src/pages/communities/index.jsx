@@ -177,7 +177,7 @@ const Communities = ({ match }) => {
             />
             <Box display={"flex"} justifyContent={"center"}>
                 <Box width={"100%"} maxWidth={1024}>
-                    {channel ? (
+                    {channel && (
                         <>
                             <Card sx={{ mb: 2, bgcolor: "#f4f6f9" }}>
                                 <CardContent>
@@ -229,53 +229,6 @@ const Communities = ({ match }) => {
                                         handleOpenEdit={handleClickEditPost}
                                     />
                                 ))}
-                        </>
-                    ) : (
-                        <>
-                            {/* {communities && communities.length > 0 && (
-                                <div>新しいコミュニティを作成</div>
-                            )}
-                            <Box
-                                display="flex"
-                                justifyContent="center"
-                                width="100%"
-                                paddingTop={5}
-                                pb={3}
-                            >
-                                <Box
-                                    display="flex"
-                                    flexDirection="column"
-                                    gap={2}
-                                >
-                                    <Typography className="text-xl">
-                                        コミュニティを構築する
-                                    </Typography>
-                                    <Typography variant="">
-                                        コミュニティイベントを計画し、ディスカッションに参加し、協力するための安全なスペースを作ります。
-                                    </Typography>
-                                    <Typography color="#4a55aa">
-                                        コミュニティについてもっと知る
-                                    </Typography>
-                                    <Box className="flex justify-center">
-                                        <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            gap={1}
-                                            flexWrap="wrap"
-                                        >
-                                            {preNamedCommunities?.map(
-                                                (item, index) => (
-                                                    <PreNamedItems
-                                                        key={index}
-                                                        community={item}
-                                                    />
-                                                )
-                                            )}
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Box> */}
                         </>
                     )}
                 </Box>

@@ -44,6 +44,7 @@ class PostController extends Controller
             'channel_id' => 'required|integer',
             'community_id' => 'required|integer',
             'notifyEmail' => 'required|boolean',
+            'attachment' => 'nullable|string|max:1000',
         ]);
         $post = new Post();
         $post->title = $validatedData['title'];
@@ -52,6 +53,7 @@ class PostController extends Controller
         $post->notifyEmail = $validatedData['notifyEmail'];
         $post->channel_id = $validatedData['channel_id'];
         $post->community_id = $validatedData['community_id'];
+        $post->attachment = $validatedData['attachment'];
         $post->user_id = Auth::id();
         if ($post->save()) {
             NewPostJob::dispatch($post, Auth::user()->name);
@@ -93,11 +95,13 @@ class PostController extends Controller
             'subject' => 'required|string|max:255',
             'content' => 'required|string|max:1000',
             'notifyEmail' => 'required|boolean',
+            'attachment' => 'nullable|string|max:1000',
         ]);
         $post->title = $validatedData['title'];
         $post->subject = $validatedData['subject'];
         $post->content = $validatedData['content'];
         $post->notifyEmail = $validatedData['notifyEmail'];
+        $post->attachment = $validatedData['attachment'];
         if ($post->save()) {
             EditPostJob::dispatch($post, Auth::user()->name);
             return response()->json($post, 201);

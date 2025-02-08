@@ -32,9 +32,10 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
                 const response = await api.post("chats", newMessage);
                 dispatch(actionChat.handleReceiveChat(response.data.chat));
                 setMessage("");
-                setSending(false);
             } catch (error) {
                 console.log(error);
+            } finally {
+                setSending(false);
             }
         }
     }, [dispatch, message, setSending, selectedUser]);
@@ -48,56 +49,41 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
     );
 
     const handleFileSelect = useCallback(
-        (event) => {
-            const files = Array.from(event.target.files);
-            if (files.length == 0) return;
-            setSending(true);
-            const formData = new FormData();
-            files.forEach((file) => {
-                formData.append("files[]", file);
-            });
-            const sendFilesFunc = async () => {
-                try {
-                    const response = await axios.post(
-                        `${API_ROUTE}upload`,
-                        formData,
-                        {
-                            headers: {
-                                "Content-Type": "multipart/form-data",
-                            },
-                        }
-                    );
-                    const uploadedFiles = response.data.files;
-                    if (uploadedFiles.length > 0) {
-                        const sendFilesToChatFunc = async () => {
-                            try {
-                                const response = await api.post("chats/files", {
-                                    chats: uploadedFiles.map((item) => ({
-                                        to: selectedUser.id,
-                                        ...item,
-                                    })),
-                                });
-                                response.data.chats.forEach((item) => {
-                                    dispatch(
-                                        actionChat.handleReceiveChat(item)
-                                    );
-                                });
-                            } catch (error) {
-                                console.log(error);
-                            } finally {
-                                setSending(false);
-                            }
-                        };
-                        sendFilesToChatFunc();
-                    } else {
-                        setSending(false);
+        async (event) => {
+            try {
+                const files = Array.from(event.target.files);
+                if (files.length == 0) return;
+                setSending(true);
+                const formData = new FormData();
+                files.forEach((file) => {
+                    formData.append("files[]", file);
+                });
+                const response = await axios.post(
+                    `${API_ROUTE}upload`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
                     }
-                } catch (error) {
-                    setSending(false);
-                    console.log(error);
+                );
+                const uploadedFiles = response.data.files;
+                if (uploadedFiles.length > 0) {
+                    const _response = await api.post("chats/files", {
+                        chats: uploadedFiles.map((item) => ({
+                            to: selectedUser.id,
+                            ...item,
+                        })),
+                    });
+                    _response.data.chats.forEach((item) => {
+                        dispatch(actionChat.handleReceiveChat(item));
+                    });
                 }
-            };
-            sendFilesFunc();
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setSending(false);
+            }
         },
         [dispatch, setSending, selectedUser]
     );

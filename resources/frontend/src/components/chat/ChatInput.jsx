@@ -18,34 +18,33 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
 
     const [message, setMessage] = useState("");
 
+    const sendMessage = useCallback(async () => {
+        if (message.trim() && selectedUser) {
+            setSending(true);
+            const newMessage = {
+                content: message,
+                to: selectedUser.id,
+                status: "unread",
+                reply: 0,
+                emoji: "",
+            };
+            try {
+                const response = await api.post("chats", newMessage);
+                dispatch(actionChat.handleReceiveChat(response.data.chat));
+                setMessage("");
+                setSending(false);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }, [dispatch, message, setSending, selectedUser]);
+
     const handleSubmit = useCallback(
         (e) => {
             e.preventDefault();
-            if (message.trim() && selectedUser) {
-                setSending(true);
-                const newMessage = {
-                    content: message,
-                    to: selectedUser.id,
-                    status: "unread",
-                    reply: 0,
-                    emoji: "",
-                };
-                const sendMsgFunc = async () => {
-                    try {
-                        const response = await api.post("chats", newMessage);
-                        dispatch(
-                            actionChat.handleReceiveChat(response.data.chat)
-                        );
-                        setMessage("");
-                        setSending(false);
-                    } catch (error) {
-                        console.log(error);
-                    }
-                };
-                sendMsgFunc();
-            }
+            sendMessage();
         },
-        [dispatch, message, setSending, selectedUser]
+        [sendMessage]
     );
 
     const handleFileSelect = useCallback(
@@ -109,6 +108,8 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
         }
     }, []);
 
+    const handleMessageChange = useCallback((e) => setMessage(e), []);
+
     return (
         <Box sx={{ position: "relative" }}>
             <form onSubmit={handleSubmit}>
@@ -129,11 +130,12 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
                         />
                     </IconButton>
                     <InputEmoji
-                        onChange={(e) => setMessage(e)}
                         value={message}
                         theme="auto"
                         placeholder="メッセージを入力してください"
                         language="ja"
+                        onChange={handleMessageChange}
+                        onEnter={sendMessage}
                     />
                     <Divider
                         sx={{ height: 28, m: 0.5 }}

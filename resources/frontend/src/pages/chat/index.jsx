@@ -157,15 +157,21 @@ const ChatItem = ({ chat, selectedUser }) => {
         removefunc();
     }, [dispatch, chat]);
 
-    const handleDownload = (_) => {
-        if (type != "text" && data.uri) {
-            const link = document.createElement("a");
-            link.href = data.uri;
-            link.download = chat.content;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+    const handleDownload = (e) => {
+        console.log(e.target.nodeName);
+        if (
+            e.target.nodeName == "IMAGE" ||
+            e.target.nodeName == "AUDIO" ||
+            e.target.nodeName == "VIDEO"
+        )
+            if (type != "text" && data.uri) {
+                const link = document.createElement("a");
+                link.href = data.uri;
+                link.download = chat.content;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
     };
 
     return (

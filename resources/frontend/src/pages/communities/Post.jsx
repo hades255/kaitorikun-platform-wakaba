@@ -290,7 +290,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
         <>
             <Card sx={{ mb: 2 }}>
                 <CardContent>
-                    <Example />
                     <Box
                         display={"flex"}
                         alignItems={"center"}

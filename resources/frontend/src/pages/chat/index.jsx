@@ -160,9 +160,9 @@ const ChatItem = ({ chat, selectedUser }) => {
     const handleDownload = (e) => {
         console.log(e.target.nodeName);
         if (
-            e.target.nodeName == "IMAGE" ||
-            e.target.nodeName == "AUDIO" ||
-            e.target.nodeName == "VIDEO"
+            e.target.nodeName == "IMG" ||
+            e.target.nodeName == "AUD" ||
+            e.target.nodeName == "VID"
         )
             if (type != "text" && data.uri) {
                 const link = document.createElement("a");

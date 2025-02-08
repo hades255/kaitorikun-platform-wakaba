@@ -179,7 +179,7 @@ const Communities = ({ match }) => {
                 <Box width={"100%"} maxWidth={1024}>
                     {channel ? (
                         <>
-                            <Card sx={{ mb: 2 }}>
+                            <Card sx={{ mb: 2, bgcolor: "#f4f6f9" }}>
                                 <CardContent>
                                     <Box mb={2}>
                                         <Creator
@@ -332,8 +332,8 @@ const ComHeader = ({
                     display={"flex"}
                     alignItems={"center"}
                     justifyContent={"space-between"}
-                    gap={4}
                     borderBottom={"1px solid gray"}
+                    gap={4}
                     p={1}
                 >
                     <Box display={"flex"} alignItems={"center"} gap={2}>

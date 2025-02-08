@@ -288,7 +288,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
 
     return (
         <>
-            <Card sx={{ mb: 2 }}>
+            <Card sx={{ mb: 2, bgcolor: "#f4f6f9" }}>
                 <CardContent>
                     <Box
                         display={"flex"}

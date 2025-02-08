@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import EmojiPicker from "emoji-picker-react";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import {
     Card,
     CardContent,
@@ -27,6 +28,7 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
 import "moment/locale/ja";
+import "./Post.css";
 import api from "../../api";
 import { getUserStatusColor } from "../../feature/action";
 import { useAuth } from "../../contexts/AuthContext";
@@ -40,28 +42,31 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
     const dispatch = useDispatch();
     const { auth } = useAuth();
     const contentRef = useRef(null);
-    const pickerRef = useRef(null);
     const postId = post?.id;
     const creatorId = post?.user_id;
     const authId = auth?.id;
     const [reply, setReply] = useState("");
     const [showReplies, setShowReplies] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [reactions, setReactions] = useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [showFull, setShowFull] = useState(false);
     const [showFullButton, setShowFullButton] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClickEmojiOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseEmojiOpen = () => {
+        setAnchorEl(null);
+    };
+
+    const showEmojiPicker = Boolean(anchorEl);
 
     const handleClickHideContent = useCallback(() => {
         setShowFull(!showFull);
     }, [showFull]);
-
-    const handleClickOutside = (event) => {
-        if (pickerRef.current && !pickerRef.current.contains(event.target)) {
-            setShowEmojiPicker(false);
-        }
-    };
 
     const handleReply = () => {
         const saveFunc = async () => {
@@ -86,16 +91,17 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
             Array.isArray(post.reactions) &&
             post.reactions.find(
                 (item) =>
-                    item.user_id == auth?.id && item.reaction == emojiData.emoji
+                    item.user_id == auth?.id &&
+                    item.reaction == emojiData.native
             )
         ) {
-            setShowEmojiPicker(false);
+            handleCloseEmojiOpen();
             return;
         }
         const saveFunc = async () => {
             try {
                 const response = await api.post("postreaction", {
-                    reaction: emojiData.emoji,
+                    reaction: emojiData.native,
                     post_id: post.id,
                 });
                 dispatch(actionChannel.handleAddREACTION(response.data));
@@ -103,7 +109,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
             } catch (error) {
                 console.log(error);
             } finally {
-                setShowEmojiPicker(false);
+                handleCloseEmojiOpen();
             }
         };
         saveFunc();
@@ -244,18 +250,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
     }, [dispatch, authId, postId]);
 
     useEffect(() => {
-        if (showEmojiPicker) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [showEmojiPicker]);
-
-    useEffect(() => {
         if (Array.isArray(post.reactions) && post.reactions.length > 0) {
             let res = {};
             post.reactions?.forEach((item) => {
@@ -381,28 +375,43 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                             ))}
                         <IconButton
                             color="primary"
-                            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                            onClick={handleClickEmojiOpen}
                         >
                             <MoodIcon />
                             <AddIcon />
                         </IconButton>
                     </Box>
-                    <Dialog
+                    <Popover
+                        id={"open-emogi-popover" + post.id}
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "left",
+                        }}
                         open={showEmojiPicker}
-                        onClose={() => setShowEmojiPicker(false)}
+                        onClose={handleCloseEmojiOpen}
                     >
-                        <DialogContent>
-                            <Box
-                                sx={{ position: "sticky", zIndex: 1 }}
-                                ref={pickerRef}
-                            >
-                                <EmojiPicker
-                                    searchPlaceholder="検索"
-                                    onEmojiClick={handleNewEmojiClick}
-                                />
-                            </Box>
-                        </DialogContent>
-                    </Dialog>
+                        <Picker
+                            locale="ja"
+                            theme="light"
+                            previewPosition="none"
+                            skinTonePosition="search"
+                            emojiButtonSize={44}
+                            emojiSize={28}
+                            emojiButtonRadius={"6px"}
+                            emojiButtonColors={[
+                                "rgba(155,223,88,.7)",
+                                "rgba(149,211,254,.7)",
+                                "rgba(247,233,34,.7)",
+                                "rgba(238,166,252,.7)",
+                                "rgba(255,213,143,.7)",
+                                "rgba(211,209,255,.7)",
+                            ]}
+                            icons={"solid"}
+                            data={data}
+                            onEmojiSelect={handleNewEmojiClick}
+                        />
+                    </Popover>
                     <Box>
                         <Button
                             onClick={() => setShowReplyInput(!showReplyInput)}

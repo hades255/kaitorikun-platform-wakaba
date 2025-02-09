@@ -90,7 +90,7 @@ export default function PostEditor({ onPost, onClose, initPost }) {
     }, []);
 
     return (
-        <Box sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
+        <Box sx={{ p: 4, maxWidth: 960, mx: "auto" }}>
             <form onSubmit={handlePost}>
                 <TextField
                     fullWidth

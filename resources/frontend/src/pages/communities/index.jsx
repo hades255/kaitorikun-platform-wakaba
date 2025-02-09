@@ -176,10 +176,21 @@ const Communities = ({ match }) => {
                 setShowInviteDialog={setShowInviteDialog}
             />
             <Box display={"flex"} justifyContent={"center"}>
-                <Box width={"100%"} maxWidth={1024}>
+                <Box width={"100%"} maxWidth={1024} position={"relative"}>
                     {channel && (
                         <>
-                            <Card sx={{ mb: 2, bgcolor: "#f4f6f9" }}>
+                            <Card
+                                sx={{
+                                    mb: 2,
+                                    bgcolor: "#f4f6f9",
+                                    position:
+                                        showPostEditor && post
+                                            ? "sticky"
+                                            : "static",
+                                    zIndex: 1,
+                                    top: 0,
+                                }}
+                            >
                                 <CardContent>
                                     <Box mb={2}>
                                         <Creator

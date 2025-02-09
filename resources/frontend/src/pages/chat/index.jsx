@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "react-chat-elements";
-import { Box } from "@mui/material";
+import "react-chat-elements/dist/main.css";
 import moment from "moment";
 import "moment/locale/ja";
 import clsx from "clsx";
-import "react-chat-elements/dist/main.css";
-import api from "../../api";
+import { Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { AnimTypingIcon } from "../../assets/loader";
+import api from "../../api";
 import { PUBLIC_HOST } from "../../config";
+import { AnimTypingIcon } from "../../assets/loader";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";

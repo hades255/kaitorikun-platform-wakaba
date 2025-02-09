@@ -16,8 +16,8 @@ import LinkIcon from "@mui/icons-material/Link";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import SettingsIcon from "@mui/icons-material/Settings";
 import api from "../../api";
-import { actionChannel, selectorChannel } from "../../reduxStore";
 import { useAuth } from "../../contexts/AuthContext";
+import { actionChannel, selectorChannel } from "../../reduxStore";
 import {
     PanelContent,
     ToastNotification,

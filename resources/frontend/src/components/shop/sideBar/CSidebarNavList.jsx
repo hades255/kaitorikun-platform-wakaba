@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
-import { makeStyles } from "@mui/styles";
 import clsx from "clsx";
+import { makeStyles } from "@mui/styles";
 import { Avatar } from "@mui/material";
 import { stringAvatar } from "../../helper/func";
 import { useCommunity } from "../../../contexts/CommunityContext";

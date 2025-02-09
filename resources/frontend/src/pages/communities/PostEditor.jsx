@@ -1,4 +1,7 @@
 import { useCallback, useRef, useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 import {
     Box,
     TextField,
@@ -9,12 +12,9 @@ import {
     Typography,
     ButtonGroup,
 } from "@mui/material";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import axios from "axios";
 import { API_ROUTE } from "../../config";
 
 export default function PostEditor({ onPost, onClose, initPost }) {

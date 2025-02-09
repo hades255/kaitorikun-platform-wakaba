@@ -40,10 +40,6 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import TableMaster from "./helper/TableMaster";
 import ModalGlobal from "./helper/ModalGlobal";
-import { CalendarGrid } from "./calendar/calendar-grid";
-import { CalendarHeader } from "./calendar/calendar-header";
-import { WeekPicker } from "./calendar/week-picker";
-import { DatePicker } from "./calendar/date-picker";
 export {
     ModalGlobal,
     TableMaster,
@@ -93,8 +89,4 @@ export {
     Footer,
     React,
     useWindowSize,
-    CalendarGrid,
-    CalendarHeader,
-    WeekPicker,
-    DatePicker
 };

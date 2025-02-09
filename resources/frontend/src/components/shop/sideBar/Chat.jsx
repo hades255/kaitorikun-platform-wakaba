@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Box, List, ListItemAvatar, Typography,Badge } from "@mui/material";
+import { Avatar, Box, List, Typography, Badge } from "@mui/material";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import { makeStyles } from "@mui/styles";
 import { format, isThisYear, isToday } from "date-fns";
@@ -201,14 +201,23 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                 <div className={classes.iconWrapper}>
                     <Badge
                         overlap="circular"
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                        badgeContent={count > 0 ? (
-                            <div className={classes.notification}>{count}</div>
-                        ) : <></>}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                        }}
+                        badgeContent={
+                            count > 0 ? (
+                                <div className={classes.notification}>
+                                    {count}
+                                </div>
+                            ) : (
+                                <></>
+                            )
+                        }
                     >
                         <Avatar alt="Remy Sharp">{user.name[0]}</Avatar>
                     </Badge>
-                                {/* <Avatar sx={{ width: 32, height: 32, color: "black" }}></Avatar> */}
+                    {/* <Avatar sx={{ width: 32, height: 32, color: "black" }}></Avatar> */}
                     <div
                         className={`${classes.statusDot} ${getUserStatusColor(
                             "online"
@@ -340,22 +349,22 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         alignItems: "center",
     },
-    badge:  {
-        '& .MuiBadge-badge': {
-            backgroundColor: '#dc2626',
-            color: '#dc2626',
+    badge: {
+        "& .MuiBadge-badge": {
+            backgroundColor: "#dc2626",
+            color: "#dc2626",
             boxShadow: "0 0 0 2px #fff",
-            '&::after': {
-                position: 'absolute',
+            "&::after": {
+                position: "absolute",
                 top: 0,
                 left: 0,
-                width: '100%',
-                height: '100%',
-                borderRadius: '50%',
-                animation: 'ripple 1.2s infinite ease-in-out',
-                border: '1px solid currentColor',
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                animation: "ripple 1.2s infinite ease-in-out",
+                border: "1px solid currentColor",
                 content: '""',
             },
         },
-    }
+    },
 }));

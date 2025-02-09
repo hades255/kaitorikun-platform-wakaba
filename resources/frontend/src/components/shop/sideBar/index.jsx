@@ -11,7 +11,6 @@ import menu3 from "./menu3";
 import ChatSidebar from "./Chat";
 import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
 import SidebarNavList from "./SidebarNavList";
-import CSidebarNavList from "./CSidebarNavList";
 
 const tabs = [
     {

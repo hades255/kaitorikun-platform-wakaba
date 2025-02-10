@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import data from "@emoji-mart/data";
+import emojiData from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import {
     Card,
@@ -23,6 +23,7 @@ import {
 import { Add as AddIcon } from "@mui/icons-material";
 import MoodIcon from "@mui/icons-material/Mood";
 import EditIcon from "@mui/icons-material/Edit";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { styled } from "@mui/material/styles";
@@ -55,54 +56,51 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
     const [showFullButton, setShowFullButton] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleClickEmojiOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleCloseEmojiOpen = () => {
-        setAnchorEl(null);
-    };
-
     const showEmojiPicker = Boolean(anchorEl);
+
+    const handleClickEmojiOpen = useCallback((event) => {
+        setAnchorEl(event.currentTarget);
+    }, []);
+
+    const handleCloseEmojiOpen = useCallback(() => {
+        setAnchorEl(null);
+    }, []);
 
     const handleClickHideContent = useCallback(() => {
         setShowFull(!showFull);
     }, [showFull]);
 
-    const handleReply = () => {
-        const saveFunc = async () => {
-            try {
-                const response = await api.post("postreply", {
-                    reply,
-                    post_id: post.id,
-                });
-                dispatch(actionChannel.handleReplyPost(response.data));
-                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
-                setReply("");
-                setShowReplyInput(false);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        saveFunc();
-    };
-
-    const handleNewEmojiClick = (emojiData) => {
-        if (
-            Array.isArray(post.reactions) &&
-            post.reactions.find(
-                (item) =>
-                    item.user_id == auth?.id &&
-                    item.reaction == emojiData.native
-            )
-        ) {
-            handleCloseEmojiOpen();
-            return;
+    const handleReply = useCallback(async () => {
+        try {
+            const response = await api.post("postreply", {
+                reply,
+                post_id: post.id,
+            });
+            dispatch(actionChannel.handleReplyPost(response.data));
+            // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
+            setReply("");
+            setShowReplyInput(false);
+        } catch (error) {
+            console.log(error);
         }
-        const saveFunc = async () => {
+    }, [dispatch]);
+
+    const handleNewEmojiClick = useCallback(
+        async (emojiData) => {
+            if (
+                Array.isArray(post.reactions) &&
+                post.reactions.find(
+                    (item) =>
+                        item.user_id == auth?.id &&
+                        item.reaction == emojiData.id
+                )
+            ) {
+                handleCloseEmojiOpen();
+                return;
+            }
             try {
                 const response = await api.post("postreaction", {
-                    reaction: emojiData.native,
+                    reaction: emojiData.id,
                     post_id: post.id,
                 });
                 dispatch(actionChannel.handleAddREACTION(response.data));
@@ -112,39 +110,32 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
             } finally {
                 handleCloseEmojiOpen();
             }
-        };
-        saveFunc();
-    };
+        },
+        [dispatch, post, handleCloseEmojiOpen]
+    );
 
-    const handleEmojiClick = (reaction) => {
-        if (reaction.mine) {
-            const saveFunc = async () => {
-                try {
+    const handleEmojiClick = useCallback(
+        async (reaction) => {
+            try {
+                if (reaction.mine) {
                     const response = await api.post("postreaction/toggle", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                     });
                     dispatch(actionChannel.handleRemoveREACTION(response.data));
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-            saveFunc();
-        } else {
-            const saveFunc = async () => {
-                try {
+                } else {
                     const response = await api.post("postreaction", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                     });
                     dispatch(actionChannel.handleAddREACTION(response.data));
-                } catch (error) {
-                    console.log(error);
                 }
-            };
-            saveFunc();
-        }
-    };
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        [dispatch]
+    );
 
     const handleClickOpenDeleteModal = useCallback(() => {
         setOpenDeleteModal(true);
@@ -342,7 +333,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     </Typography>
                     {post.attachment && <PostMedia file={post.attachment} />}
                     <Box
-                        height={showFull ? "100%" : 100}
+                        maxHeight={showFull ? "100%" : 100}
                         overflow={"hidden"}
                         position={"relative"}
                     >
@@ -414,7 +405,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                             locale="ja"
                             theme="light"
                             previewPosition="none"
-                            skinTonePosition="search"
+                            skinTonePosition="none"
                             emojiButtonSize={44}
                             emojiSize={28}
                             emojiButtonRadius={"6px"}
@@ -427,7 +418,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                                 "rgba(211,209,255,.7)",
                             ]}
                             icons={"solid"}
-                            data={data}
+                            data={emojiData}
                             onEmojiSelect={handleNewEmojiClick}
                         />
                     </Popover>
@@ -548,6 +539,7 @@ const ReplyItem = ({ reply, users }) => {
 };
 
 const EmojiItem = ({ reaction, onClick, users }) => {
+    const emoji = emojiData.emojis[reaction.reaction];
     const [anchorEl, setAnchorEl] = useState(null);
 
     const handlePopoverOpen = (event) => {
@@ -573,7 +565,7 @@ const EmojiItem = ({ reaction, onClick, users }) => {
                     sx={{ fontSize: 24 }}
                     variant="outlined"
                     color="secondary"
-                    label={reaction.reaction}
+                    label={emoji.skins[0].native}
                     onClick={handleClick}
                 ></Chip>
             </Badge>
@@ -602,13 +594,21 @@ const EmojiItem = ({ reaction, onClick, users }) => {
                             flexDirection={"column"}
                             gap={1}
                         >
-                            {reaction.users.map((item, index) => (
-                                <Creator
-                                    key={index}
-                                    users={users}
-                                    creature={{ user_id: item }}
-                                />
-                            ))}
+                            {reaction.users.map(
+                                (item, index) =>
+                                    index < 3 && (
+                                        <Creator
+                                            key={index}
+                                            users={users}
+                                            creature={{ user_id: item }}
+                                        />
+                                    )
+                            )}
+                            {reaction.users.length > 3 && (
+                                <Box pl={1}>
+                                    <MoreHorizIcon color="gray" />
+                                </Box>
+                            )}
                         </Box>
                     </Popover>
                 )}

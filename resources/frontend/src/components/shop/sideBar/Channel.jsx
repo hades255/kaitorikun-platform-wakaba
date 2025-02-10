@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Box, Dialog, Menu, MenuItem } from "@mui/material";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
-import { Route, useDispatch, useSelector } from "../../../components";
+import { useDispatch, useSelector } from "../../../components";
 import CreateCommunity from "../../community/New";
 import CreateChannel from "../../community/NewChannel";
 import CSidebarNavList from "./CSidebarNavList";
@@ -69,18 +69,11 @@ const ChannelSidebar = ({ page = true }) => {
                 data-accordion="false"
             >
                 {communityItems.map((menu, i) => (
-                    <Route
-                        path={menu.path}
-                        exact={menu.exact}
-                        key={i}
-                        children={({ match }) => (
-                            <CSidebarNavList
-                                data={menu}
-                                page={page}
-                                path={page ? "communities" : "channels"}
-                                key={i}
-                            />
-                        )}
+                    <CSidebarNavList
+                        data={menu}
+                        page={page}
+                        path={page ? "communities" : "channels"}
+                        key={menu.id}
                     />
                 ))}
             </ul>
@@ -146,11 +139,11 @@ export const AddNewCommunityButton = ({ page = true }) => {
                         "aria-labelledby": "basic-button",
                     }}
                 >
-                    <MenuItem onClick={handleNewCommunity}>
-                        {/* Add Community */}コミュニティを追加
-                    </MenuItem>
                     <MenuItem onClick={handleNewChannel}>
                         {/* Add Channel */}チャンネルを追加
+                    </MenuItem>
+                    <MenuItem onClick={handleNewCommunity}>
+                        {/* Add Community */}コミュニティを追加
                     </MenuItem>
                     <MenuItem onClick={handleClose}>
                         {/* Join Community */}コミュニティに参加
@@ -162,6 +155,7 @@ export const AddNewCommunityButton = ({ page = true }) => {
                     open={showCommunityEditor}
                     onClose={() => setShowCommunityEditor(false)}
                     maxWidth="md"
+                    fullWidth={true}
                 >
                     <CreateCommunity page={page} />
                 </Dialog>

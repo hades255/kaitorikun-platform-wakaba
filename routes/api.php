@@ -62,11 +62,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('communities/mine', [CommunityController::class, 'getMine'])->name('communities.getMine');
     Route::get('communities/joined', [CommunityController::class, 'getWorking'])->name('communities.getWorking');
     Route::get('communities/public', [CommunityController::class, 'getPublic'])->name('communities.getPublic');
-    Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');
+    Route::delete('communities/{community}', [CommunityController::class, 'destroy'])->name('communities.destroy')->where('community', '[0-9]+');
 
     Route::post('invitations', [InvitationController::class, 'store'])->name('invitations.store');
 
     Route::post('channels', [ChannelController::class, 'store'])->name('channels.store');
+    Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');
+    Route::delete('channels/{channel}', [ChannelController::class, 'destroy'])->name('channels.destroy')->where('channel', '[0-9]+');
 
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');

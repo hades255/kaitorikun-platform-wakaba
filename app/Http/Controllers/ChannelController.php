@@ -13,14 +13,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ChannelController extends Controller
 {
-    // List all channels 
     public function index()
     {
         $channel = Channel::all();
         return response()->json($channel);
     }
 
-    // Store a new channel 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -45,13 +43,12 @@ class ChannelController extends Controller
                 ],
                 []
             );
-            // $channel->users()->attach(Auth::id());
+
             return response()->json(["channel" => $channel, "user" => Auth::user()], 201);
         }
         return response()->json(['error' => 'Failed to create channel'], 500);
     }
 
-    // Show a specific channel 
     public function show(Channel $channel, Request $request)
     {
         $limit = $request->input('limit', 10);
@@ -59,23 +56,30 @@ class ChannelController extends Controller
         $sortBy = $request->input('sort_by', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
         $posts = $channel->limitedPosts($limit, $offset, $sortBy, $sortOrder);
-        // $users = $channel->community->users->select('users.id', 'users.name', 'users.email')->get();
+
         $users = $channel->community->users;
-        // return response()->json(["chennel" => $channel, "posts" => $posts, "users" => $users]);
+
         return response()->json(["posts" => $posts, "users" => $users, "channel" => $channel, "community" => $channel->community]);
     }
 
-    // Update a specific channel 
-    public function update(Request $request, Channel $channel)
-    {
-        // Validate and update the channel 
-        // ...
+    public function update(Request $request, Channel $channel) {
+        //
     }
 
-    // Delete a specific channel 
     public function destroy(Channel $channel)
     {
-        // Delete the channel 
-        // ...
+        if ($channel->user_id == Auth::id()) {
+            try {
+                $data = ["name" => $channel->name, "id" => $channel->id, "user_id" => $channel->user_id, "community_id" => $channel->community_id];
+
+                if ($channel->delete()) {
+                    return response()->json($data);
+                }
+            } catch (\Throwable $th) {
+                return response()->json(['error' => 'Failed to remove channel', "message" => $th->getMessage()], 500);
+            }
+        } else {
+            return response()->json(['error' => 'Failed to remove channel', "message" => "Unauthorized user"], 401);
+        }
     }
 }

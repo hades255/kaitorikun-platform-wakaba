@@ -77,7 +77,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 post_id: post.id,
             });
             dispatch(actionChannel.handleReplyPost(response.data));
-            // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
             setReply("");
             setShowReplyInput(false);
         } catch (error) {
@@ -104,7 +103,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     post_id: post.id,
                 });
                 dispatch(actionChannel.handleAddREACTION(response.data));
-                // dispatch(actionChannel.handleSetMyCommunity(post.community_id));
             } catch (error) {
                 console.log(error);
             } finally {
@@ -555,64 +553,69 @@ const EmojiItem = ({ reaction, onClick, users }) => {
     const handleClick = () => onClick(reaction);
 
     return (
-        <div onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
-            <Badge
-                badgeContent={reaction.count > 1 ? reaction.count : 0}
-                color="info"
-                sx={{ cursor: "pointer" }}
+        emoji && (
+            <div
+                onMouseEnter={handlePopoverOpen}
+                onMouseLeave={handlePopoverClose}
             >
-                <Chip
-                    sx={{ fontSize: 24 }}
-                    variant="outlined"
-                    color="secondary"
-                    label={emoji.skins[0].native}
-                    onClick={handleClick}
-                ></Chip>
-            </Badge>
-            {Array.isArray(reaction.users) &&
-                reaction.users.length > 0 &&
-                open && (
-                    <Popover
-                        id="mouse-over-popover"
-                        sx={{ pointerEvents: "none" }}
-                        open={open}
-                        anchorEl={anchorEl}
-                        anchorOrigin={{
-                            vertical: "bottom",
-                            horizontal: "left",
-                        }}
-                        transformOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                        }}
-                        onClose={handlePopoverClose}
-                        disableRestoreFocus
-                    >
-                        <Box
-                            p={2}
-                            display={"flex"}
-                            flexDirection={"column"}
-                            gap={1}
+                <Badge
+                    badgeContent={reaction.count > 1 ? reaction.count : 0}
+                    color="info"
+                    sx={{ cursor: "pointer" }}
+                >
+                    <Chip
+                        sx={{ fontSize: 24 }}
+                        variant="outlined"
+                        color="secondary"
+                        label={emoji.skins[0].native}
+                        onClick={handleClick}
+                    ></Chip>
+                </Badge>
+                {Array.isArray(reaction.users) &&
+                    reaction.users.length > 0 &&
+                    open && (
+                        <Popover
+                            id="mouse-over-popover"
+                            sx={{ pointerEvents: "none" }}
+                            open={open}
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "left",
+                            }}
+                            transformOrigin={{
+                                vertical: "top",
+                                horizontal: "left",
+                            }}
+                            onClose={handlePopoverClose}
+                            disableRestoreFocus
                         >
-                            {reaction.users.map(
-                                (item, index) =>
-                                    index < 3 && (
-                                        <Creator
-                                            key={index}
-                                            users={users}
-                                            creature={{ user_id: item }}
-                                        />
-                                    )
-                            )}
-                            {reaction.users.length > 3 && (
-                                <Box pl={1}>
-                                    <MoreHorizIcon color="gray" />
-                                </Box>
-                            )}
-                        </Box>
-                    </Popover>
-                )}
-        </div>
+                            <Box
+                                p={2}
+                                display={"flex"}
+                                flexDirection={"column"}
+                                gap={1}
+                            >
+                                {reaction.users.map(
+                                    (item, index) =>
+                                        index < 3 && (
+                                            <Creator
+                                                key={index}
+                                                users={users}
+                                                creature={{ user_id: item }}
+                                            />
+                                        )
+                                )}
+                                {reaction.users.length > 3 && (
+                                    <Box pl={1}>
+                                        <MoreHorizIcon color="gray" />
+                                    </Box>
+                                )}
+                            </Box>
+                        </Popover>
+                    )}
+            </div>
+        )
     );
 };
 

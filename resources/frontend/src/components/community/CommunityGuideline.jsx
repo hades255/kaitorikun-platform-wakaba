@@ -30,7 +30,7 @@ const CommunityGuideline = ({ comData, setComData }) => {
                                 guideline: e.target.value,
                             })
                         }
-                        placeholder="コミュニティのメンバーに対して親切で敬意を持って接してください。失礼な態度や残酷な態度はとらないでください。自分らしく参加し、違反する投稿はしないでください"
+                        placeholder="仲間であるコミュニティ メンバーには親切に接し、敬意を払いましょう。無礼な態度を取ったり、酷いことをしたりするのはやめましょう。自分自身として参加し、コミュニティ規定に違反する内容は投稿しないでください。"
                         required
                         mb={2}
                     />
@@ -43,7 +43,7 @@ const CommunityGuideline = ({ comData, setComData }) => {
                             {/* community standards. */}
                             {/* コミュニティの基準。 */}
                             {comData.guideline}{" "}
-                            <span
+                            {/* <span
                                 style={{
                                     color: "#4d5288",
                                     fontWeight: 600,
@@ -51,7 +51,7 @@ const CommunityGuideline = ({ comData, setComData }) => {
                                 }}
                             >
                                 コミュニティの基準
-                            </span>
+                            </span> */}
                             。
                         </Typography>
                     </Box>

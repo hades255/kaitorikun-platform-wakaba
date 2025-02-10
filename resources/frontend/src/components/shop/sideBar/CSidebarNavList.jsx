@@ -2,10 +2,17 @@ import { memo, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
-import { Avatar } from "@mui/material";
+import { Avatar, IconButton, Menu, MenuItem } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { stringAvatar } from "../../helper/func";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { useNotification } from "../../../contexts/NotificationContext";
+import "./CSidebarNavList.css";
+import { ToastNotification } from "../../helper";
+import api from "../../../api";
+import { useDispatch } from "react-redux";
+import { actionChannel } from "../../../reduxStore";
 
 const CSidebarNavList = (props) => {
     const dataId = props.data.id;
@@ -43,7 +50,10 @@ const CSidebarNavList = (props) => {
         >
             {props.data.type == "com" ? (
                 <div
-                    className={clsx("nav-link nav-link-font", classes.menuItem)}
+                    className={clsx(
+                        "CSidebarNavListItem nav-link nav-link-font",
+                        classes.menuItem
+                    )}
                     onClick={handleMainMenuAction}
                 >
                     <Avatar
@@ -62,11 +72,17 @@ const CSidebarNavList = (props) => {
                         {props.data.title}
                         <i className="right fas fa-angle-left" />
                     </p>
+                    <div className={"CSidebarNavListItem-setting"}>
+                        <MoreButton data={props.data} />
+                    </div>
                 </div>
             ) : (
                 <Link
                     to={`/${props.path}/${dataId}`}
-                    className={clsx("nav-link nav-link-font", classes.menuItem)}
+                    className={clsx(
+                        "CSidebarNavListItem nav-link nav-link-font",
+                        classes.menuItem
+                    )}
                     onClick={handleMainSubMenuAction}
                 >
                     <i
@@ -74,6 +90,9 @@ const CSidebarNavList = (props) => {
                         style={{ minWidth: 24, width: 24 }}
                     />
                     <p>{props.data.title}</p>
+                    <div className={"CSidebarNavListItem-setting"}>
+                        <MoreButton data={props.data} />
+                    </div>
                 </Link>
             )}
             {isMenuExtended && (
@@ -110,6 +129,75 @@ const CSidebarNavList = (props) => {
 };
 
 export default memo(CSidebarNavList);
+
+const MoreButton = ({ data }) => {
+    const dispatch = useDispatch();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    }, []);
+
+    const handleClose = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setAnchorEl(null);
+    }, []);
+
+    const handleDelete = useCallback(
+        async (event) => {
+            try {
+                if (data) {
+                    const response = await api.delete(
+                        `${data.type == "com" ? "communities" : "channels"}/${
+                            data.id
+                        }`
+                    );
+                    dispatch(
+                        data.type == "com"
+                            ? actionChannel.handleRemoveCommunity(response.data)
+                            : actionChannel.handleRemoveChannel(response.data)
+                    );
+                    ToastNotification("success", "正常に削除されました");
+                }
+            } catch (error) {
+                console.log(error);
+                ToastNotification(
+                    "warning",
+                    "サーバーエラーです。後でもう一度お試しください"
+                );
+            } finally {
+                handleClose(event);
+            }
+        },
+        [dispatch, handleClose, data]
+    );
+
+    return (
+        <>
+            <IconButton onClick={handleClick}>
+                <MoreHorizIcon color="white" />
+            </IconButton>
+            <Menu
+                id="delete-channel-button"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                }}
+            >
+                <MenuItem onClick={handleDelete}>
+                    <DeleteOutlineIcon />
+                    チャネルの削除
+                </MenuItem>
+            </Menu>
+        </>
+    );
+};
 
 const useStyles = makeStyles((theme) => ({
     navItem: {

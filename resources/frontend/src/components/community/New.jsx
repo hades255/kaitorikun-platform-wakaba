@@ -70,7 +70,7 @@ const CreateCommunity = ({ page = true }) => {
 
     return (
         <>
-            <DialogTitle fontWeight={700}>新しいコミュニティを作る</DialogTitle>
+            <DialogTitle fontWeight={700}>コミュニティの作成</DialogTitle>
             <DialogContent>
                 <form onSubmit={handleSubmit}>
                     <Box
@@ -96,7 +96,7 @@ const CreateCommunity = ({ page = true }) => {
                                     name: e.target.value,
                                 })
                             }
-                            placeholder="コミュニティに名前を付ける"
+                            placeholder="コミュニティに名前を付けます"
                             required
                         />
                     </Box>
@@ -105,7 +105,7 @@ const CreateCommunity = ({ page = true }) => {
                         multiline
                         rows={4}
                         variant="filled"
-                        label="説明(オプション)"
+                        label="説明 (任意)"
                         value={comData.description}
                         onChange={(e) =>
                             setComData({
@@ -113,7 +113,7 @@ const CreateCommunity = ({ page = true }) => {
                                 description: e.target.value,
                             })
                         }
-                        placeholder="コミュニティについて簡単に説明して、コミュニティの目的を人々に知らせてください。"
+                        placeholder="コミュニティに関する簡単な説明を記述して、ユーザーがコミュニティの内容を知るようにします。"
                         sx={{ mb: 2 }}
                     />
                     <CommunityGuideline

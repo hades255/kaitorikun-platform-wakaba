@@ -112,9 +112,21 @@ class CommunityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Community $community)
     {
-        //
+        if ($community->user_id == Auth::id()) {
+            try {
+                $data = ["name" => $community->name, "id" => $community->id, "user_id" => $community->user_id];
+                // DeletePostJob::dispatch($data, Auth::user()->name);
+                if ($community->delete()) {
+                    return response()->json($data);
+                }
+            } catch (\Throwable $th) {
+                return response()->json(['error' => 'Failed to remove community', "message" => $th->getMessage()], 500);
+            }
+        } else {
+            return response()->json(['error' => 'Failed to remove community', "message" => "Unauthorized user"], 401);
+        }
     }
 
     //   get public communities

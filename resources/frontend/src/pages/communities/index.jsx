@@ -27,11 +27,12 @@ import {
 import Creator from "../../components/community/Creator";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
+import { stringAvatar } from "../../components/helper/func";
 
 const sepItems = [
     { type: "posts", title: "投稿" },
     { type: "files", title: "ファイル" },
-    { type: "photos", title: "写真" },
+    // { type: "photos", title: "写真" },
 ];
 
 const Communities = ({ match }) => {
@@ -284,13 +285,19 @@ const ComHeader = ({
     sepCom,
     setShowInviteDialog,
 }) => {
+    const mainContent = channel
+        ? channel.type == 0
+            ? community
+            : channel
+        : null;
+
     const handleClickInvite = useCallback(() => {
         setShowInviteDialog(true);
     }, [setShowInviteDialog]);
 
     return (
         <>
-            {community && (
+            {mainContent && (
                 <Box
                     width={"100%"}
                     display={"flex"}
@@ -302,18 +309,24 @@ const ComHeader = ({
                 >
                     <Box display={"flex"} alignItems={"center"} gap={2}>
                         <Avatar
-                            alt={community.name}
-                            src={community.icon || "avatar"}
+                            {...stringAvatar({
+                                name: mainContent.name,
+                                src: mainContent.icon,
+                                sx: {
+                                    color: "black",
+                                    width: 32,
+                                    height: 32,
+                                },
+                            })}
                             variant="rounded"
-                            sx={{ color: "black", width: 32, height: 32 }}
                         />
                         <Typography variant="h5" color="black">
-                            {community.name}
+                            {mainContent.name}
                         </Typography>
                         <ButtonGroup
                             size="small"
                             variant="text"
-                            aria-label="sep community settings"
+                            aria-label="sep mainContent settings"
                         >
                             {sepItems.map((item) => (
                                 <SepItems
@@ -331,7 +344,7 @@ const ComHeader = ({
                         <ButtonGroup
                             size="small"
                             variant="text"
-                            aria-label="community settings"
+                            aria-label="mainContent settings"
                         >
                             <Button onClick={handleClickInvite}>
                                 <GroupAddIcon />

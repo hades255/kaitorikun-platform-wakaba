@@ -94,7 +94,7 @@ export default function PostEditor({ onPost, onClose, initPost }) {
             <form onSubmit={handlePost}>
                 <TextField
                     fullWidth
-                    label="タイトル"
+                    label="件名を追加"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
@@ -114,7 +114,7 @@ export default function PostEditor({ onPost, onClose, initPost }) {
                     }}
                     style={{ height: "200px", marginBottom: "50px" }}
                 />
-                <Box display={"flex"} alignItems={"baseline"} gap={2}>
+                {/* <Box display={"flex"} alignItems={"baseline"} gap={2}>
                     <IconButton onClick={handleClickFileInput}>
                         <AttachFileIcon />
                         <input
@@ -138,7 +138,7 @@ export default function PostEditor({ onPost, onClose, initPost }) {
                         // label="Also notify via email"
                         label="メールでも通知"
                     />
-                </Box>
+                </Box> */}
                 {attachment && (
                     <Box
                         display={"flex"}

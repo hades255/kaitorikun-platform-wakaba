@@ -5,24 +5,19 @@ import {
     NEW_CHANNEL,
     NEW_COMMUNITY,
     NEW_POST,
-    NEW_PUBLIC_CHANNEL,
-    NEW_PUBLIC_COMMUNITY,
+    REMOVE_CHANNEL,
+    REMOVE_COMMUNITY,
     REMOVE_POST,
     REMOVE_REACTION,
     REPLY_POST,
     SELECT_CHANNEL,
     SET_CHANNEL,
     SET_COMMUNITY,
-    SET_COMMUNITY_AS_MINE,
-    SET_PUBLIC_CHANNEL,
-    SET_PUBLIC_COMMUNITY,
 } from "../actions/channel_action";
 
 const initialState = {
     communities: [],
-    publicCommunities: [],
     channels: [],
-    publicChannels: [],
     community: null,
     channel: null,
     users: [],
@@ -43,30 +38,22 @@ const channels = (state = initialState, actions) => {
                 ...state,
                 communities: data,
             };
-        case SET_PUBLIC_COMMUNITY:
-            return {
-                ...state,
-                publicCommunities: data,
-            };
         case NEW_COMMUNITY:
             return {
                 ...state,
                 communities: [...state.communities, data],
             };
-        case NEW_PUBLIC_COMMUNITY:
+        case REMOVE_COMMUNITY:
             return {
                 ...state,
-                publicCommunities: [...state.publicCommunities, data],
+                communities: state.communities.filter(
+                    ({ id }) => id != data.id
+                ),
             };
         case SET_CHANNEL:
             return {
                 ...state,
                 channels: data,
-            };
-        case SET_PUBLIC_CHANNEL:
-            return {
-                ...state,
-                publicChannels: data,
             };
         case NEW_CHANNEL:
             return {
@@ -78,18 +65,6 @@ const channels = (state = initialState, actions) => {
                             ? [...item.channels, data]
                             : item.channels,
                 })),
-                publicCommunities: state.publicCommunities?.map((item) => ({
-                    ...item,
-                    channels:
-                        item.id == data.community_id
-                            ? [...item.channels, data]
-                            : item.channels,
-                })),
-            };
-        case NEW_PUBLIC_CHANNEL:
-            return {
-                ...state,
-                publicChannels: [...state.publicChannels, data],
             };
         case SELECT_CHANNEL:
             return {
@@ -98,6 +73,17 @@ const channels = (state = initialState, actions) => {
                 channel: data.channel,
                 users: data.users,
                 posts: data.posts,
+            };
+        case REMOVE_CHANNEL:
+            return {
+                ...state,
+                communities: state.communities?.map((item) => ({
+                    ...item,
+                    channels:
+                        item.id == data.community_id
+                            ? item.channels.filter((cha) => cha.id != data.id)
+                            : item.channels,
+                })),
             };
         case NEW_POST:
             return {
@@ -152,21 +138,6 @@ const channels = (state = initialState, actions) => {
                               ),
                           }
                         : item
-                ),
-            };
-        case SET_COMMUNITY_AS_MINE:
-            const com = state.communities.find((item) => item.id == data);
-            const pubcom = state.publicCommunities.find(
-                (item) => item.id == data
-            );
-            return {
-                ...state,
-                communities:
-                    pubcom && !com
-                        ? [...state.communities, pubcom]
-                        : [...state.communities],
-                publicCommunities: state.publicCommunities.filter(
-                    (item) => item.id != data
                 ),
             };
         default:

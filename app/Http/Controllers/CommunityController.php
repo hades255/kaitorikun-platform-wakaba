@@ -118,8 +118,11 @@ class CommunityController extends Controller
         if ($community->user_id == Auth::id()) {
             try {
                 $data = ["name" => $community->name, "id" => $community->id, "user_id" => $community->user_id];
-                RemoveCommunityJob::dispatch($data, Auth::user()->name);
+                $community->communityUsers()->delete();
+                $community->channels()->delete();
+                $community->invitations()->delete();
                 if ($community->delete()) {
+                    RemoveCommunityJob::dispatch($data, Auth::user()->name);
                     return response()->json($data);
                 }
             } catch (\Throwable $th) {

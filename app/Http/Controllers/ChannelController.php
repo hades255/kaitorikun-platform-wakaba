@@ -73,8 +73,11 @@ class ChannelController extends Controller
         if ($channel->user_id == Auth::id()) {
             try {
                 $data = ["name" => $channel->name, "id" => $channel->id, "user_id" => $channel->user_id, "community_id" => $channel->community_id];
-                RemoveChannelJob::dispatch($data, Auth::user()->name);
+                // $channel->posts()->reactions()->delete();
+                // $channel->posts()->replies()->delete();
+                $channel->posts()->delete();
                 if ($channel->delete()) {
+                    RemoveChannelJob::dispatch($data, Auth::user()->name);
                     return response()->json($data);
                 }
             } catch (\Throwable $th) {

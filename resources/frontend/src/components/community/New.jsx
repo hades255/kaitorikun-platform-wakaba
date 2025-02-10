@@ -120,7 +120,7 @@ const CreateCommunity = ({ page = true }) => {
                         comData={comData}
                         setComData={setComData}
                     />
-                    <Box
+                    {/* <Box
                         sx={{
                             display: "flex",
                             alignItems: "center",
@@ -182,7 +182,7 @@ const CreateCommunity = ({ page = true }) => {
                             }
                             sx={{ mb: 2 }}
                         />
-                    </Box>
+                    </Box> */}
                     <Box display="flex" justifyContent="end" sx={{ gap: 2 }}>
                         <Button variant="outlined" onClick={handleClose}>
                             キャンセル

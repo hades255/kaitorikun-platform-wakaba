@@ -47,4 +47,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\SchannelUser', 'user_id');
     }
+
+    public function communityUsers()
+    {
+        return $this->hasMany(CommunityUser::class);
+    }
 }

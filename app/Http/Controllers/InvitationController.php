@@ -34,10 +34,13 @@ class InvitationController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'email' => 'required|email|max:255',
+            'users.*' => 'required',
             'community_id' => 'required|integer',
         ]);
         $userId = Auth::id();
+        $users = $validatedData["users"];
+
+        return response()->json($users);
         $email = $validatedData["email"];
         $receiver = User::where("email", $email)->first();
         if ($receiver) {
@@ -136,5 +139,21 @@ class InvitationController extends Controller
         $invitation->save();
 
         return response()->json(['message' => '招待が正常に承諾されました!']);
+    }
+
+    public function search_users(Request $request)
+    {
+        $search = $request->search;
+        $community_id = $request->community_id;
+        $users = User::where(function ($query) use ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%');
+        })
+            ->whereDoesntHave('communityUsers', function ($query) use ($community_id) {
+                $query->where('community_id', $community_id);
+            })
+            ->select('id', 'name', 'email')
+            ->get();
+        return response()->json($users);
     }
 }

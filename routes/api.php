@@ -64,6 +64,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('communities/public', [CommunityController::class, 'getPublic'])->name('communities.getPublic');
     Route::delete('communities/{community}', [CommunityController::class, 'destroy'])->name('communities.destroy')->where('community', '[0-9]+');
 
+    Route::get('invitations/users/search', [InvitationController::class, 'search_users'])->name('invitations.users.search');
     Route::post('invitations', [InvitationController::class, 'store'])->name('invitations.store');
 
     Route::post('channels', [ChannelController::class, 'store'])->name('channels.store');

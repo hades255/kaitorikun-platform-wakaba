@@ -7,6 +7,7 @@ import {
     ButtonGroup,
     Card,
     CardContent,
+    Chip,
     Dialog,
     TextField,
     Typography,
@@ -16,7 +17,6 @@ import LinkIcon from "@mui/icons-material/Link";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import SettingsIcon from "@mui/icons-material/Settings";
 import api from "../../api";
-import { useAuth } from "../../contexts/AuthContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import {
     PanelContent,
@@ -25,13 +25,13 @@ import {
     useSelector,
 } from "../../components";
 import Creator from "../../components/community/Creator";
+import { stringAvatar } from "../../components/helper/func";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
-import { stringAvatar } from "../../components/helper/func";
 
 const sepItems = [
     { type: "posts", title: "投稿" },
-    { type: "files", title: "ファイル" },
+    // { type: "files", title: "ファイル" },
     // { type: "photos", title: "写真" },
 ];
 
@@ -46,11 +46,8 @@ const Communities = ({ match }) => {
     const [comSepType, setComSepType] = useState("posts");
     const [post, setPost] = useState(null);
 
-    const { auth } = useAuth();
-
     const [showPostEditor, setShowPostEditor] = useState(false);
     const [showInviteDialog, setShowInviteDialog] = useState(false);
-    const [inviteEmail, setInviteEmail] = useState("");
 
     const getChannel = useCallback(
         (param) => {
@@ -122,34 +119,6 @@ const Communities = ({ match }) => {
         [channel]
     );
 
-    const handleSubmitInvitation = useCallback(
-        (e) => {
-            e.preventDefault();
-            console.log(inviteEmail);
-            const inviteFunc = async () => {
-                try {
-                    const response = await api.post("invitations", {
-                        email: inviteEmail,
-                        community_id: channel.id,
-                    });
-                    console.log(response);
-                    ToastNotification("success", "招待が正常に送信されました");
-                    setInviteEmail("");
-                    setShowInviteDialog(false);
-                } catch (error) {
-                    console.log(error);
-                    if (error.response?.status == 404)
-                        ToastNotification(
-                            "warning",
-                            "登録ユーザーに招待を送信できます"
-                        );
-                }
-            };
-            inviteFunc();
-        },
-        [auth, channel, inviteEmail]
-    );
-
     const handleClickSepCom = useCallback((type) => setComSepType(type), []);
 
     useEffect(() => {
@@ -219,14 +188,6 @@ const Communities = ({ match }) => {
                                             >
                                                 <PostAddIcon /> 新しい投稿を開始
                                             </Button>
-                                            <Button
-                                                variant="outlined"
-                                                onClick={() =>
-                                                    setShowInviteDialog(true)
-                                                }
-                                            >
-                                                人を招待
-                                            </Button>
                                         </Box>
                                     )}
                                 </CardContent>
@@ -250,26 +211,10 @@ const Communities = ({ match }) => {
                     open={showInviteDialog}
                     onClose={() => setShowInviteDialog(false)}
                 >
-                    <div className="p-2">
-                        <form onSubmit={handleSubmitInvitation}>
-                            <div className="text-lg">
-                                {/* Invite People */}人を招待
-                            </div>
-                            <TextField
-                                fullWidth
-                                // label="Email"
-                                label="メール"
-                                type="email"
-                                required
-                                value={inviteEmail}
-                                onChange={(e) => setInviteEmail(e.target.value)}
-                                sx={{ my: 2 }}
-                            />
-                            <Button variant="contained" type="submit">
-                                {/* Send Invite */}招待を送信
-                            </Button>
-                        </form>
-                    </div>
+                    <Invitation
+                        onClose={setShowInviteDialog}
+                        community={community}
+                    />
                 </Dialog>
             )}
         </PanelContent>
@@ -372,5 +317,151 @@ const SepItems = ({ children, type, onClick, active }) => {
         <Button onClick={handleClick} variant={active ? "outlined" : "text"}>
             {children}
         </Button>
+    );
+};
+
+const Invitation = ({ community, onClose }) => {
+    const [inviteEmail, setInviteEmail] = useState("");
+    const [selected, setSelected] = useState([]);
+    const [timer, setTimer] = useState(null);
+    const [users, setUsers] = useState([]);
+
+    const handleSubmitInvitation = useCallback(async () => {
+        try {
+            const response = await api.post("invitations", {
+                users: selected,
+                community_id: community.id,
+            });
+            console.log(response.data);
+            // ToastNotification("success", "招待が正常に送信されました");
+            // setInviteEmail("");
+            // onClose(false);
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status == 404)
+                ToastNotification(
+                    "warning",
+                    "登録ユーザーに招待を送信できます"
+                );
+        }
+    }, [community, onClose, selected]);
+
+    const getUsers = useCallback(
+        async (input) => {
+            try {
+                const response = await api(
+                    `invitations/users/search?search=${input}&community_id=${community.id}`
+                );
+                setUsers(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        [community]
+    );
+
+    const handleInputChange = useCallback(
+        (e) => {
+            setInviteEmail(e.target.value);
+            if (timer) clearTimeout(timer);
+            if (e.target.value.length > 2)
+                setTimer(setTimeout(() => getUsers(e.target.value), 500));
+            else setUsers([]);
+        },
+        [timer, getUsers]
+    );
+
+    return (
+        <Box p={4}>
+            <Typography variant="body1">
+                {/* Invite People */}メンバーを「コミュニティ ガイド」に招待
+            </Typography>
+            <Typography variant="subtitle2">
+                このコミュニティに追加する個人の名前、メール
+                アドレスを入力します。
+            </Typography>
+            <Box minHeight={200} my={2}>
+                {selected.length > 0 && (
+                    <Box
+                        display={"flex"}
+                        alignItems={"center"}
+                        flexWrap={"wrap"}
+                        gap={1}
+                    >
+                        {selected.map((user) => (
+                            <Chip
+                                key={user.id}
+                                id={user.id}
+                                label={user.name}
+                                variant="outlined"
+                                color="info"
+                                onDelete={() =>
+                                    setSelected(
+                                        selected.filter(
+                                            ({ id }) => id != user.id
+                                        )
+                                    )
+                                }
+                                avatar={<Avatar>{user.name[0]}</Avatar>}
+                            />
+                        ))}
+                    </Box>
+                )}
+                <TextField
+                    fullWidth
+                    // label="Email"
+                    label="名前、メールを検索"
+                    type="email"
+                    placeholder="名前、メールを入力"
+                    required
+                    value={inviteEmail}
+                    onChange={handleInputChange}
+                    sx={{ my: 2 }}
+                />
+                <Box
+                    display={"flex"}
+                    flexDirection={"column"}
+                    gap={1}
+                    maxHeight={400}
+                    sx={{ overflowY: "scroll", cursor: "pointer" }}
+                >
+                    {users.map(
+                        (user) =>
+                            !selected.find(({ id }) => id == user.id) && (
+                                <Box
+                                    key={user.id}
+                                    id={user.id}
+                                    display={"flex"}
+                                    alignItems={"center"}
+                                    gap={2}
+                                    onClick={() =>
+                                        setSelected([...selected, user])
+                                    }
+                                >
+                                    <Avatar>{user.name[0]}</Avatar>
+                                    <Box
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                    >
+                                        <Typography variant="caption">
+                                            {user.name}
+                                        </Typography>
+                                        <Typography variant="caption">
+                                            {user.email}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            )
+                    )}
+                </Box>
+            </Box>
+            <Button
+                variant="contained"
+                disabled={selected.length == 0}
+                onClick={handleSubmitInvitation}
+            >
+                {/* Send Invite */}招待を送信
+            </Button>
+        </Box>
     );
 };

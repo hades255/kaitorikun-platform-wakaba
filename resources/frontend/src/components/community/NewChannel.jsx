@@ -4,9 +4,8 @@ import api from "../../api";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { ToastNotification, useDispatch, useSelector } from "..";
-import { makeStyles, useTheme } from "@mui/styles";
+import { makeStyles } from "@mui/styles";
 
-// Define the styles using makeStyles
 const useStyles = makeStyles((theme) => ({
     formContainer: {
         display: "flex",
@@ -96,16 +95,15 @@ const CreateChannel = () => {
     return (
         <Paper sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
             <Typography variant="h5" sx={{ mb: 3 }}>
-                新しいチャンネルを作成する
+                チャネルの作成
             </Typography>
 
             <form onSubmit={handleSubmit} className={classes.formContainer}>
-                {/* <div className="flex items-center gap-4 mb-2"> */}
                 <div className={classes.formGroup}>
-                    {/* <span className="text-gray-800 w-24">コミュニティ</span> */}
-                    <span className={classes.label}>コミュニティ</span>
+                    <span className={classes.label}>
+                        チャネルをチームに追加する*
+                    </span>
                     <select
-                        // className="min-w-24 rounded border p-2 text-gray-800"
                         value={comData.community_id}
                         onChange={(e) =>
                             setComData({
@@ -125,7 +123,8 @@ const CreateChannel = () => {
                 </div>
                 <TextField
                     fullWidth
-                    label="チャンネル名"
+                    label="チャネル名"
+                    placeholder="文字、数字、スペースを使用できます"
                     value={comData.name}
                     onChange={(e) =>
                         setComData({
@@ -141,7 +140,7 @@ const CreateChannel = () => {
                     multiline
                     rows={4}
                     label="説明"
-                    // label="Description"
+                    placeholder="他のユーザーが、適切なチャネルを見つけられるように説明を入力します"
                     value={comData.description}
                     onChange={(e) =>
                         setComData({
@@ -151,15 +150,15 @@ const CreateChannel = () => {
                     }
                     sx={{ mb: 2 }}
                 />
-                <Box display="flex" sx={{ gap: 2 }}>
-                    <Button variant="contained" type="submit">
-                        {/* Create community */}チャンネルを作成
-                    </Button>
+                <Box display="flex" justifyContent={"end"} sx={{ gap: 2 }}>
                     <Button
                         variant="outlined"
                         onClick={() => setShowChannelEditor(false)}
                     >
-                        {/* Cancel */}キャンセル
+                        キャンセル
+                    </Button>
+                    <Button variant="contained" type="submit">
+                        作成
                     </Button>
                 </Box>
             </form>

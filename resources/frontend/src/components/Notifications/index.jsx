@@ -109,7 +109,6 @@ const Notifications = () => {
             }
         };
         const handleDeleteCommunity = (data) => {
-            console.log(data.community);
             if (
                 data &&
                 data.community &&
@@ -127,7 +126,6 @@ const Notifications = () => {
             }
         };
         const handleDeleteChannel = (data) => {
-            console.log(data.channel);
             if (
                 data &&
                 data.channel &&
@@ -149,7 +147,7 @@ const Notifications = () => {
         channel.listen(".channel.post.deleted", handleDeletePost);
         channel.listen(".channel.chat.created", handleNewChat);
         channel.listen(".channel.community.removed", handleDeleteCommunity);
-        channel.listen(".channel.channel.removed", handleDeleteChannel);
+        channel.listen(".channel.removed", handleDeleteChannel);
 
         return () => {
             if (channel) {
@@ -159,7 +157,7 @@ const Notifications = () => {
                 channel.stopListening(".channel.post.deleted");
                 channel.stopListening(".channel.chat.created");
                 channel.stopListening(".channel.community.removed");
-                channel.stopListening(".channel.channel.removed");
+                channel.stopListening(".channel.removed");
             }
         };
     }, [dispatch, showNotification, updateUnreadTab, auth, comIds, scomIds]);

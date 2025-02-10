@@ -37,6 +37,6 @@ class RemoveChannel implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'channel.channel.removed';
+        return 'channel.removed';
     }
 }

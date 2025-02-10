@@ -24,8 +24,10 @@ const ChannelSidebar = ({ page = true }) => {
                             id: cha.id,
                             path: "#",
                             title: cha.name,
+                            user_id: cha.user_id,
                             icon: null,
-                            type: "cha",
+                            mood: "cha",
+                            type: cha.type,
                         });
                     });
                 }
@@ -33,8 +35,10 @@ const ChannelSidebar = ({ page = true }) => {
                     id: item.id,
                     path: "#",
                     title: item.name,
+                    user_id: item.user_id,
                     icon: item.icon,
-                    type: "com",
+                    mood: "com",
+                    type: item.type,
                     children,
                 });
             });

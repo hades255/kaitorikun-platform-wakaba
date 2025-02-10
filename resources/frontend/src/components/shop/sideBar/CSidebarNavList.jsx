@@ -2,7 +2,18 @@ import { memo, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
-import { Avatar, IconButton, Menu, MenuItem } from "@mui/material";
+import {
+    Avatar,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    Menu,
+    MenuItem,
+} from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { stringAvatar } from "../../helper/func";
@@ -13,6 +24,7 @@ import { ToastNotification } from "../../helper";
 import api from "../../../api";
 import { useDispatch } from "react-redux";
 import { actionChannel } from "../../../reduxStore";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const CSidebarNavList = (props) => {
     const dataId = props.data.id;
@@ -21,7 +33,7 @@ const CSidebarNavList = (props) => {
     const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
 
     const count = Array.isArray(unreadTab.scom)
-        ? props.data.type == "com"
+        ? props.data.mood == "com"
             ? unreadTab.scom.filter(({ com }) => com == dataId).length
             : unreadTab.scom.filter(({ cha }) => cha == dataId).length
         : 0;
@@ -48,7 +60,7 @@ const CSidebarNavList = (props) => {
                 "menu-open": isMenuExtended,
             })}
         >
-            {props.data.type == "com" ? (
+            {props.data.mood == "com" ? (
                 <div
                     className={clsx(
                         "CSidebarNavListItem nav-link nav-link-font",
@@ -97,7 +109,7 @@ const CSidebarNavList = (props) => {
             )}
             {isMenuExtended && (
                 <ul className="nav nav-treeview">
-                    {props.data.type == "com" &&
+                    {props.data.mood == "com" &&
                         props.data.children &&
                         props.data.children.map((submenu, i) => (
                             <CSidebarNavList
@@ -132,8 +144,10 @@ export default memo(CSidebarNavList);
 
 const MoreButton = ({ data }) => {
     const dispatch = useDispatch();
+    const { auth } = useAuth();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
     const handleClick = useCallback((event) => {
         event.preventDefault();
@@ -147,17 +161,32 @@ const MoreButton = ({ data }) => {
         setAnchorEl(null);
     }, []);
 
-    const handleDelete = useCallback(
+    const handleClickOpenDeleteModal = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setOpenDeleteModal(true);
+        setAnchorEl(null);
+    }, []);
+
+    const handleCloseDeleteModal = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setOpenDeleteModal(false);
+    }, []);
+
+    const handleAcceptDeleteModal = useCallback(
         async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
             try {
                 if (data) {
                     const response = await api.delete(
-                        `${data.type == "com" ? "communities" : "channels"}/${
+                        `${data.mood == "com" ? "communities" : "channels"}/${
                             data.id
                         }`
                     );
                     dispatch(
-                        data.type == "com"
+                        data.mood == "com"
                             ? actionChannel.handleRemoveCommunity(response.data)
                             : actionChannel.handleRemoveChannel(response.data)
                     );
@@ -170,7 +199,7 @@ const MoreButton = ({ data }) => {
                     "サーバーエラーです。後でもう一度お試しください"
                 );
             } finally {
-                handleClose(event);
+                setOpenDeleteModal(false);
             }
         },
         [dispatch, handleClose, data]
@@ -190,11 +219,38 @@ const MoreButton = ({ data }) => {
                     "aria-labelledby": "basic-button",
                 }}
             >
-                <MenuItem onClick={handleDelete}>
+                <MenuItem
+                    disabled={
+                        (auth ? auth.id != data.user_id : true) ||
+                        (data.mood == "cha" && data.type == 0)
+                    }
+                    onClick={handleClickOpenDeleteModal}
+                >
                     <DeleteOutlineIcon />
                     チャネルの削除
                 </MenuItem>
             </Menu>
+            <Dialog
+                open={openDeleteModal}
+                onClose={handleCloseDeleteModal}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    これを削除してもよろしいですか?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {data.title}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteModal}>反対</Button>
+                    <Button onClick={handleAcceptDeleteModal} autoFocus>
+                        賛成
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

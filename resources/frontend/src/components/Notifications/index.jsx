@@ -12,7 +12,6 @@ const Notifications = () => {
     const { auth } = useAuth();
     const { updateUnreadTab, showNotification } = useNotification();
     const coms = useSelector(selectorChannel.handleGetCommunities);
-    // const pubcoms = useSelector(selectorChannel.handleGetPublicCommunities);
 
     const [comIds, setComIds] = useState([]);
     const [scomIds, setSComIds] = useState([]);
@@ -25,15 +24,6 @@ const Notifications = () => {
                 : []
         );
     }, [coms]);
-
-    // useEffect(() => {
-    //     setComIds([
-    //         ...(coms && coms.length > 0 ? coms.map(({ id }) => id) : []),
-    //         ...(pubcoms && pubcoms.length > 0
-    //             ? pubcoms.map(({ id }) => id)
-    //             : []),
-    //     ]);
-    // }, [coms, pubcoms]);
 
     useEffect(() => {
         myEcho();
@@ -118,12 +108,48 @@ const Notifications = () => {
                     });
             }
         };
+        const handleDeleteCommunity = (data) => {
+            console.log(data.community);
+            if (
+                data &&
+                data.community &&
+                comIds?.includes(Number(data.community.id))
+            ) {
+                if (auth?.id != data.community.user_id) {
+                    if (data.name)
+                        showNotification("コミュニティを削除しました", {
+                            message: `${data.name} がコミュニティを削除しました.\n${data.community.name}`,
+                        });
+                    dispatch(
+                        actionChannel.handleRemoveCommunity(data.community)
+                    );
+                }
+            }
+        };
+        const handleDeleteChannel = (data) => {
+            console.log(data.channel);
+            if (
+                data &&
+                data.channel &&
+                comIds?.includes(Number(data.channel.community_id))
+            ) {
+                if (auth?.id != data.channel.user_id) {
+                    if (data.name)
+                        showNotification("チャンネルを削除しました", {
+                            message: `${data.name} がチャンネルを削除しました.\n${data.channel.name}`,
+                        });
+                    dispatch(actionChannel.handleRemoveChannel(data.channel));
+                }
+            }
+        };
 
         // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
         channel.listen(".channel.post.created", handlePostCreated);
         channel.listen(".channel.post.deleted", handleDeletePost);
         channel.listen(".channel.chat.created", handleNewChat);
+        channel.listen(".channel.community.removed", handleDeleteCommunity);
+        channel.listen(".channel.channel.removed", handleDeleteChannel);
 
         return () => {
             if (channel) {
@@ -132,6 +158,8 @@ const Notifications = () => {
                 channel.stopListening(".channel.post.created");
                 channel.stopListening(".channel.post.deleted");
                 channel.stopListening(".channel.chat.created");
+                channel.stopListening(".channel.community.removed");
+                channel.stopListening(".channel.channel.removed");
             }
         };
     }, [dispatch, showNotification, updateUnreadTab, auth, comIds, scomIds]);
@@ -187,21 +215,6 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
-            // const fetchPublicCommunities = async () => {
-            //     try {
-            //         const response = await api.get(
-            //             `${API_ROUTE}communities/public`
-            //         );
-            //         dispatch(
-            //             actionChannel.handleSetPublicCommunity(
-            //                 response.data.communities
-            //             )
-            //         );
-            //     } catch (err) {
-            //         console.log(err);
-            //     }
-            // };
-            // fetchPublicCommunities();
             getUsers();
             getMyChats();
             // getMineCommunities();

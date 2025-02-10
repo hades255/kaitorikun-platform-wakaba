@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\NewCommunityJob;
+use App\Jobs\RemoveCommunityJob;
 use App\Models\Channel;
 use App\Models\Community;
 use Illuminate\Http\Request;
@@ -117,7 +118,7 @@ class CommunityController extends Controller
         if ($community->user_id == Auth::id()) {
             try {
                 $data = ["name" => $community->name, "id" => $community->id, "user_id" => $community->user_id];
-                // DeletePostJob::dispatch($data, Auth::user()->name);
+                RemoveCommunityJob::dispatch($data, Auth::user()->name);
                 if ($community->delete()) {
                     return response()->json($data);
                 }

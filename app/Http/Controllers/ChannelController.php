@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\NewChannel;
 use App\Jobs\NewChannelJob;
+use App\Jobs\RemoveChannelJob;
 use App\Models\Channel;
 use App\Models\CommunityUser;
 use App\Models\Invitation;
@@ -62,7 +63,8 @@ class ChannelController extends Controller
         return response()->json(["posts" => $posts, "users" => $users, "channel" => $channel, "community" => $channel->community]);
     }
 
-    public function update(Request $request, Channel $channel) {
+    public function update(Request $request, Channel $channel)
+    {
         //
     }
 
@@ -71,7 +73,7 @@ class ChannelController extends Controller
         if ($channel->user_id == Auth::id()) {
             try {
                 $data = ["name" => $channel->name, "id" => $channel->id, "user_id" => $channel->user_id, "community_id" => $channel->community_id];
-
+                RemoveChannelJob::dispatch($data, Auth::user()->name);
                 if ($channel->delete()) {
                     return response()->json($data);
                 }

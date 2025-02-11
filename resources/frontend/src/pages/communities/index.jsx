@@ -328,14 +328,13 @@ const Invitation = ({ community, onClose }) => {
 
     const handleSubmitInvitation = useCallback(async () => {
         try {
-            const response = await api.post("invitations", {
+            await api.post("invitations", {
                 users: selected,
                 community_id: community.id,
             });
-            console.log(response.data);
-            // ToastNotification("success", "招待が正常に送信されました");
-            // setInviteEmail("");
-            // onClose(false);
+            ToastNotification("success", "招待が正常に送信されました");
+            setInviteEmail("");
+            onClose(false);
         } catch (error) {
             console.log(error);
             if (error.response?.status == 404)

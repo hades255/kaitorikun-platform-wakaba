@@ -8,6 +8,7 @@ use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class InvitationController extends Controller
@@ -34,38 +35,52 @@ class InvitationController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'users.*' => 'required',
-            'community_id' => 'required|integer',
+            'users.*.id' => 'required|integer|exists:users,id',
+            'users.*.email' => 'required|email',
+            'users.*.name' => 'required|string',
+            'community_id' => 'required|integer|exists:communities,id',
         ]);
+
         $userId = Auth::id();
-        $users = $validatedData["users"];
         $communityId = $validatedData['community_id'];
+        $users = $validatedData['users'];
+
+        DB::beginTransaction();
 
         try {
             foreach ($users as $receiver) {
-                $token = hash('sha256', $receiver["email"] . '-' . microtime(true));
-                $invitation = new Invitation();
-                $invitation->sender_id = $userId;
-                $invitation->community_id = $communityId;
-                $invitation->receiver_id = $receiver["id"];
-                $invitation->token = $token;
-                if ($invitation->save()) {
-                    $data = array(
-                        'email' => $receiver["email"],
-                        'name' => $receiver["name"],
-                        'token' => $token,
-                        'contact' => env('MAIL_FROM_ADDRESS', ''),
-                        'social' => '/',
-                        'url' => url('/accept-invitation?token=' . $token),
-                        'subject' => 'コミュニティに参加しましょう'
-                    );
-                    SendEmailJob::dispatch($data, "email.community_invitation");
-                }
+                $token = hash('sha256', $receiver['email'] . '-' . microtime(true));
+
+                // Create invitation
+                $invitation = Invitation::create([
+                    'sender_id' => $userId,
+                    'community_id' => $communityId,
+                    'receiver_id' => $receiver['id'],
+                    'token' => $token,
+                ]);
+
+                // Prepare email data
+                $data = [
+                    'email' => $receiver['email'],
+                    'name' => $receiver['name'],
+                    'token' => $token,
+                    'contact' => env('MAIL_FROM_ADDRESS', ''),
+                    'social' => '/',
+                    'url' => url('/accept-invitation?token=' . $token),
+                    'subject' => 'コミュニティに参加しましょう',
+                ];
+
+                // Dispatch email job
+                SendEmailJob::dispatch($data, 'email.community_invitation');
             }
-        } catch (\Throwable $th) {
-            return response()->json(['error' => 'Failed to send invitation', "message" => $th->getMessage()], 500);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to send invitation', 'message' => $e->getMessage()], 500);
         }
-        return response()->json($users);
+
+        return response()->json(['message' => 'Invitations sent successfully'], 200);
     }
 
     /**

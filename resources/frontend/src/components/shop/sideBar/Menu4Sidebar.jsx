@@ -10,22 +10,34 @@ const Menu4Sidebar = () => {
 
     const menuItems = useMemo(() => {
         if (channels && Array.isArray(channels)) {
-            return channels
-                .sort((a, b) => {
-                    if (a.type > b.type) return 1;
-                    if (a.type < b.type) return -1;
-                    return 0;
-                })
-                .map((item) => ({
-                    id: item.id,
-                    path: "#",
-                    title: item.name,
-                    user_id: item.user_id,
-                    icon: item.icon,
-                    type: item.type,
-                }));
+            return channels.map((item) => ({
+                id: item.id,
+                path: "#",
+                title: item.name,
+                user_id: item.user_id,
+                icon: item.icon,
+                type: item.type,
+            }));
         } else return [];
     }, [channels]);
+
+    const menu4Items = useMemo(() => {
+        if (menuItems && Array.isArray(menuItems)) {
+            return menuItems.filter(({ type }) => type == 4);
+        } else return [];
+    }, [menuItems]);
+
+    const menu5Items = useMemo(() => {
+        if (menuItems && Array.isArray(menuItems)) {
+            return menuItems.filter(({ type }) => type == 5);
+        } else return [];
+    }, [menuItems]);
+
+    const menu6Items = useMemo(() => {
+        if (menuItems && Array.isArray(menuItems)) {
+            return menuItems.filter(({ type }) => type == 6);
+        } else return [];
+    }, [menuItems]);
 
     return (
         <>
@@ -35,7 +47,27 @@ const Menu4Sidebar = () => {
                 role="menu"
                 data-accordion="false"
             >
-                {menuItems.map((menu) => (
+                {menu4Items.map((menu) => (
+                    <MenuItem menu={menu} key={menu.id} />
+                ))}
+            </ul>
+            <ul
+                className="nav nav-pills nav-sidebar flex-column side-menu-separate"
+                data-widget="treeview"
+                role="menu"
+                data-accordion="false"
+            >
+                {menu5Items.map((menu) => (
+                    <MenuItem menu={menu} key={menu.id} />
+                ))}
+            </ul>
+            <ul
+                className="nav nav-pills nav-sidebar flex-column side-menu-separate"
+                data-widget="treeview"
+                role="menu"
+                data-accordion="false"
+            >
+                {menu6Items.map((menu) => (
                     <MenuItem menu={menu} key={menu.id} />
                 ))}
             </ul>

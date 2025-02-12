@@ -11,7 +11,13 @@ class PostReply extends Model
 
     protected $fillable = ['post_id', 'reply', 'user_id'];
 
-    public function post() {
+    public function post()
+    {
         return $this->belongsTo(Post::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

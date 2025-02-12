@@ -87,4 +87,68 @@ class ChannelController extends Controller
             return response()->json(['error' => 'Failed to remove channel', "message" => "Unauthorized user"], 401);
         }
     }
+
+    public function all_schannels()
+    {
+        $channels = Channel::where("community_id", 0)->get();
+        return response()->json($channels);
+    }
+    public function show_schannel(Request $request, Channel $channel)
+    {
+        $validatedData = $request->validate([
+            'limit' => 'integer|min:1|max:100',
+            'offset' => 'integer|min:0',
+            'sort_by' => 'string|in:created_at,updated_at,title',
+            'sort_order' => 'string|in:asc,desc',
+        ]);
+
+        $channel->load('user');
+        if ($channel->user) {
+            $channel->user = collect($channel->user->only(['id', 'name', 'email']));
+        }
+        $limit = $validatedData['limit'] ?? 10;
+        $offset = $validatedData['offset'] ?? 0;
+        $sortBy = $validatedData['sort_by'] ?? 'created_at';
+        $sortOrder = $validatedData['sort_order'] ?? 'desc';
+        $posts = $channel->posts()
+            ->orderBy($sortBy, $sortOrder)
+            ->skip($offset)
+            ->take($limit)
+            ->with(['user', 'reactions.user', 'replies.user'])
+            ->get();
+        $hidden_fields = [
+            'active',
+            'last_login',
+            'password',
+            'remember_token',
+            'token',
+            'role',
+            'status',
+            'updated_at',
+            'created_at',
+            'email_verified_at',
+            'deleted_at'
+        ];
+        $posts->each(function ($post) use ($hidden_fields) {
+            $post->user->makeHidden($hidden_fields);
+            $post->reactions->each(function ($reaction) use ($hidden_fields) {
+                $reaction->user->makeHidden($hidden_fields);
+            });
+            $post->replies->each(function ($reply) use ($hidden_fields) {
+                $reply->user->makeHidden($hidden_fields);
+            });
+        });
+        $uniqueUsers = collect([$channel->user, Auth::user()]);
+        foreach ($posts as $post) {
+            $uniqueUsers->push($post->user);
+            $uniqueUsers = $uniqueUsers->merge($post->reactions->pluck('user'));
+            $uniqueUsers = $uniqueUsers->merge($post->replies->pluck('user'));
+        }
+        $users = $uniqueUsers->unique('id')->values();
+        return response()->json([
+            'posts' => $posts,
+            'users' => $users,
+            'channel' => $channel,
+        ]);
+    }
 }

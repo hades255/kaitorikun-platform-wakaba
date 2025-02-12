@@ -71,6 +71,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('channels/{channel}', [ChannelController::class, 'show'])->name('channels.show')->where('channel', '[0-9]+');
     Route::delete('channels/{channel}', [ChannelController::class, 'destroy'])->name('channels.destroy')->where('channel', '[0-9]+');
 
+    Route::get('schannels', [ChannelController::class, 'all_schannels'])->name('schannels.all');
+    Route::get('schannels/{channel}', [ChannelController::class, 'show_schannel'])->name('schannels.show')->where('channel', '[0-9]+');
+
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');

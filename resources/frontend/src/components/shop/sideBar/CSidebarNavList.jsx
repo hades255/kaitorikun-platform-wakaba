@@ -255,7 +255,7 @@ const MoreButton = ({ data }) => {
     );
 };
 
-const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles((theme) => ({
     navItem: {
         position: "relative",
     },

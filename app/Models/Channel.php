@@ -26,6 +26,20 @@ class Channel extends Model
             ->get();
     }
 
+    public function limitedPostsWithUsers($limit = 10, $offset = 0, $sortBy = 'created_at', $sortOrder = 'desc')
+    {
+        return $this->posts()
+            ->orderBy($sortBy, $sortOrder)
+            ->skip($offset)
+            ->take($limit)
+            ->with([
+                'user',
+                'reactions.user',
+                'replies.user'
+            ])
+            ->get();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

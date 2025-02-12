@@ -73,7 +73,7 @@ const Communities = ({ match }) => {
 
     useEffect(() => {
         if (channelId) getChannel(channelId);
-    }, [getChannel, channelId, history]);
+    }, [getChannel, channelId]);
 
     const handleCreatePost = useCallback(
         (post, init) => {

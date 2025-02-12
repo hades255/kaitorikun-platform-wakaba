@@ -4,7 +4,11 @@ import api from "../../api";
 import myEcho from "../helper/Echo";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
-import { actionChannel, selectorChannel } from "../../reduxStore";
+import {
+    actionChannel,
+    actionSChannel,
+    selectorChannel,
+} from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 
 const Notifications = () => {
@@ -213,8 +217,17 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
+            const getMenusFunc = async () => {
+                try {
+                    const response = await api.get("schannels");
+                    dispatch(actionSChannel.handleSetSChannels(response.data));
+                } catch (error) {
+                    console.log(error);
+                }
+            };
             getUsers();
             getMyChats();
+            getMenusFunc();
             // getMineCommunities();
             getJoinedCommunities();
         }

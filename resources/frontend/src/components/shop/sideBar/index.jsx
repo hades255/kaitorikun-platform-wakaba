@@ -11,6 +11,7 @@ import menu3 from "./menu3";
 import ChatSidebar from "./Chat";
 import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
 import SidebarNavList from "./SidebarNavList";
+import Menu4Sidebar from "./Menu4Sidebar";
 
 const tabs = [
     {
@@ -154,7 +155,8 @@ const Sidebar = (props) => {
                                 </div>
                             </li>
                         </ul>
-                        <ChannelSidebar page={false} />
+                        {/* <ChannelSidebar page={false} /> */}
+                        <Menu4Sidebar />
                     </nav>
                 )}
             </div>

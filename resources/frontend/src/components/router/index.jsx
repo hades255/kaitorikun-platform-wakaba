@@ -13,6 +13,7 @@ import CalendarPage from "../../pages/calendar";
 import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
 import PurchaseRegister from "../../pages/purchase-manage/register";
 import PurchaseList from "../../pages/purchase-manage/list";
+import Schannel from "../../pages/schannel";
 
 const MenuRoutes = [
     {
@@ -130,6 +131,12 @@ const MenuRoutes = [
         exact: true,
         title: "チャネル",
         component: () => <Communities />,
+    },
+    {
+        path: "/schannels/:id",
+        exact: true,
+        title: "チャネル",
+        component: () => <Schannel />,
     },
     {
         path: "/accept-invitation",

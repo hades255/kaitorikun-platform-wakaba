@@ -33,6 +33,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function onlyEssentialFields()
+    {
+        return $this->only(['id', 'name', 'email']);
+    }
+
     public function channels()
     {
         return $this->belongsToMany(Channel::class, 'channel_users');

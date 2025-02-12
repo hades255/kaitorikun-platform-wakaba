@@ -104,7 +104,7 @@ class PostController extends Controller
         $post->attachment = $validatedData['attachment'];
         if ($post->save()) {
             EditPostJob::dispatch($post, Auth::user()->name);
-            return response()->json($post, 201);
+            return response()->json($post);
         }
         return response()->json(['error' => 'Failed to create post'], 500);
     }

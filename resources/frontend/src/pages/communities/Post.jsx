@@ -34,7 +34,7 @@ import api from "../../api";
 import { PUBLIC_HOST } from "../../config";
 import { getUserStatusColor } from "../../feature/action";
 import { useAuth } from "../../contexts/AuthContext";
-import { actionChannel } from "../../reduxStore";
+import { actionChannel, actionSChannel } from "../../reduxStore";
 import { ToastNotification } from "../../components";
 import Creator from "../../components/community/Creator";
 
@@ -72,17 +72,25 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
 
     const handleReply = useCallback(async () => {
         try {
+            if (!reply.trim()) return;
             const response = await api.post("postreply", {
                 reply,
                 post_id: post.id,
             });
-            dispatch(actionChannel.handleReplyPost(response.data));
+            if (channel.community_id == 0)
+                dispatch(
+                    actionSChannel.handlePostReplied({
+                        ...response.data,
+                        channel_id: post.channel_id,
+                    })
+                );
+            else dispatch(actionChannel.handleReplyPost(response.data));
             setReply("");
             setShowReplyInput(false);
         } catch (error) {
             console.log(error);
         }
-    }, [dispatch]);
+    }, [dispatch, reply, channel]);
 
     const handleNewEmojiClick = useCallback(
         async (emojiData) => {
@@ -102,37 +110,51 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     reaction: emojiData.id,
                     post_id: post.id,
                 });
-                dispatch(actionChannel.handleAddREACTION(response.data));
+                if (channel.community_id == 0)
+                    dispatch(
+                        actionSChannel.handlePostAddReaction({
+                            ...response.data,
+                            channel_id: post.channel_id,
+                        })
+                    );
+                else dispatch(actionChannel.handleAddREACTION(response.data));
             } catch (error) {
                 console.log(error);
             } finally {
                 handleCloseEmojiOpen();
             }
         },
-        [dispatch, post, handleCloseEmojiOpen]
+        [dispatch, handleCloseEmojiOpen, post, channel]
     );
 
     const handleEmojiClick = useCallback(
         async (reaction) => {
             try {
+                let response;
                 if (reaction.mine) {
-                    const response = await api.post("postreaction/toggle", {
+                    response = await api.post("postreaction/toggle", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                     });
-                    dispatch(actionChannel.handleRemoveREACTION(response.data));
                 } else {
-                    const response = await api.post("postreaction", {
+                    response = await api.post("postreaction", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                     });
-                    dispatch(actionChannel.handleAddREACTION(response.data));
                 }
+                if (channel.community_id == 0)
+                    dispatch(
+                        actionSChannel.handlePostRemoveReaction({
+                            ...response.data,
+                            channel_id: post.channel_id,
+                        })
+                    );
+                else dispatch(actionChannel.handleAddREACTION(response.data));
             } catch (error) {
                 console.log(error);
             }
         },
-        [dispatch]
+        [dispatch, post, channel]
     );
 
     const handleClickOpenDeleteModal = useCallback(() => {

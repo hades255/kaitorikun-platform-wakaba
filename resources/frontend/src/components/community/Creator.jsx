@@ -7,20 +7,22 @@ const Creator = ({ creature, users }) => {
         users.find((item) => item.id == creature.user_id);
 
     return (
-        <Box display={"flex"} alignItems={"center"} gap={1}>
-            <Avatar
-                {...stringAvatar({
-                    name: user.name,
-                    src: user.icon,
-                    sx: {
-                        color: "black",
-                        width: 36,
-                        height: 36,
-                    },
-                })}
-            />
-            <Typography>{user?.name}</Typography>
-        </Box>
+        user && (
+            <Box display={"flex"} alignItems={"center"} gap={1}>
+                <Avatar
+                    {...stringAvatar({
+                        name: user.name,
+                        src: user.icon,
+                        sx: {
+                            color: "black",
+                            width: 36,
+                            height: 36,
+                        },
+                    })}
+                />
+                <Typography>{user?.name}</Typography>
+            </Box>
+        )
     );
 };
 

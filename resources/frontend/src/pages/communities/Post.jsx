@@ -46,6 +46,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
     const contentRef = useRef(null);
     const postId = post?.id;
     const creatorId = post?.user_id;
+    const community_id = channel?.community_id;
     const authId = auth?.id;
     const [reply, setReply] = useState("");
     const [showReplies, setShowReplies] = useState(false);
@@ -77,20 +78,15 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 reply,
                 post_id: post.id,
             });
-            if (channel.community_id == 0)
-                dispatch(
-                    actionSChannel.handlePostReplied({
-                        ...response.data,
-                        channel_id: post.channel_id,
-                    })
-                );
+            if (community_id == 0)
+                dispatch(actionSChannel.handlePostReplied(response.data));
             else dispatch(actionChannel.handleReplyPost(response.data));
             setReply("");
             setShowReplyInput(false);
         } catch (error) {
             console.log(error);
         }
-    }, [dispatch, reply, channel]);
+    }, [dispatch, reply, community_id]);
 
     const handleNewEmojiClick = useCallback(
         async (emojiData) => {
@@ -110,12 +106,9 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     reaction: emojiData.id,
                     post_id: post.id,
                 });
-                if (channel.community_id == 0)
+                if (community_id == 0)
                     dispatch(
-                        actionSChannel.handlePostAddReaction({
-                            ...response.data,
-                            channel_id: post.channel_id,
-                        })
+                        actionSChannel.handlePostAddReaction(response.data)
                     );
                 else dispatch(actionChannel.handleAddREACTION(response.data));
             } catch (error) {
@@ -124,37 +117,46 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 handleCloseEmojiOpen();
             }
         },
-        [dispatch, handleCloseEmojiOpen, post, channel]
+        [dispatch, handleCloseEmojiOpen, post, community_id]
     );
 
     const handleEmojiClick = useCallback(
         async (reaction) => {
             try {
-                let response;
                 if (reaction.mine) {
-                    response = await api.post("postreaction/toggle", {
+                    const response = await api.post("postreaction/toggle", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                     });
+                    if (community_id == 0)
+                        dispatch(
+                            actionSChannel.handlePostRemoveReaction(
+                                response.data
+                            )
+                        );
+                    else
+                        dispatch(
+                            actionChannel.handleRemoveREACTION(response.data)
+                        );
                 } else {
-                    response = await api.post("postreaction", {
+                    const response = await api.post("postreaction", {
                         reaction: reaction.reaction,
                         post_id: post.id,
                     });
+                    if (community_id == 0)
+                        dispatch(
+                            actionSChannel.handlePostAddReaction(response.data)
+                        );
+                    else
+                        dispatch(
+                            actionChannel.handleAddREACTION(response.data)
+                        );
                 }
-                if (channel.community_id == 0)
-                    dispatch(
-                        actionSChannel.handlePostRemoveReaction({
-                            ...response.data,
-                            channel_id: post.channel_id,
-                        })
-                    );
-                else dispatch(actionChannel.handleAddREACTION(response.data));
             } catch (error) {
                 console.log(error);
             }
         },
-        [dispatch, post, channel]
+        [dispatch, post, community_id]
     );
 
     const handleClickOpenDeleteModal = useCallback(() => {
@@ -195,13 +197,23 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 data.reply.post_id == postId &&
                 authId != data.reply.user_id
             ) {
-                dispatch(
-                    actionChannel.handleAddUser({
-                        id: data.reply.user_id,
-                        name: data.name,
-                    })
-                );
-                dispatch(actionChannel.handleReplyPost(data.reply));
+                if (community_id == 0) {
+                    dispatch(
+                        actionSChannel.handleAddUser({
+                            id: data.reply.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(actionSChannel.handlePostReplied(data.reply));
+                } else {
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.reply.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(actionChannel.handleReplyPost(data.reply));
+                }
             }
         };
         const handleAddReactionToPost = (data) => {
@@ -211,13 +223,25 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 data.reaction.post_id == postId &&
                 authId != data.reaction.user_id
             ) {
-                dispatch(
-                    actionChannel.handleAddUser({
-                        id: data.reaction.user_id,
-                        name: data.name,
-                    })
-                );
-                dispatch(actionChannel.handleAddREACTION(data.reaction));
+                if (community_id == 0) {
+                    dispatch(
+                        actionSChannel.handleAddUser({
+                            id: data.reaction.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(
+                        actionSChannel.handlePostAddReaction(data.reaction)
+                    );
+                } else {
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.reaction.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(actionChannel.handleAddREACTION(data.reaction));
+                }
             }
         };
         const handleRemoveReactFromPost = (data) => {
@@ -227,7 +251,25 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 data.reaction.post_id == postId &&
                 authId != data.reaction.user_id
             ) {
-                dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+                if (community_id == 0) {
+                    dispatch(
+                        actionSChannel.handleAddUser({
+                            id: data.reaction.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(
+                        actionSChannel.handlePostRemoveReaction(data.reaction)
+                    );
+                } else {
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.reaction.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(actionChannel.handleRemoveREACTION(data.reaction));
+                }
             }
         };
         const handlePostEdited = (data) => {
@@ -237,7 +279,9 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 data.post.id == postId &&
                 authId != data.post.user_id
             ) {
-                dispatch(actionChannel.handlePostEdited(data.post));
+                if (community_id == 0)
+                    dispatch(actionSChannel.handlePostEdited(data.post));
+                else dispatch(actionChannel.handlePostEdited(data.post));
             }
         };
 
@@ -259,7 +303,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                 channel.stopListening(".channel.post.edited");
             }
         };
-    }, [dispatch, authId, postId]);
+    }, [dispatch, authId, postId, community_id]);
 
     useEffect(() => {
         if (Array.isArray(post.reactions) && post.reactions.length > 0) {

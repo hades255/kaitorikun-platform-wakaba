@@ -104,7 +104,7 @@ class ChannelController extends Controller
 
         $channel->load('user');
         if ($channel->user) {
-            $channel->user = collect($channel->user->only(['id', 'name', 'email']));
+            $channel->user = collect($channel->user->only(['id', 'name']));
         }
         $limit = $validatedData['limit'] ?? 10;
         $offset = $validatedData['offset'] ?? 0;
@@ -117,6 +117,7 @@ class ChannelController extends Controller
             ->with(['user', 'reactions.user', 'replies.user'])
             ->get();
         $hidden_fields = [
+            'email',
             'active',
             'last_login',
             'password',

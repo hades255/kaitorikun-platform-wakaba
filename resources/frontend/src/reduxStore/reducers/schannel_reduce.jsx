@@ -30,7 +30,7 @@ const schannels = (state = initialState, actions) => {
                 users: data.users,
                 posts: data.posts,
                 unreadPosts: state.unreadPosts.filter(
-                    ({ channel_id }) => channel_id != data.channel.id
+                    ({ channel_id }) => channel_id != data.channel?.id
                 ),
             };
         case SELETE_SCHANNEL_POST_CREATED:
@@ -49,62 +49,49 @@ const schannels = (state = initialState, actions) => {
                         : state.posts,
             };
         case SCHANNEL_REPLY_POST:
-            if (state.channel && state.channel.id == data.channel_id)
-                return {
-                    ...state,
-                    posts: state.posts.map((item) =>
-                        item.id == data.post_id
-                            ? {
-                                  ...item,
-                                  replies: [data, ...(item.replies ?? [])],
-                              }
-                            : item
-                    ),
-                };
-            else return { ...state };
+            return {
+                ...state,
+                posts: state.posts.map((item) =>
+                    item.id == data.post_id
+                        ? {
+                              ...item,
+                              replies: [data, ...(item.replies ?? [])],
+                          }
+                        : item
+                ),
+            };
         case SCHANNEL_ADD_REACTION:
-            if (state.channel && state.channel.id == data.channel_id)
-                return {
-                    ...state,
-                    posts: state.posts.map((item) =>
-                        item.id == data.post_id
-                            ? {
-                                  ...item,
-                                  reactions: [...(item.reactions ?? []), data],
-                              }
-                            : item
-                    ),
-                };
-            else return { ...state };
+            return {
+                ...state,
+                posts: state.posts.map((item) =>
+                    item.id == data.post_id
+                        ? {
+                              ...item,
+                              reactions: [...(item.reactions ?? []), data],
+                          }
+                        : item
+                ),
+            };
         case SCHANNEL_REMOVE_REACTION:
-            if (state.channel && state.channel.id == data.channel_id)
-                return {
-                    ...state,
-                    posts: state.posts.map((item) =>
-                        item.id == data.post_id
-                            ? {
-                                  ...item,
-                                  reactions: (item.reactions ?? []).filter(
-                                      ({ id }) => id != data.id
-                                  ),
-                              }
-                            : item
-                    ),
-                };
-            else return { ...state };
+            return {
+                ...state,
+                posts: state.posts.map((item) =>
+                    item.id == data.post_id
+                        ? {
+                              ...item,
+                              reactions: (item.reactions ?? []).filter(
+                                  ({ id }) => id != data.id
+                              ),
+                          }
+                        : item
+                ),
+            };
         case SCHANNEL_REMOVE_POST:
-            if (state.channel && state.channel.id == data.channel_id)
-                return {
-                    ...state,
-                    posts: state.posts.filter(({ id }) => id != data.id),
-                };
-            else
-                return {
-                    ...state,
-                    unreadPosts: state.unreadPosts.filter(
-                        ({ id }) => id != data.id
-                    ),
-                };
+            return {
+                ...state,
+                posts: state.posts.filter(({ id }) => id != data),
+                unreadPosts: state.unreadPosts.filter(({ id }) => id != data),
+            };
         case SCHANNEL_ADD_USER:
             return {
                 ...state, //  fix something must be fixed

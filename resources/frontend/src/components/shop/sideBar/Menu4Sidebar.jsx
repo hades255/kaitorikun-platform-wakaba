@@ -47,8 +47,12 @@ export default Menu4Sidebar;
 
 const MenuItem = ({ menu }) => {
     const classes = useStyles();
+    const unreads = useSelector(selectorSChannel.handleGetUnreadPosts);
 
-    const count = 0;
+    const count =
+        unreads && Array.isArray(unreads)
+            ? unreads.filter(({ channel_id }) => channel_id == menu.id).length
+            : 0;
 
     const handleMainMenuAction = () => {};
 

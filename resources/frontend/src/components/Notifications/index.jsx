@@ -65,35 +65,48 @@ const Notifications = () => {
         };
         const handlePostCreated = (data) => {
             if (data && data.post && auth?.id != data.post.user_id) {
-                if (comIds?.includes(Number(data.post.community_id))) {
+                if (
+                    data.post.community_id == 0 ||
+                    comIds?.includes(Number(data.post.community_id))
+                ) {
                     if (data.name)
                         showNotification("新しい投稿", {
                             message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                         });
-                    dispatch(
-                        actionChannel.handleAddUser({
-                            id: data.post.user_id,
-                            name: data.name,
-                        })
-                    );
-                    dispatch(actionChannel.handleAddPostToChannel(data.post));
-                    if (scomIds?.includes(Number(data.post.community_id)))
-                        updateUnreadTab("scom", {
-                            com: data.post.community_id,
-                            cha: data.post.channel_id,
-                        });
-                    else updateUnreadTab("com", true);
+                    if (data.post.community_id == 0) {
+                        dispatch(
+                            actionSChannel.handleAddUser({
+                                id: data.post.user_id,
+                                name: data.name,
+                            })
+                        );
+                        dispatch(actionSChannel.handleAddPost(data.post));
+                    } else {
+                        dispatch(
+                            actionChannel.handleAddUser({
+                                id: data.post.user_id,
+                                name: data.name,
+                            })
+                        );
+                        dispatch(
+                            actionChannel.handleAddPostToChannel(data.post)
+                        );
+                        if (scomIds?.includes(Number(data.post.community_id)))
+                            updateUnreadTab("scom", {
+                                com: data.post.community_id,
+                                cha: data.post.channel_id,
+                            });
+                        else updateUnreadTab("com", true);
+                    }
                 }
             }
         };
         const handleDeletePost = (data) => {
-            if (
-                data &&
-                data.post &&
-                auth?.id != data.post.user_id &&
-                comIds?.includes(Number(data.post.community_id))
-            ) {
-                dispatch(actionChannel.handleRemovePost(data.post.id));
+            if (data && data.post && auth?.id != data.post.user_id) {
+                if (comIds?.includes(Number(data.post.community_id)))
+                    dispatch(actionChannel.handleRemovePost(data.post.id));
+                if (data.post.community_id == 0)
+                    dispatch(actionSChannel.handlePostRemoved(data.post.id));
             }
         };
         const handleNewChat = (data) => {

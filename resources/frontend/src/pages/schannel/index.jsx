@@ -171,5 +171,5 @@ const SChannel = () => {
     );
 };
 
-export default withRouter(SChannel);
+export default SChannel;
 export { OriginalSchannal };

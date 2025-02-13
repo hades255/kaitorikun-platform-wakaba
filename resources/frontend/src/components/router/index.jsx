@@ -18,6 +18,7 @@ import PurchaseEdit from "../../pages/purchase-manage/edit";
 import PurchaseCustomer from "../../pages/purchase-manage/customer";
 import SChannel from "../../pages/schannel";
 import SchannelWithSeparatorBar from "../../pages/schannel/SchannelWithSeparatorBar";
+import Schannel from "../../pages/schannel";
 
 const MenuRoutes = [
     {

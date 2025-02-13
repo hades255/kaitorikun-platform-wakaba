@@ -6,11 +6,8 @@ import {
     Card,
     CardContent,
     Divider,
-    ThemeProvider,
     Typography,
-    createTheme,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import api from "../../api";
 import { actionSChannel, selectorSChannel } from "../../reduxStore";
@@ -23,9 +20,7 @@ import {
 import Post from "../communities/Post";
 import PostEditor from "../communities/PostEditor";
 
-const theme = createTheme();
-
-const SChannel = ({ match }) => {
+const OriginalSchannal = withRouter(({ match }) => {
     const dispatch = useDispatch();
 
     const schannelId = match.params.id;
@@ -123,56 +118,58 @@ const SChannel = ({ match }) => {
 
     return (
         channel && (
-            <ThemeProvider theme={theme}>
-                <PanelContent>
-                    <Typography variant="h4">{channel.name}</Typography>
-                    <Divider sx={{ my: 1 }} />
-                    <Box display={"flex"} justifyContent={"center"}>
-                        <Box width={"100%"} maxWidth={960}>
-                            <Card sx={{ mb: 2 }}>
-                                <CardContent>
-                                    {showPostEditor ? (
-                                        <PostEditor
-                                            onPost={handleCreatePost}
-                                            onClose={() =>
-                                                setShowPostEditor(false)
-                                            }
-                                            initPost={post}
-                                        />
-                                    ) : (
-                                        <Box
-                                            display={"flex"}
-                                            alignItems={"center"}
-                                        >
-                                            <Button
-                                                variant="contained"
-                                                onClick={handleClickNewPost}
-                                                sx={{ mr: 1 }}
-                                            >
-                                                <PostAddIcon /> 新しい投稿を開始
-                                            </Button>
-                                        </Box>
-                                    )}
-                                </CardContent>
-                            </Card>
-                            {Array.isArray(posts) &&
-                                posts?.map((post) => (
-                                    <Post
-                                        key={post.id}
-                                        post={post}
-                                        channel={channel}
-                                        users={users}
-                                        handleOpenEdit={handleClickEditPost}
+            <>
+                <Typography variant="h4">{channel.name}</Typography>
+                <Divider sx={{ my: 1 }} />
+                <Box display={"flex"} justifyContent={"center"}>
+                    <Box width={"100%"} maxWidth={960}>
+                        <Card sx={{ mb: 2 }}>
+                            <CardContent>
+                                {showPostEditor ? (
+                                    <PostEditor
+                                        onPost={handleCreatePost}
+                                        onClose={() => setShowPostEditor(false)}
+                                        initPost={post}
                                     />
-                                ))}
-                        </Box>
+                                ) : (
+                                    <Box display={"flex"} alignItems={"center"}>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleClickNewPost}
+                                            sx={{ mr: 1 }}
+                                        >
+                                            <PostAddIcon /> 新しい投稿を開始
+                                        </Button>
+                                    </Box>
+                                )}
+                            </CardContent>
+                        </Card>
+                        {Array.isArray(posts) &&
+                            posts?.map((post) => (
+                                <Post
+                                    key={post.id}
+                                    post={post}
+                                    channel={channel}
+                                    users={users}
+                                    handleOpenEdit={handleClickEditPost}
+                                />
+                            ))}
                     </Box>
-                </PanelContent>
-            </ThemeProvider>
+                </Box>
+            </>
         )
+    );
+});
+
+const SChannel = () => {
+    return (
+        <>
+            <PanelContent>
+                <OriginalSchannal />
+            </PanelContent>
+        </>
     );
 };
 
 export default withRouter(SChannel);
-
-const useStyles = makeStyles({});
+export { OriginalSchannal };

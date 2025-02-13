@@ -14,6 +14,7 @@ import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
 import PurchaseRegister from "../../pages/purchase-manage/register";
 import PurchaseList from "../../pages/purchase-manage/list";
 import Schannel from "../../pages/schannel";
+import SchannelWithSeparatorBar from "../../pages/schannel/SchannelWithSeparatorBar";
 
 const MenuRoutes = [
     {
@@ -134,6 +135,12 @@ const MenuRoutes = [
     },
     {
         path: "/schannels/:id",
+        exact: true,
+        title: "チャネル",
+        component: () => <SchannelWithSeparatorBar />,
+    },
+    {
+        path: "/sschannels/:id",
         exact: true,
         title: "チャネル",
         component: () => <Schannel />,

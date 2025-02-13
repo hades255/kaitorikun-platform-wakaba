@@ -91,7 +91,7 @@ const MenuItem = ({ menu }) => {
     return (
         <li className={clsx("nav-item", classes.navItem)}>
             <Link
-                to={`/schannels/${menu.id}`}
+                to={`/${menu.type > 5 ? "s" : ""}schannels/${menu.id}`}
                 className={clsx(
                     "CSidebarNavListItem nav-link nav-link-font",
                     classes.menuItem

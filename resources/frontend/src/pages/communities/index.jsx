@@ -9,7 +9,6 @@ import {
     CardContent,
     Chip,
     Dialog,
-    Paper,
     TextField,
     Typography,
 } from "@mui/material";
@@ -17,7 +16,6 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import LinkIcon from "@mui/icons-material/Link";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import SettingsIcon from "@mui/icons-material/Settings";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import api from "../../api";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import {
@@ -37,18 +35,7 @@ const sepItems = [
     // { type: "photos", title: "写真" },
 ];
 
-const Communities = () => {
-    return (
-        <PanelContent>
-            <HorizontalSeparator
-                TopComponent={withRouter(TopComponent)}
-                BottomComponent={<></>}
-            />
-        </PanelContent>
-    );
-};
-
-const TopComponent = ({ match }) => {
+const Communities = ({ match }) => {
     const channelId = match.params.id;
 
     const dispatch = useDispatch();
@@ -150,189 +137,94 @@ const TopComponent = ({ match }) => {
     }, []);
 
     return (
-        <>
-            <ComHeader
-                community={community}
-                channel={channel}
-                handleClickSepCom={handleClickSepCom}
-                sepCom={comSepType}
-                setShowInviteDialog={setShowInviteDialog}
-            />
-            <Box display={"flex"} justifyContent={"center"}>
-                <Box width={"100%"} maxWidth={1024} position={"relative"}>
-                    {channel && (
-                        <>
-                            <Card
-                                sx={{
-                                    mb: 2,
-                                    bgcolor: "#f4f6f9",
-                                    position:
-                                        showPostEditor && post
-                                            ? "sticky"
-                                            : "static",
-                                    zIndex: 1,
-                                    top: 0,
-                                }}
-                            >
-                                <CardContent>
-                                    <Box mb={2}>
-                                        <Creator
-                                            creature={channel}
-                                            users={users}
-                                        />
-                                    </Box>
-                                    {showPostEditor ? (
-                                        <PostEditor
-                                            onPost={handleCreatePost}
-                                            onClose={() =>
-                                                setShowPostEditor(false)
-                                            }
-                                            initPost={post}
-                                        />
-                                    ) : (
-                                        <Box
-                                            display={"flex"}
-                                            alignItems={"center"}
-                                        >
-                                            <Button
-                                                variant="contained"
-                                                onClick={handleClickNewPost}
-                                                sx={{ mr: 1 }}
-                                            >
-                                                <PostAddIcon /> 新しい投稿を開始
-                                            </Button>
+        <PanelContent>
+            <>
+                <ComHeader
+                    community={community}
+                    channel={channel}
+                    handleClickSepCom={handleClickSepCom}
+                    sepCom={comSepType}
+                    setShowInviteDialog={setShowInviteDialog}
+                />
+                <Box display={"flex"} justifyContent={"center"}>
+                    <Box width={"100%"} maxWidth={1024} position={"relative"}>
+                        {channel && (
+                            <>
+                                <Card
+                                    sx={{
+                                        mb: 2,
+                                        bgcolor: "#f4f6f9",
+                                        position:
+                                            showPostEditor && post
+                                                ? "sticky"
+                                                : "static",
+                                        zIndex: 1,
+                                        top: 0,
+                                    }}
+                                >
+                                    <CardContent>
+                                        <Box mb={2}>
+                                            <Creator
+                                                creature={channel}
+                                                users={users}
+                                            />
                                         </Box>
-                                    )}
-                                </CardContent>
-                            </Card>
-                            {Array.isArray(posts) &&
-                                posts?.map((post) => (
-                                    <Post
-                                        key={post.id}
-                                        post={post}
-                                        channel={channel}
-                                        users={users}
-                                        handleOpenEdit={handleClickEditPost}
-                                    />
-                                ))}
-                        </>
-                    )}
+                                        {showPostEditor ? (
+                                            <PostEditor
+                                                onPost={handleCreatePost}
+                                                onClose={() =>
+                                                    setShowPostEditor(false)
+                                                }
+                                                initPost={post}
+                                            />
+                                        ) : (
+                                            <Box
+                                                display={"flex"}
+                                                alignItems={"center"}
+                                            >
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleClickNewPost}
+                                                    sx={{ mr: 1 }}
+                                                >
+                                                    <PostAddIcon />{" "}
+                                                    新しい投稿を開始
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                                {Array.isArray(posts) &&
+                                    posts?.map((post) => (
+                                        <Post
+                                            key={post.id}
+                                            post={post}
+                                            channel={channel}
+                                            users={users}
+                                            handleOpenEdit={handleClickEditPost}
+                                        />
+                                    ))}
+                            </>
+                        )}
+                    </Box>
                 </Box>
-            </Box>
-            {showInviteDialog && (
-                <Dialog
-                    open={showInviteDialog}
-                    onClose={() => setShowInviteDialog(false)}
-                >
-                    <Invitation
-                        onClose={setShowInviteDialog}
-                        community={community}
-                    />
-                </Dialog>
-            )}
-        </>
+                {showInviteDialog && (
+                    <Dialog
+                        open={showInviteDialog}
+                        onClose={() => setShowInviteDialog(false)}
+                    >
+                        <Invitation
+                            onClose={setShowInviteDialog}
+                            community={community}
+                        />
+                    </Dialog>
+                )}
+            </>
+        </PanelContent>
     );
 };
 
-const HorizontalSeparator = ({ TopComponent, BottomComponent }) => {
-    const [splitPosition, setSplitPosition] = useState(50);
-    const [isDragging, setIsDragging] = useState(false);
-
-    const handleMouseDown = useCallback(() => {
-        setIsDragging(true);
-    }, []);
-
-    const handleMouseMove = useCallback(
-        (e) => {
-            if (isDragging) {
-                const container = document.getElementById("split-container");
-                if (container) {
-                    const containerRect = container.getBoundingClientRect();
-                    const percentage =
-                        ((e.clientY - containerRect.top) /
-                            containerRect.height) *
-                        100;
-                    setSplitPosition(Math.min(Math.max(percentage, 10), 90));
-                }
-            }
-        },
-        [isDragging]
-    );
-
-    const handleMouseUp = useCallback(() => {
-        setIsDragging(false);
-    }, []);
-
-    useEffect(() => {
-        if (isDragging) {
-            window.addEventListener("mousemove", handleMouseMove);
-            window.addEventListener("mouseup", handleMouseUp);
-        }
-
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("mouseup", handleMouseUp);
-        };
-    }, [isDragging, handleMouseMove, handleMouseUp]);
-
-    return (
-        <Box
-            id="split-container"
-            sx={{
-                height: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-                bgcolor: "#f5f5f5",
-            }}
-        >
-            <Paper
-                elevation={3}
-                sx={{
-                    height: `${splitPosition}%`,
-                    overflow: "auto",
-                    transition: isDragging ? "none" : "height 0.1s ease",
-                    borderRadius: 0,
-                }}
-            >
-                <TopComponent />
-            </Paper>
-
-            <Box
-                sx={{
-                    height: "8px",
-                    bgcolor: "lightgray",
-                    cursor: "row-resize",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    "&:hover": {
-                        bgcolor: "gray",
-                    },
-                    borderRadius: "4px",
-                    transition: "background-color 0.2s ease",
-                }}
-                onMouseDown={handleMouseDown}
-            >
-                <MoreHorizIcon size={20} color="primary" />
-            </Box>
-
-            <Paper
-                elevation={3}
-                sx={{
-                    height: `${100 - splitPosition}%`,
-                    overflow: "auto",
-                    transition: isDragging ? "none" : "height 0.1s ease",
-                    borderRadius: 0,
-                }}
-            >
-                {BottomComponent}
-            </Paper>
-        </Box>
-    );
-};
-
-export default Communities;
+export default withRouter(Communities);
 
 const ComHeader = ({
     community,

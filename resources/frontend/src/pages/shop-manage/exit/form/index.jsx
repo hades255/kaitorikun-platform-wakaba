@@ -12,6 +12,7 @@ import TextInput from '../../../../components/TextInput';
 import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import { actionTheme, utilityAction } from "../../../../reduxStore";
+import { withRouter } from "react-router-dom";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -294,7 +295,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={staffId}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -304,7 +305,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={name}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -314,7 +315,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={nameKana}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -324,7 +325,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={birthday}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -334,7 +335,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={gender}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -344,7 +345,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={zipCode}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -354,7 +355,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={address1}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -364,7 +365,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={address2}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -374,7 +375,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={address3}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -386,7 +387,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={shop}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -396,7 +397,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={type}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -406,7 +407,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={email}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -416,7 +417,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={phoneNumber}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div>
@@ -426,7 +427,7 @@ let FormStaffExit = (props) => {
                             <TextInput
                                 value={""}
                                 className="mt-1 block w-full w-100-pro"
-                                readOnly
+                                disabled
                             />
                         </div>
                     </div> */}
@@ -439,7 +440,7 @@ let FormStaffExit = (props) => {
                                         <TextInput
                                             value={identificationId1}
                                             className="mt-1 block w-full w-100-pro"
-                                            readOnly
+                                            disabled
                                         />
                                         <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                     </div>
@@ -448,7 +449,7 @@ let FormStaffExit = (props) => {
                                             <TextInput
                                                 value={identificationId2}
                                                 className="mt-1 block w-full w-100-pro"
-                                                readOnly
+                                                disabled
                                             />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                         </div>
@@ -478,7 +479,7 @@ let FormStaffExit = (props) => {
                                     <TextInput
                                         value={guarantorId}
                                         className="mt-1 block w-full w-100-pro"
-                                        readOnly
+                                        disabled
                                     />
                                     <div className="flex-center image-show-btn" onClick={handleContractBtn}>誓約書画像</div>
                                 </div>
@@ -503,14 +504,17 @@ let FormStaffExit = (props) => {
                 >退会する</div>
 
             </div>
-            <Dialog
-                open={openImagePreview}
-                onClose={() => handleImagePreviewClose()}
-            >
-                <div className=''>
-                    <img src={previewImage} alt="preview" />
-                </div>
-            </Dialog>
+            <div>
+                <Dialog
+                    open={openImagePreview}
+                    onClose={() => handleImagePreviewClose()}
+                    className='image-preview'
+                >
+                    <div className=''>
+                        <img src={previewImage} alt="preview" />
+                    </div>
+                </Dialog>
+            </div>
             <Dialog
                 open={openPdfPreview}
                 onClose={() => handlePdfPreviewClose()}
@@ -541,4 +545,4 @@ let FormStaffExit = (props) => {
         </div>
     );
 };
-export default FormStaffExit;
+export default withRouter(FormStaffExit);

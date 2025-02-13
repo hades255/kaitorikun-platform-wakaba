@@ -11,6 +11,7 @@ import {
 import { reduxForm } from "redux-form";
 import Validate from "../validate";
 import { useState } from 'react';
+import { withRouter } from "react-router-dom";
 
 let FormForgotPassword = (props) => {
     const [email, setEmail] = useState()
@@ -66,4 +67,4 @@ FormForgotPassword = reduxForm({
     enableReinitialize: true,
     validate: Validate,
 })(FormForgotPassword);
-export default FormForgotPassword;
+export default withRouter(FormForgotPassword);

@@ -64,11 +64,11 @@ class StaffController extends Controller
         $shops = Shop::select(['id', 'name'])->get();
         $guarantors = Guarantor::select(['id', 'name'])->get();
         $categories1 = Category1::select(['id', 'name'])->get();
-        $categories2 = Category2::select(['id', 'parent_id', 'name'])->get();
-        $categories3 = Category3::select(['id', 'parent_id', 'name'])->get();
-        $categories4 = Category4::select(['id', 'parent_id', 'name'])->get();
-        $categories5 = Category5::select(['id', 'parent_id', 'name'])->get();
-        $categories6 = Category6::select(['id', 'parent_id', 'name'])->get();
+        $categories2 = Category2::select(['id', 'parent_id', 'name', 'child_id'])->get();
+        $categories3 = Category3::select(['id', 'parent_id', 'name', 'child_id'])->get();
+        $categories4 = Category4::select(['id', 'parent_id', 'name', 'child_id'])->get();
+        $categories5 = Category5::select(['id', 'parent_id', 'name', 'child_id'])->get();
+        $categories6 = Category6::select(['id', 'parent_id', 'name', 'child_id'])->get();
 
         return response()->json([
             "prefectures" => $prefectures,

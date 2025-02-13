@@ -37,7 +37,7 @@ export default forwardRef(function TextInput({ value, onChange, className = '', 
         onChange(formatted);
       }
     }
-  }, [year, month, date]);
+  }, [year, month, date, hour, minute]);
 
   return (
     <div className="date-input space-x-5" ref={ref}>

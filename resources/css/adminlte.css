@@ -34981,6 +34981,8 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
   background-color: #e9ecef;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-align: center;
   -ms-flex-direction: column;
   flex-direction: column;
   height: 100vh;
@@ -34990,7 +34992,8 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
 
 .login-box,
 .register-box {
-  width: 360px;
+  width: 550px;
+  height: 450px !important;
 }
 
 @media (max-width: 576px) {

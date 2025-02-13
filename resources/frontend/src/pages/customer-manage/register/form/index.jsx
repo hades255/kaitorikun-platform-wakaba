@@ -1,32 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import {
     React,
     Button,
     multiPostData,
     previewThumbnail,
     getData,
+    getItem,
     ToastNotification,
     useDispatch
 } from "../../../../components";
 import PhoneInput from "../../../../components/PhoneInput";
 import DateInput from "../../../../components/DateInput";
+import DateTimeInput from "../../../../components/DateTimeInput";
 import TextInput from '../../../../components/TextInput';
-import InputLabel from '../../../../components/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
-import Checkbox from '@mui/material/Checkbox';
-import { Dialog, DialogTitle, DialogContent } from "@mui/material";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
+import { withRouter } from "react-router-dom";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
-import { actionTheme, utilityAction } from "../../../../reduxStore";
+import { utilityAction } from "../../../../reduxStore";
 import Tesseract from 'tesseract.js';
+import CameraCaptureDialog from '../../../purchase-manage/register/camera';
+import 'swiper/css';
+import moment from 'moment';
+moment.locale("ja");
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 let FormCustomerRegister = (props) => {
     const [shop, setShop] = useState()
+    const [shopName, setShopName] = useState()
     const [type, setType] = useState()
     const [name, setName] = useState()
     const [nameKana, setNameKana] = useState()
@@ -35,6 +42,7 @@ let FormCustomerRegister = (props) => {
     const [birthday, setBirthday] = useState()
     const [gender, setGender] = useState()
     const [zipCode, setZipCode] = useState()
+    const [job, setJob] = useState()
     const [address1, setAddress1] = useState()
     const [address2, setAddress2] = useState()
     const [address3, setAddress3] = useState()
@@ -46,18 +54,67 @@ let FormCustomerRegister = (props) => {
     const [identificationType2, setIdentificationType2] = useState()
     const [identificationFile2, setIdentificationFile2] = useState()
     const [note, setNote] = useState()
+    const [hearingItem1Id, setHearingItem1Id] = useState()
+    const [hearingItem1Value, setHearingItem1Value] = useState()
+    const [hearingItem2Value, setHearingItem2Value] = useState()
+    const [hearingLine, setHearingLine] = useState()
+    const [hearingGoogle, setHearingGoogle] = useState()
+    const [hearingCoupon, setHearingCoupon] = useState()
+    const [hearingGift, setHearingGift] = useState()
+    const [cameraCaptureType, setCameraCaptureType] = useState()
 
     const [shops, setShops] = useState([])
     const [prefectures, setPrefectures] = useState([])
     const [cities, setCities] = useState([])
     const [filteredCities, setFilteredCities] = useState([])
     const [openImagePreview, setOpenImagePreview] = useState(false)
+    const [openCameraPreview, setOpenCameraPreview] = useState(false)
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
+
+    const hearingNews = [
+        'さきがけ',
+        '読売',
+        '朝日',
+        '日経',
+        '産経',
+        '毎日',
+        '奈良',
+        '店舗前',
+        '顧客',
+        'マイタウン奈良',
+        'アナウンス',
+        'きのかわトーク',
+        'クレール',
+        'フリーペーパー',
+        'HP',
+        '紹介',
+        '看板',
+        '地域新聞',
+        '従業員',
+        'その他',
+    ];
+    const hearingInternet = [
+        'パソコンHP',
+        'スマホHP',
+        'GoogleMap',
+        'SNS',
+    ];
+    const jobList = [
+        '自営業',
+        '自由業',
+        '会社員',
+        'バート･アールバイト',
+        '主婦',
+        '学生',
+        '無職',
+    ];
+    const coupons = ["利用なし", "クーポン1", "クーポン2", "現金還元"];
+    const gifts = ["なし", "テイッシュボックス", "その他"];
 
     //For OCR
     const videoRef = useRef(null);
@@ -77,9 +134,31 @@ let FormCustomerRegister = (props) => {
                 setShops(data.shops);
             }
         };
+        fetchData();
+    }, []);
 
-        fetchData(); // Execute API call
-    }, []); // Empty dependency array means it runs once when mounted
+    useEffect(() => {
+        // API Call
+        const initRegisterAPI = async () => {
+            let result = await getData("purchase/init-register")
+            if (result.status === 200) {
+                let data = result.data;
+                setPurchaseId(data.purchase.id);
+            }
+        };
+        initRegisterAPI();
+    }, []);
+
+    useEffect(() => {
+        let newCities = [];
+        cities.forEach(element => {
+            if (element.prefecture_id == address1) {
+                newCities.push(element);
+            }
+        });
+        setFilteredCities(newCities);
+    }, [address1, cities]);
+
 
     // Start the camera when the component mounts
     useEffect(() => {
@@ -171,6 +250,12 @@ let FormCustomerRegister = (props) => {
         });
     };
 
+    const handleShopChange = (e) => {
+        setShop(e)
+        const shop = shops.filter(shop => shop.id === e)
+        setShopName(shop[0].name)
+    }
+
     const handleChangeAddress1 = (e) => {
         console.log(e.target.value);
         let selectedPrefectureId = e.target.value;
@@ -244,6 +329,46 @@ let FormCustomerRegister = (props) => {
         setPreviewImage("")
     }
 
+    const handleCameraCaptureDialogOpen1 = (type) => {
+        setCameraCaptureType("passport1")
+        setOpenCameraPreview(true)
+    }
+
+    const handleCameraCaptureDialogOpen2 = (type) => {
+        setCameraCaptureType("passport2")
+        setOpenCameraPreview(true)
+    }
+
+    const handleCameraPreviewClose = () => {
+        setOpenCameraPreview(false)
+    }
+
+    const handleCapturedImage = (type, image) => { // base64
+        setOpenCameraPreview(false)
+        const file = base64ToFile(image, moment().format('YYYYMMDDHHmmss'))
+        if (type == "passport1") {
+            setIdentificationType1(file.type);
+            setIdentificationFile1(file);
+        } else if (type == "passport2") {
+            setIdentificationType2(file.type);
+            setIdentificationFile2(file);
+        }
+    }
+
+    const base64ToFile = (base64String, fileName) => {
+        const arr = base64String.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1]; // Extract MIME type
+        const bstr = atob(arr[1]); // Decode Base64
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new File([u8arr], fileName, { type: mime });
+    };
+
     const handlePdfPreview = async (file) => {
         setOpenPdfPreview(true)
         const previewPdf = await file
@@ -265,7 +390,7 @@ let FormCustomerRegister = (props) => {
         setZipCode(e);
     }
 
-    const handleRegisterClick = async () => {
+    const handleSaveCustomerClick = async () => {
         // check validate
         if (shop === undefined) {
             ToastNotification("error", "店舗名は必須です。");
@@ -283,14 +408,6 @@ let FormCustomerRegister = (props) => {
             ToastNotification("error", "カタカナ名は必須です。");
             return;
         }
-        if (phoneNumber1 === undefined) {
-            ToastNotification("error", "電話番号(自宅)は必須です。");
-            return;
-        }
-        if (phoneNumber2 === undefined) {
-            ToastNotification("error", "電話番号(携帯)は必須です。");
-            return;
-        }
         if (birthday === undefined) {
             ToastNotification("error", "生年月日は必須です。");
             return;
@@ -299,8 +416,20 @@ let FormCustomerRegister = (props) => {
             ToastNotification("error", "性別は必須です。");
             return;
         }
+        if (phoneNumber1 === undefined) {
+            ToastNotification("error", "電話番号(自宅)は必須です。");
+            return;
+        }
+        if (phoneNumber2 === undefined) {
+            ToastNotification("error", "電話番号(携帯)は必須です。");
+            return;
+        }
         if (zipCode === undefined) {
             ToastNotification("error", "郵便番号は必須です。");
+            return;
+        }
+        if (job === undefined) {
+            ToastNotification("error", "職業は必須です。");
             return;
         }
         if (address1 === undefined) {
@@ -315,6 +444,10 @@ let FormCustomerRegister = (props) => {
             ToastNotification("error", "住所詳細は必須です。");
             return;
         }
+        if (note === undefined) {
+            ToastNotification("error", "特記事項は必須です。");
+            return;
+        }
         let exist = false
         if (identificationId1 !== undefined && identificationType1 !== undefined) {
             exist = true;
@@ -326,45 +459,69 @@ let FormCustomerRegister = (props) => {
             ToastNotification("error", "本人確認書類は必須です。");
             return;
         }
-
-        dispatch(utilityAction.setLoading("content"));
-        try {
-            const formData = new FormData();
-            formData.append("shop_id", shop);
-            formData.append("type", type);
-            formData.append("name", name);
-            formData.append("name_kana", nameKana);
-            formData.append("phone_number1", phoneNumber1);
-            formData.append("phone_number2", phoneNumber2);
-            formData.append("birthday", birthday);
-            formData.append("gender", gender);
-            formData.append("zipcode", zipCode);
-            formData.append("address1", address1);
-            formData.append("address2", address2);
-            formData.append("address3", address3);
-            if (identificationId1 !== undefined && identificationType1 !== undefined) {
-                formData.append("identification_id1", identificationId1);
-                formData.append("identification_type1", identificationType1);
-                formData.append("files[]", identificationFile1);
-            }
-            if (identificationId2 !== undefined && identificationType2 !== undefined) {
-                formData.append("identification_id2", identificationId2);
-                formData.append("identification_type2", identificationType2);
-                formData.append("files[]", identificationFile2);
-            }
-            formData.append("note", note);
-
-            let feedback = await multiPostData("customer/register", formData)
-            if (feedback.status === 200) {
-                setTimeout(() => {
+        if (hearingItem1Id === undefined || (hearingItem2Value === undefined || hearingItem2Value === "")) {
+            ToastNotification("error", "全体ヒアリングは必須です。");
+            return;
+        }
+        if (hearingItem1Id > 2 && (hearingItem1Value === undefined || hearingItem1Value === "")) {
+            ToastNotification("error", "全体ヒアリングは必須です。");
+            return;
+        }
+        if (window.confirm("お客様の情報を本当に登録してもよろしいですか？")) {
+            dispatch(utilityAction.setLoading("content"));
+            try {
+                const formData = new FormData();
+                formData.append("shop_id", shop);
+                formData.append("type", type);
+                formData.append("name", name);
+                formData.append("name_kana", nameKana);
+                formData.append("phone_number1", phoneNumber1);
+                formData.append("phone_number2", phoneNumber2);
+                formData.append("birthday", birthday);
+                formData.append("gender", gender);
+                formData.append("zipcode", zipCode);
+                formData.append("job", job);
+                formData.append("address1", address1);
+                formData.append("address2", address2);
+                formData.append("address3", address3);
+                if (identificationId1 !== undefined && identificationType1 !== undefined) {
+                    formData.append("identification_id1", identificationId1);
+                    formData.append("identification_type1", identificationType1);
+                    formData.append("files[]", identificationFile1);
+                }
+                if (identificationId2 !== undefined && identificationType2 !== undefined) {
+                    formData.append("identification_id2", identificationId2);
+                    formData.append("identification_type2", identificationType2);
+                    formData.append("files[]", identificationFile2);
+                }
+                formData.append("note", note);
+                formData.append("hearing_item1_id", hearingItem1Id);
+                formData.append("hearing_item1_value", hearingItem1Value);
+                formData.append("hearing_item2_value", hearingItem2Value);
+                if (hearingLine !== undefined) {
+                    formData.append("hearing_line", hearingLine);
+                }
+                if (hearingGoogle !== undefined) {
+                    formData.append("hearing_google", hearingGoogle);
+                }
+                if (hearingCoupon !== undefined) {
+                    formData.append("hearing_coupon", hearingCoupon);
+                }
+                if (hearingGift !== undefined) {
+                    formData.append("hearing_gift", hearingGift);
+                }
+    
+                let feedback = await multiPostData("customer/register", formData)
+                if (feedback.status === 200) {
                     window.history.back();
-                }, 300);
+                }
+                dispatch(utilityAction.stopLoading());
+            } catch (error) {
+                console.log(error)
+                ToastNotification("error", error?.message);
+                dispatch(utilityAction.stopLoading());
             }
-            dispatch(utilityAction.stopLoading());
-        } catch (error) {
-            console.log(error)
-            ToastNotification("error", error?.message);
-            dispatch(utilityAction.stopLoading());
+        } else {
         }
     };
 
@@ -376,15 +533,106 @@ let FormCustomerRegister = (props) => {
         }
     };
 
+    const handleHearingItem1IdChange = (ind) => {
+        setHearingItem1Id(ind)
+        setHearingItem1Value('')
+        switch (ind) {
+            case 1:
+                setType('顧客')
+                break;
+            case 2:
+                setType('店舗前')
+                break;
+            case 3:
+                setType('ポスティング')
+                break;
+            case 4:
+                setType('折込')
+                break;
+            case 5:
+                setType('ＨＰ')
+                break;
+            case 6:
+                setType('紹介')
+                break;
+            case 7:
+                setType('その他')
+                break;
+
+            default:
+                break;
+        }
+    };
+
+    const handleHearingItem1ValueChange = (e) => {
+        setHearingItem1Value(e);
+    };
+
+    const handleHearingItem2ValueChange = (e) => {
+        setHearingItem2Value(e);
+    };
+
+    const handleHearingItem1SelectValueChange = (e) => {
+        setHearingItem1Value(e.target.value)
+    }
+
+    const handleHearingLineChange = (e) => {
+        setHearingLine(e.target.checked ? 1 : 0)
+    };
+
+    const handleHearingGoogleChange = (e) => {
+        setHearingGoogle(e.target.checked ? 1 : 0)
+    };
+
+    const handleHearingCouponChange = (e) => {
+        setHearingCoupon(e.target.value)
+    };
+
+    const handleHearingGiftChange = (e) => {
+        setHearingGift(e.target.value)
+    };
+
+    const handleSearchAddressClick = async () => {
+        let zip = zipCode.replace("-", "")
+        console.log(zip);
+        if (zip && !zip.match(/^\d{7}$/)) {
+            alert("郵便番号は7桁の数字を入力してください。");
+            return;
+        }
+        setAddress1(0);
+        setAddress2(0);
+        setAddress3("");
+
+        try {
+            const response = await fetch(
+                `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`
+            );
+            const data = await response.json();
+
+            if (data.status === 200 && data.results) {
+                const result = data.results[0];
+                const prefecture = prefectures.filter(item => item.name === result.address1)
+                setAddress1(prefecture[0].id);
+                const city = cities.filter(item => item.name === result.address2)
+                setAddress2(city[0].id);
+                setAddress3(result.address3)
+            } else {
+                alert("住所が見つかりませんでした。");
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     return (
         <div>
             <div className='customer-register-container'>
-                <div className='screen-div'>
-                    <div className="mt-10">
+                <div className='screen-div3'>
+                    <div className="mt-20">
                         <div className="input-label">店舗名</div>
                         <div className="input-value">
                             <Select
-                                onChange={(e) => setShop(e.target.value)}
+                                onChange={(e) => handleShopChange(e.target.value)}
                                 displayEmpty
                                 className="shop-select"
                                 size='small'
@@ -398,27 +646,19 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">種別</div>
+                    <div className="mt-20">
+                        <div className="input-label">来店経緯</div>
                         <div className="input-value">
-                            <Select
-                                onChange={(e) => setType(e.target.value)}
-                                displayEmpty
-                                className="shop-select"
-                                size='small'
-                            >
-                                <MenuItem disabled value="">
-                                    <span className="text-gray-500">種別</span>
-                                </MenuItem>
-                                <MenuItem value={2}>マネージャー</MenuItem>
-                                <MenuItem value={3}>本部社員</MenuItem>
-                                <MenuItem value={4}>店長</MenuItem>
-                                <MenuItem value={5}>社員</MenuItem>
-                                <MenuItem value={6}>アルバイト</MenuItem>
-                            </Select>
+                            <TextInput
+                                type="text"
+                                name="type"
+                                value={type}
+                                className="mt-1 block w-full w-100-pro"
+                                disabled
+                            />
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">名前</div>
                         <div className="input-value">
                             <TextInput
@@ -432,7 +672,7 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">カタカナ名</div>
                         <div className="input-value">
                             <TextInput
@@ -446,7 +686,31 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className='flex-left'>
+                        <div className="mt-20">
+                            <div className="input-label">生年月日</div>
+                            <div className="input-value">
+                                <DateInput
+                                    className="shop-select"
+                                    onChange={(e) => setBirthday(e)}
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-20" style={{ width: '33%' }}>
+                            <div className="input-label">性別</div>
+                            <div className="input-value">
+                                <Select
+                                    onChange={(e) => setGender(e.target.value)}
+                                    className="shop-select"
+                                    size='small'
+                                >
+                                    <MenuItem value={1}>男</MenuItem>
+                                    <MenuItem value={2}>女</MenuItem>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-20">
                         <div className="input-label">電話番号(自宅)</div>
                         <div className="input-value">
                             <PhoneInput
@@ -458,7 +722,7 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">電話番号(携帯)</div>
                         <div className="input-value">
                             <PhoneInput
@@ -470,43 +734,47 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">生年月日</div>
-                        <div className="input-value">
-                            <DateInput
-                                className="shop-select"
-                                onChange={(e) => setBirthday(e)}
-                            />
-                        </div>
-                    </div>
-                    <div className="mt-10">
-                        <div className="input-label">性別</div>
+                    <div className="mt-20">
+                        <div className="input-label">職業</div>
                         <div className="input-value">
                             <Select
-                                onChange={(e) => setGender(e.target.value)}
+                                onChange={(e) => setJob(e.target.value)}
+                                displayEmpty
                                 className="shop-select"
                                 size='small'
                             >
-                                <MenuItem value={1}>男</MenuItem>
-                                <MenuItem value={2}>女</MenuItem>
+                                {jobList.map((item, key) => (
+                                    <MenuItem value={key} key={key}>{item}</MenuItem>
+                                ))}
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
+                </div>
+                <div className='screen-div3'>
+                    <div className="mt-20">
                         <div className="input-label">郵便番号</div>
-                        <div className="input-value">
+                        <div className="input-value flex-left">
                             <ZipcodeInput
                                 onChange={(e) => handleZipCode(e)}
                             />
+                            <Button
+                                loading
+                                textLoading="Waiting"
+                                type="submit"
+                                color="outline-secondary"
+                                title="住所検索"
+                                onClick={handleSearchAddressClick}
+                            />
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">都道府県</div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress1}
                                 className="shop-select"
                                 size='small'
+                                value={address1 ? address1 : 0}
                             >
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">都道府県</span>
@@ -517,13 +785,14 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">市町村</div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress2}
                                 className="shop-select"
                                 size='small'
+                                value={address2 ? address2 : 0}
                             >
                                 {filteredCities.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
@@ -531,7 +800,7 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">住所詳細</div>
                         <div className="input-value">
                             <TextInput
@@ -542,10 +811,11 @@ let FormCustomerRegister = (props) => {
                                 onChange={(e) => setAddress3(e.target.value)}
                                 required
                                 placeholder="住所詳細"
+                                value={address3}
                             />
                         </div>
                     </div>
-                    <div className="flex-left mt-10">
+                    <div className="mt-20">
                         <div className="input-label">本人確認書類</div>
                         <div className="input-value">
                             <div className='flex-left'>
@@ -553,7 +823,7 @@ let FormCustomerRegister = (props) => {
                                     <div><AddIcon className='add-icon' onClick={handleAddIdentification} /></div>
                                 </div>
                                 <div>
-                                    <div className='flex-center'>
+                                    <div className='flex-left'>
                                         <Select
                                             onChange={(e) => setIdentificationId1(e.target.value)}
                                             className="shop-select w-150"
@@ -568,10 +838,11 @@ let FormCustomerRegister = (props) => {
                                             <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
                                             <ImageIcon className='file-icon' />
                                         </label>
+                                        <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen1} />
                                         <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                     </div>
                                     {isVisible && (
-                                        <div className='flex-center'>
+                                        <div className='flex-left'>
                                             <Select
                                                 onChange={(e) => setIdentificationId2(e.target.value)}
                                                 className="shop-select w-150"
@@ -586,6 +857,7 @@ let FormCustomerRegister = (props) => {
                                                 <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
                                                 <ImageIcon className='file-icon' />
                                             </label>
+                                            <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen2} />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                         </div>
                                     )}
@@ -593,7 +865,7 @@ let FormCustomerRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-20">
                         <div className="input-label">特記事項</div>
                         <div className="input-value">
                             <textarea
@@ -605,61 +877,200 @@ let FormCustomerRegister = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className='screen-div'>
-                </div>
-                <div className='hidden'>
-                    <div>
-                        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: 'auto' }} />
+                <div className='screen-div3'>
+                    <div className="mt-20">
+                        <div className="input-label">全体ヒアリング</div>
+                        <div className="hearing-container" style={{ height: '650px' }}>
+                            <div>
+                                <div className="input-label">来店経緯</div>
+                                <div className='ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(1)}
+                                        />
+                                        以前も利用したことがある
+                                    </label>
+                                </div>
+                                <div className='ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(2)}
+                                        />
+                                        店舗を見て
+                                    </label>
+                                </div>
+                                <div className='ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(3)}
+                                        />
+                                        店舗以外の看板・広告を見て
+                                    </label>
+                                    <div className='flex-left' style={{ marginLeft: '20px' }}>
+                                        <label className='mt-1 custom-radio-label'>(</label>
+                                        <TextInput
+                                            type="text"
+                                            name="hearing_item2"
+                                            className="free-input w-100 block"
+                                            onChange={(e) => handleHearingItem1ValueChange(e.target.value)}
+                                            placeholder="場所"
+                                            disabled={hearingItem1Id != 3}
+                                        />
+                                        <label className='mt-1 custom-radio-label'>)の場所で見ました</label>
+                                    </div>
+                                </div>
+                                <div className='ml-10 mt-20'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(4)}
+                                        />
+                                        折込チラシを見て
+                                        {
+                                            hearingItem1Id == 4 && (
+                                                <Select
+                                                    onChange={handleHearingItem1SelectValueChange}
+                                                    className="hearing-select"
+                                                    size='small'
+                                                >
+                                                    {hearingNews.map((item, key) => (
+                                                        <MenuItem value={key} key={key}>{item}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            )
+                                        }
+                                    </label>
+                                </div>
+                                <div className='ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(5)}
+                                        />
+                                        インターネットを見て
+                                        {
+                                            hearingItem1Id == 5 && (
+                                                <Select
+                                                    onChange={handleHearingItem1SelectValueChange}
+                                                    className="hearing-select"
+                                                    size='small'
+                                                >
+                                                    {hearingInternet.map((item, key) => (
+                                                        <MenuItem value={key} key={key}>{item}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            )
+                                        }
+                                    </label>
+                                </div>
+                                <div className='ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(6)}
+                                        />
+                                        紹介されて
+                                        <label className='mt-1'>(</label>
+                                        <TextInput
+                                            type="text"
+                                            name="hearing_item2"
+                                            className="free-input w-100 block"
+                                            onChange={(e) => handleHearingItem1ValueChange(e.target.value)}
+                                            disabled={hearingItem1Id != 6}
+                                        />
+                                        <label className='mt-1'>)</label>
+                                    </label>
+                                </div>
+                                <div className='ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="radio"
+                                            name="hearing_item1"
+                                            onChange={() => handleHearingItem1IdChange(7)}
+                                        />
+                                        その他
+                                        <TextInput
+                                            type="text"
+                                            name="hearing_item2"
+                                            className="free-input block"
+                                            onChange={(e) => handleHearingItem1ValueChange(e.target.value)}
+                                            disabled={hearingItem1Id != 7}
+                                        />
+                                    </label>
+                                </div>
+                                <div className="mt-20">
+                                    <div className="input-label">よく買取店に行かれるんですか？</div>
+                                    <div className="input-value">
+                                        <TextInput
+                                            type="text"
+                                            name="hearing_item2"
+                                            className="mt-1 ml-10 block w-full w-100-pro"
+                                            onChange={(e) => handleHearingItem2ValueChange(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='mt-20 ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="checkbox"
+                                            name="hearing_line"
+                                            onChange={(e) => handleHearingLineChange(e)}
+                                        />
+                                        LINEお友達登録したか？
+                                    </label>
+                                </div>
+                                <div className='mt-20 ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="checkbox"
+                                            name="hearing_google"
+                                            onChange={(e) => handleHearingGoogleChange(e)}
+                                        />
+                                        Googleロコミしたか？
+                                    </label>
+                                </div>
+                                <div className="mt-20 ml-10">
+                                    <div className="input-label">ノベルティーを何を渡したか？</div>
+                                    <div className="input-value">
+                                        <Select
+                                            onChange={handleHearingGiftChange}
+                                            className="hearing-select w-100-pro"
+                                            size='small'
+                                        >
+                                            {gifts.map((item, key) => (
+                                                <MenuItem value={key} key={key}>{item}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
+                                <div className="mt-20 ml-10">
+                                    <div className="input-label">クーポンのご利用はあったか？</div>
+                                    <div className="input-value">
+                                        <Select
+                                            onChange={handleHearingCouponChange}
+                                            className="hearing-select w-100-pro"
+                                            size='small'
+                                        >
+                                            {coupons.map((item, key) => (
+                                                <MenuItem value={key} key={key}>{item}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <button onClick={captureImage}>Capture Image</button>
-
-                    {/* Hidden Canvas to Draw Image */}
-                    <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-                    {/* Display Captured Image */}
-                    {imageSrc && (
-                        <div>
-                            <h3>Captured Image:</h3>
-                            <img src={imageSrc} alt="Captured" style={{ maxWidth: '100%' }} />
-                        </div>
-                    )}
-
-                    {/* Display OCR Result */}
-                    {isProcessing ? (
-                        <p>Processing...</p>
-                    ) : (
-                        <div>
-                            <h3>OCR Result:</h3>
-                            <p>{ocrResult}</p>
-                        </div>
-                    )}
-                </div>
-                <div className='hidden'>
-                    <h1>OCR from Image</h1>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-
-                    {/* Display Image Preview */}
-                    {imageSrc && (
-                        <div>
-                            <h3>Image Preview:</h3>
-                            <img src={imageSrc} alt="Selected" style={{ maxWidth: '100%' }} />
-                        </div>
-                    )}
-
-                    {/* Display OCR Result */}
-                    {isProcessing ? (
-                        <p>Processing...</p>
-                    ) : (
-                        <div>
-                            <h3>OCR Result:</h3>
-                            <p>{ocrResult}</p>
-                        </div>
-                    )}
                 </div>
             </div>
-
             <div className='flex-center'
                 style={{
                     marginTop: '50px',
@@ -671,18 +1082,33 @@ let FormCustomerRegister = (props) => {
                 >キャンセル</div>
                 <div
                     className="register-btn"
-                    onClick={handleRegisterClick}
+                    onClick={handleSaveCustomerClick}
                 >登録する</div>
-
             </div>
-            <Dialog
-                open={openImagePreview}
-                onClose={() => handleImagePreviewClose()}
-            >
-                <div className=''>
-                    <img src={previewImage} alt="preview" />
-                </div>
-            </Dialog>
+            <div>
+                <Dialog
+                    open={openImagePreview}
+                    onClose={() => handleImagePreviewClose()}
+                    className='image-preview'
+                >
+                    <div className=''>
+                        <img src={previewImage} alt="preview" />
+                    </div>
+                </Dialog>
+            </div>
+            <div>
+                <Dialog
+                    open={openCameraPreview}
+                    disableEscapeKeyDown={true}
+                    className='image-preview'
+                >
+                    <CameraCaptureDialog
+                        type={cameraCaptureType}
+                        onHandleCameraDialogClose={handleCameraPreviewClose}
+                        onHandleCapturedImage={handleCapturedImage}
+                    />
+                </Dialog>
+            </div>
             <Dialog
                 open={openPdfPreview}
                 onClose={() => handlePdfPreviewClose()}
@@ -710,7 +1136,58 @@ let FormCustomerRegister = (props) => {
                     )}
                 </DialogContent>
             </Dialog>
+            <div className='hidden'>
+                <div>
+                    <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: 'auto' }} />
+                </div>
+
+                <button onClick={captureImage}>Capture Image</button>
+
+                {/* Hidden Canvas to Draw Image */}
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+                {/* Display Captured Image */}
+                {imageSrc && (
+                    <div>
+                        <h3>Captured Image:</h3>
+                        <img src={imageSrc} alt="Captured" style={{ maxWidth: '100%' }} />
+                    </div>
+                )}
+
+                {/* Display OCR Result */}
+                {isProcessing ? (
+                    <p>Processing...</p>
+                ) : (
+                    <div>
+                        <h3>OCR Result:</h3>
+                        <p>{ocrResult}</p>
+                    </div>
+                )}
+            </div>
+            <div className='hidden'>
+                <h1>OCR from Image</h1>
+
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+
+                {/* Display Image Preview */}
+                {imageSrc && (
+                    <div>
+                        <h3>Image Preview:</h3>
+                        <img src={imageSrc} alt="Selected" style={{ maxWidth: '100%' }} />
+                    </div>
+                )}
+
+                {/* Display OCR Result */}
+                {isProcessing ? (
+                    <p>Processing...</p>
+                ) : (
+                    <div>
+                        <h3>OCR Result:</h3>
+                        <p>{ocrResult}</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
-export default FormCustomerRegister;
+export default withRouter(FormCustomerRegister);

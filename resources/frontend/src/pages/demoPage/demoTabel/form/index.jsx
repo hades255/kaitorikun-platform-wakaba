@@ -20,7 +20,7 @@ let FormDataUser = (props) => {
                         component={ReanderField}
                         label="Username"
                         type="text"
-                        readOnly={props.isEdit}
+                        disabled={props.isEdit}
                         placeholder="Masukkan Username"
                     />
                 </div>

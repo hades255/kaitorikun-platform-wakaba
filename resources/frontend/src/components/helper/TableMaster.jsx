@@ -36,7 +36,7 @@ const TableMaster = (props) => {
         disableButton,
         disableButton2,
         disableButton3,
-        width = 1300,
+        width=1300,
         pageSize,
     } = props;
 

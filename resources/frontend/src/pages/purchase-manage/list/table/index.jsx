@@ -5,12 +5,80 @@ import {
     Row,
     Col,
 } from "../../../../components";
+import moment from 'moment';
+moment.locale("ja");
+
 const PurchaseTable = (props) => {
     const columns = [
         {
             title: "id",
-            dataIndex: "id",
-            key: "id",
+            dataIndex: "purchase_id",
+            key: "purchase_id",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                    >{cell.toString().padStart(6, '0')}</div>
+                );
+            },
+        },
+        {
+            title: "来店日",
+            dataIndex: "visit_date",
+            key: "visit_date",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                    >{moment(cell).format('YYYY/MM/DD')}</div>
+                );
+            },
+        },
+        {
+            title: "買取状態",
+            dataIndex: "status",
+            key: "status",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                    >{cell}</div>
+                );
+            },
+        },
+        {
+            title: "買い取った日付",
+            dataIndex: "purchases_date",
+            key: "purchases_date",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                    >{moment(cell).format('YYYY/MM/DD HH:ss')}</div>
+                );
+            },
+        },
+        {
+            title: "買取金額",
+            dataIndex: "purchase_price",
+            key: "purchase_price",
+            render: (cell, row) => {
+                return (
+                    <div>{cell ? cell.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</div>
+                );
+            },
+        },
+        {
+            title: "買取査定金額",
+            dataIndex: "purchase_estimate_price",
+            key: "purchase_estimate_price",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                    >{cell ? cell.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</div>
+                );
+            },
         },
         {
             title: "店舗名",
@@ -18,30 +86,41 @@ const PurchaseTable = (props) => {
             key: "shop_name",
         },
         {
-            title: "来店経緯",
-            dataIndex: "type",
-            key: "type",
-        },
-        {
             title: "氏名",
             dataIndex: "name",
             key: "name",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                        onClick={() => handleClick(row)}
+                    >{cell}</div>
+                );
+            },
         },
         {
             title: "カタカナ名",
             dataIndex: "name_kana",
             key: "name_kana",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                        onClick={() => handleClick(row)}
+                    >{cell}</div>
+                );
+            },
         },
         {
             title: "生年月日",
             dataIndex: "birthday",
             key: "birthday",
         },
-        {
-            title: "年齢",
-            dataIndex: "age",
-            key: "age",
-        },
+        // {
+        //     title: "年齢",
+        //     dataIndex: "age",
+        //     key: "age",
+        // },
         {
             title: "電話番号(自宅)",
             dataIndex: "phone_number1",
@@ -67,38 +146,16 @@ const PurchaseTable = (props) => {
             dataIndex: "address3",
             key: "address3",
         },
-        {
-            title: "身分証",
-            dataIndex: "identification1",
-            key: "identification1",
-        },
-        {
-            title: "身分証NO.",
-            dataIndex: "identification_no1",
-            key: "identification_no1",
-        },
-        {
-            title: "職業",
-            dataIndex: "business",
-            key: "business",
-        },
-        {
-            title: "来店回数",
-            dataIndex: "shop_visit_num",
-            key: "shop_visit_num",
-        },
-        {
-            title: "最終来店日",
-            dataIndex: "last_visit_date",
-            key: "last_visit_date",
-        },
-        {
-            title: "特記事項",
-            className: "Purchase-note",
-            dataIndex: "note",
-            key: "note",
-        },
-
+        // {
+        //     title: "身分証",
+        //     dataIndex: "identification1",
+        //     key: "identification1",
+        // },
+        // {
+        //     title: "職業",
+        //     dataIndex: "job",
+        //     key: "job",
+        // },
         {
             title: "",
             dataIndex: "action",
@@ -122,14 +179,17 @@ const PurchaseTable = (props) => {
         },
     ];
     const handleClick = (data) => {
-        props.onHandleEdit(data); 
+        props.onHandleEdit(data);
     };
     return (
         <TableMaster
-            rowKey="id"
             disabledSearch="true"
             columns={columns}
-            dataSource={props.dataSource}
+            dataSource={props.purchases}
+            scrollX={{ x: "max-content" }}
+            tableLayout="fixed"
+            width={1300}
+            pageSize={15}
         />
     );
 };

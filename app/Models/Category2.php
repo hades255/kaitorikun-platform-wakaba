@@ -16,5 +16,6 @@ class Category2 extends Model
         "id",
         "parent_id",
         "name",
+        "child_id",
     ];
 }

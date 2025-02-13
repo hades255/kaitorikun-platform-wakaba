@@ -16,9 +16,7 @@ class CustomerRequest extends FormRequest
         return true;
     }
 
-    protected function failedValidation(Validator $validator)
-    {
-    }
+    protected function failedValidation(Validator $validator) {}
 
     public function getValidator()
     {
@@ -37,7 +35,7 @@ class CustomerRequest extends FormRequest
                 'nullable',
                 'integer',
             ],
-            'shop_name' => [
+            'shop_id' => [
                 'nullable',
                 'string',
             ],
@@ -49,7 +47,11 @@ class CustomerRequest extends FormRequest
                 'nullable',
                 'string',
             ],
-            'address' => [ // 住所
+            'address1' => [ // 住所
+                'nullable',
+                'string',
+            ],
+            'address2' => [ // 住所
                 'nullable',
                 'string',
             ],
@@ -60,13 +62,10 @@ class CustomerRequest extends FormRequest
             ],
         ];
     }
-    public function withValidator(Validator $validator)
-    {
-    }
+    public function withValidator(Validator $validator) {}
     // バリデーションエラーメッセージのカスタマイズ
     public function messages()
     {
-        return [
-        ];
+        return [];
     }
 }

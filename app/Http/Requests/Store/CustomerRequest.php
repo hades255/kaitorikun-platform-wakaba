@@ -37,83 +37,83 @@ class CustomerRequest extends FormRequest
                 'nullable',
                 'integer',
             ],
-            'shop_id' => [ // 店舗ID
-                'required',
-                'integer',
-            ],
-            'type' => [ // 種別
-                'required',
-                'integer',
-            ],
+            // 'shop_id' => [ // 店舗ID
+            //     'nullable',
+            //     'integer',
+            // ],
+            // 'type' => [ // 種別
+            //     'nullable',
+            //     'string',
+            // ],
             'name' => [ // 名前
                 'required',
                 'string',
             ],
-            'name_kana' => [ // カタカナ名
-                'required',
-                'string',
-            ],
+            // 'name_kana' => [ // カタカナ名
+            //     'nullable',
+            //     'string',
+            // ],
             'phone_number1' => [ // 電話番号(自宅)
-                'required',
+                'nullable',
                 'string',
             ],
             'phone_number2' => [ // 電話番号(携帯)
-                'required',
-                'string',
-            ],
-            'birthday' => [ // 生年月日
-                'required',
-                'date',
-                'date_format:Y-m-d',
-            ],
-            'gender' => [ // 性別
-                'required',
-                'integer',
-            ],
-            'zipcode' => [ // 郵便番号
-                'required',
-                'string',
-            ],
-            'address1' => [ // 都道府県
-                'required',
-                'integer',
-            ],
-            'address2' => [ // 市町村
-                'required',
-                'integer',
-            ],
-            'address3' => [ // 住所詳細
-                'required',
-                'string',
-            ],
-            'identification_id1' => [ // 本人確認書類ID
-                'nullable',
-                'integer',
-            ],
-            'identification_type1' => [
                 'nullable',
                 'string',
             ],
-            'identification_path1' => [
-                'nullable',
-                'string',
-            ],
-            'identification_id2' => [ // 本人確認書類ID
-                'nullable',
-                'integer',
-            ],
-            'identification_type2' => [
-                'nullable',
-                'string',
-            ],
-            'identification_path2' => [
-                'nullable',
-                'string',
-            ],
-            'note' => [
-                'nullable',
-                'string',
-            ],
+            // 'birthday' => [ // 生年月日
+            //     'nullable',
+            //     'date',
+            //     'date_format:Y-m-d',
+            // ],
+            // 'gender' => [ // 性別
+            //     'nullable',
+            //     'integer',
+            // ],
+            // 'zipcode' => [ // 郵便番号
+            //     'nullable',
+            //     'string',
+            // ],
+            // 'address1' => [ // 都道府県
+            //     'nullable',
+            //     'integer',
+            // ],
+            // 'address2' => [ // 市町村
+            //     'nullable',
+            //     'integer',
+            // ],
+            // 'address3' => [ // 住所詳細
+            //     'nullable',
+            //     'string',
+            // ],
+            // 'identification_id1' => [ // 本人確認書類ID
+            //     'nullable',
+            //     'integer',
+            // ],
+            // 'identification_type1' => [
+            //     'nullable',
+            //     'string',
+            // ],
+            // 'identification_path1' => [
+            //     'nullable',
+            //     'string',
+            // ],
+            // 'identification_id2' => [ // 本人確認書類ID
+            //     'nullable',
+            //     'integer',
+            // ],
+            // 'identification_type2' => [
+            //     'nullable',
+            //     'string',
+            // ],
+            // 'identification_path2' => [
+            //     'nullable',
+            //     'string',
+            // ],
+            // 'note' => [
+            //     'nullable',
+            //     'string',
+            // ],
         ];
     }
     public function withValidator(Validator $validator)

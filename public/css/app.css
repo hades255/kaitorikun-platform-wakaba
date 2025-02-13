@@ -31775,6 +31775,8 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
   align-items: center;
   background-color: #e9ecef;
   display: flex;
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-align: center;
   flex-direction: column;
   height: 100vh;
   justify-content: center;
@@ -31782,7 +31784,8 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
 
 .login-box,
 .register-box {
-  width: 360px;
+  width: 550px;
+  height: 450px !important;
 }
 
 @media (max-width: 576px) {
@@ -50468,6 +50471,28 @@ input.password-hide-css {
     display: none;
 }
 
+.css-1tktgsa-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    max-height: 520px !important;
+}
+
+/* Chrome, Safari, Edge のスピナーを削除 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox のスピナーを削除 */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+@media print {
+    .no-print {
+        display: none;
+        /* 印刷時に非表示 */
+    }
+}
 .dark-orange {
   color: #ffffff;
 }
@@ -50668,6 +50693,7 @@ input {
   gap: 10px;
   justify-content: center;
   align-items: center;
+  max-width: 220px;
 }
 
 .zip-left {
@@ -50680,6 +50706,10 @@ input {
   width: 70%;
   border-radius: 5px;
   border: solid 0.5px #D9D9D9;
+}
+
+.mt-5 {
+  margin-top: 5px !important;
 }
 
 .mt-10 {
@@ -50700,6 +50730,10 @@ input {
 
 .ml-20 {
   margin-left: 20px;
+}
+
+.w-200 {
+  width: 200px !important;
 }
 
 .w-150 {
@@ -50742,6 +50776,11 @@ input {
   cursor: pointer;
 }
 
+.menu-item:hover {
+  color: #2174ce;
+  cursor: pointer;
+}
+
 .hidden {
   display: none;
 }
@@ -50761,7 +50800,7 @@ input {
 }
 
 .image-show-btn {
-  width: 150px;
+  width: 120px;
   height: 40px;
   border: solid 0.5px #D9D9D9;
   border-radius: 5px;
@@ -50775,6 +50814,11 @@ input {
     display: flex;
     gap: 100px;
   }
+  .purchase-register-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+  }
   .customer-register-container {
     display: flex;
     justify-content: flex-start;
@@ -50785,6 +50829,9 @@ input {
     justify-content: center;
     align-items: center;
     gap: 10px;
+  }
+  .search-container .shop-select {
+    height: 40px !important;
   }
   .screen-div2 {
     width: 50%;
@@ -50799,10 +50846,16 @@ input {
     gap: 0px;
     flex-direction: column;
   }
+  .purchase-register-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-direction: column;
+  }
   .customer-register-container {
     display: flex;
     justify-content: flex-start;
-    gap: 0px;
+    gap: 10px;
     flex-direction: column;
   }
   .search-container {
@@ -50819,8 +50872,14 @@ input {
     width: 100%;
   }
 }
-.customer-register-container input, .shop-select {
+.purchase-register-container input,
+.shop-select {
   height: 30px;
+}
+
+.customer-register-container input,
+.shop-select {
+  height: 40px;
 }
 
 .customer-business {
@@ -50891,6 +50950,18 @@ input {
   cursor: pointer;
 }
 
+.init-btn {
+  width: 200px;
+  background-color: #107C41;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  border-radius: 35px;
+  cursor: pointer;
+}
+
 .exit-btn {
   width: 200px;
   background-color: red;
@@ -50941,4 +51012,113 @@ input {
   position: absolute;
   right: 20px;
   top: -35px;
+}
+
+.add-items-container {
+  padding: 20px;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.add-items-btns {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
+.purchase-add-item {
+  display: block;
+}
+
+.purchase-add-item .css-10d30g3-MuiPaper-root-MuiDialog-paper {
+  min-width: 90% !important;
+  min-height: 90% !important;
+}
+
+.purchase-summary-item {
+  display: block;
+}
+
+.purchase-summary-item .css-10d30g3-MuiPaper-root-MuiDialog-paper {
+  min-width: 70% !important;
+  min-height: 90% !important;
+}
+
+.image-preview {
+  display: block;
+}
+
+.image-preview .css-10d30g3-MuiPaper-root-MuiDialog-paper {
+  min-width: 650px !important;
+}
+
+.image-preview img {
+  width: 100% !important;
+  height: 100% !important;
+  -o-object-fit: cover !important;
+     object-fit: cover !important;
+}
+
+@media (max-width: 576px) {
+  .image-preview .css-10d30g3-MuiPaper-root-MuiDialog-paper {
+    min-width: 70% !important;
+  }
+}
+.dialog-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.purchase-table-cell {
+  max-width: 200px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ant-table-cell {
+  padding: 5px 0px !important;
+}
+
+.item-hearing-container {
+  padding: 20px;
+  height: 470px;
+  width: 450px;
+}
+
+.item-hearing-content {
+  height: 350px;
+  border: solid #B9B9B9 1px;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.item-status-container {
+  padding: 20px;
+  height: 200px;
+  width: 450px;
+}
+
+.camera-icon {
+  background: white;
+  margin-top: 0px;
+}
+
+.address-search-btn {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.sign-board {
+  width: 80%;
+  height: 150px;
+  touch-action: none;
+  border: solid 1px #B9B9B9;
+  border-radius: 5px;
+}
+
+.custom-table {
+  min-width: none !important;
 }

@@ -13,7 +13,10 @@ import CalendarPage from "../../pages/calendar";
 import AcceptInvitation from "../../pages/invitations/AcceptInvitation";
 import PurchaseRegister from "../../pages/purchase-manage/register";
 import PurchaseList from "../../pages/purchase-manage/list";
-import Schannel from "../../pages/schannel";
+import PurchaseContract from "../../pages/purchase-manage/contract";
+import PurchaseEdit from "../../pages/purchase-manage/edit";
+import PurchaseCustomer from "../../pages/purchase-manage/customer";
+import SChannel from "../../pages/schannel";
 import SchannelWithSeparatorBar from "../../pages/schannel/SchannelWithSeparatorBar";
 
 const MenuRoutes = [
@@ -84,10 +87,22 @@ const MenuRoutes = [
         component: () => <PurchaseRegister />,
     },
     {
-        path: "/purchase/edit",
+        path: "/purchase/customer",
         exact: true,
         title: "買取計算書(顧客)",
-        component: () => <CustomerEdit />,
+        component: () => <PurchaseCustomer />,
+    },
+    {
+        path: "/purchase/contract",
+        exact: true,
+        title: "買取明細書",
+        component: () => <PurchaseContract />,
+    },
+    {
+        path: "/purchase/edit",
+        exact: true,
+        title: "買取計算書",
+        component: () => <PurchaseEdit />,
     },
     {
         path: "/form-control",

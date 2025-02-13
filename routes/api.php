@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CustomerManage\ItemsController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactionController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\SChannelController;
 use App\Http\Controllers\UserController;
 use App\Mail\CommunityInvitationEmail;
 use Illuminate\Support\Facades\Mail;
@@ -53,6 +55,12 @@ Route::post('/customer/delete', [CustomerController::class, 'destroy']);
 Route::get('/purchase/init-register', [PurchaseController::class, 'initRegister']);
 Route::post('/purchase/leave-items-register', [PurchaseController::class, 'leaveItemsRegister']);
 Route::post('/purchase/update', [PurchaseController::class, 'update']);
+Route::post('/purchase/index', [PurchaseController::class, 'index']);
+Route::post('/purchase/list', [PurchaseController::class, 'search']);
+Route::post('/purchase/contract', [PurchaseController::class, 'contract']);
+
+Route::post('/purchase/search/items', [ItemsController::class, 'search']);
+Route::post('/purchase/item/init-register', [ItemsController::class, 'initRegister']);
 
 Route::post('/invitations/{id}/view', [InvitationController::class, 'view'])->name('invitations.view');
 Route::post('/invitations/{id}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');

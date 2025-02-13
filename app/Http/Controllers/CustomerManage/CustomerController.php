@@ -5,11 +5,15 @@ namespace App\Http\Controllers\CustomerManage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Index\CustomerRequest;
 use App\Http\Requests\Store\CustomerRequest as StoreCustomerRequest;
+use App\Models\Category1;
 use App\Models\Customer;
 use App\Models\City;
+use App\Models\Items;
 use App\Models\Prefectures;
+use App\Models\Purchase;
 use App\Models\Shop;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -38,11 +42,21 @@ class CustomerController extends Controller
             $prefectures = Prefectures::select(['id', 'name'])->get();
             $cities = City::select(['id', 'prefecture_id', 'name'])->get();
             $shops = Shop::select(['id', 'name'])->get();
+            $categories1 = Category1::select(['id', 'name'])->get();
+            $purchases = Purchase::getPurchasesByCustomer($validatedData['id']);
+            $items = array();
+            foreach ($purchases as $key => $purchase) {
+                $item = Items::getItems($purchase->id);
+                $items[] = $item;
+            }
             return response()->json([
                 "prefectures" => $prefectures,
                 "cities" => $cities,
                 "shops" => $shops,
+                "categories1" => $categories1,
                 "customer" => $customer,
+                "purchases" => $purchases,
+                "items" => $items,
             ]);
         } else {
             $results = Customer::getCustomers($validatedData);
@@ -50,8 +64,8 @@ class CustomerController extends Controller
             foreach ($results as $key => $data) {
                 $customer = array();
                 $customer['id'] = $data->id;
-                $customer['shop_name'] = $data->shop;
                 $customer['type'] = $data->type;
+                $customer['shop_name'] = $data->shop_name;
                 $customer['gender'] = $data->gender;
                 $customer['name'] = $data->name;
                 $customer['name_kana'] = $data->name_kana;
@@ -73,10 +87,42 @@ class CustomerController extends Controller
                         $customer['identification1'] = "パスポート";
                     }
                 }
+                switch ($data->job) {
+                    case 0:
+                        $customer['job'] = "自営業";
+                        break;
+                    case 1:
+                        $customer['job'] = "自由業";
+                        break;
+                    case 2:
+                        $customer['job'] = "会社員";
+                        break;
+                    case 3:
+                        $customer['job'] = "バート･アールバイト";
+                        break;
+                    case 4:
+                        $customer['job'] = "主婦";
+                        break;
+                    case 5:
+                        $customer['job'] = "学生";
+                        break;
+                    case 6:
+                        $customer['job'] = "学生";
+                        break;
+
+                    default:
+                        $customer['job'] = "";
+                        break;
+                }
                 // $customer['identification_no1'] = $data->id;
-                $customer['business'] = "";
-                $customer['shop_visit_num'] = 100;
-                $customer['last_visit_date'] = "2024-12-20";
+                $purchases = DB::table('purchases')->where('customer_id', $data->id)->orderBy('created_at', 'DESC')->get();
+                if (count($purchases) > 0) {
+                    $customer['shop_visit_num'] = count($purchases);
+                    $customer['last_visit_date'] = $purchases[0]->created_at;
+                } else {
+                    $customer['shop_visit_num'] = 0;
+                    $customer['last_visit_date'] = "";
+                }
                 $customer['note'] = $data->note;
                 $customers[] = $customer;
             }
@@ -106,7 +152,7 @@ class CustomerController extends Controller
         }
 
         // バリデーションされたデータを取得
-        $validatedData = $request->validated();
+        $validatedData = $request->all();
         $uploadedFilePaths = array();
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
@@ -132,60 +178,60 @@ class CustomerController extends Controller
                 }
             }
         }
-
-        // 更新
-        if (isset($validatedData['id'])) {
+        $customer = new customer(); // 新規登録
+        if (isset($validatedData['id'])) { // 更新
             $customer = Customer::find($validatedData['id']);
-            $customer->shop_id = $validatedData['shop_id'];
-            $customer->type = $validatedData['type'];
-            $customer->name = $validatedData['name'];
-            $customer->name_kana = $validatedData['name_kana'];
-            $customer->phone_number1 = $validatedData['phone_number1'];
-            $customer->phone_number2 = $validatedData['phone_number2'];
-            $customer->birthday = $validatedData['birthday'];
-            $customer->gender = $validatedData['gender'];
-            $customer->zipcode = $validatedData['zipcode'];
-            $customer->address1 = $validatedData['address1'];
-            $customer->address2 = $validatedData['address2'];
-            $customer->address3 = $validatedData['address3'];
-            if (isset($validatedData['identification_id1'])) {
-                $customer->identification_id1 = $validatedData['identification_id1'];
-                $customer->identification_type1 = $validatedData['identification_type1'];
-                $customer->identification_path1 = $validatedData['identification_path1'];
-            }
-            if (isset($validatedData['identification_id2'])) {
-                $customer->identification_id2 = $validatedData['identification_id2'];
-                $customer->identification_type2 = $validatedData['identification_type2'];
-                $customer->identification_path2 = $validatedData['identification_path2'];
-            }
-            $customer->save();
-            // 新規登録
-        } else {
-            $customer = new customer();
-            $customer->shop_id = $validatedData['shop_id'];
-            $customer->type = $validatedData['type'];
-            $customer->name = $validatedData['name'];
-            $customer->name_kana = $validatedData['name_kana'];
-            $customer->phone_number1 = $validatedData['phone_number1'];
-            $customer->phone_number2 = $validatedData['phone_number2'];
-            $customer->birthday = $validatedData['birthday'];
-            $customer->gender = $validatedData['gender'];
-            $customer->zipcode = $validatedData['zipcode'];
-            $customer->address1 = $validatedData['address1'];
-            $customer->address2 = $validatedData['address2'];
-            $customer->address3 = $validatedData['address3'];
-            if (isset($validatedData['identification_id1'])) {
-                $customer->identification_id1 = $validatedData['identification_id1'];
-                $customer->identification_type1 = $validatedData['identification_type1'];
-                $customer->identification_path1 = $validatedData['identification_path1'];
-            }
-            if (isset($validatedData['identification_id2'])) {
-                $customer->identification_id2 = $validatedData['identification_id2'];
-                $customer->identification_type2 = $validatedData['identification_type2'];
-                $customer->identification_path2 = $validatedData['identification_path2'];
-            }
-            $customer->save();
         }
+        $customer->shop_id = $validatedData['shop_id'];
+        $customer->type = $validatedData['type'];
+        $customer->name = $validatedData['name'];
+        $customer->name_kana = $validatedData['name_kana'];
+        $customer->phone_number1 = $validatedData['phone_number1'];
+        $customer->phone_number2 = $validatedData['phone_number2'];
+        $customer->birthday = $validatedData['birthday'];
+        $customer->gender = $validatedData['gender'];
+        $customer->zipcode = $validatedData['zipcode'];
+        $customer->job = $validatedData['job'];
+        $customer->address1 = $validatedData['address1'];
+        $customer->address2 = $validatedData['address2'];
+        $customer->address3 = $validatedData['address3'];
+        if (isset($validatedData['identification_id1'])) {
+            $customer->identification_id1 = $validatedData['identification_id1'];
+            $customer->identification_type1 = $validatedData['identification_type1'];
+            if (isset($validatedData['identification_path1'])) {
+                $customer->identification_path1 = $validatedData['identification_path1'];
+            }
+        }
+        if (isset($validatedData['identification_id2'])) {
+            $customer->identification_id2 = $validatedData['identification_id2'];
+            $customer->identification_type2 = $validatedData['identification_type2'];
+            if (isset($validatedData['identification_path2'])) {
+                $customer->identification_path2 = $validatedData['identification_path2'];
+            }
+        }
+        $customer->note = $validatedData['note'];
+        if (isset($validatedData['hearing_item1_id'])) {
+            $customer->hearing_item1_id = $validatedData['hearing_item1_id'];
+        }
+        if (isset($validatedData['hearing_item1_value'])) {
+            $customer->hearing_item1_value = $validatedData['hearing_item1_value'];
+        }
+        if (isset($validatedData['hearing_item2_value'])) {
+            $customer->hearing_item2_value = $validatedData['hearing_item2_value'];
+        }
+        if (isset($validatedData['hearing_line'])) {
+            $customer->hearing_line = $validatedData['hearing_line'];
+        }
+        if (isset($validatedData['hearing_google'])) {
+            $customer->hearing_google = $validatedData['hearing_google'];
+        }
+        if (isset($validatedData['hearing_coupon'])) {
+            $customer->hearing_coupon = $validatedData['hearing_coupon'];
+        }
+        if (isset($validatedData['hearing_gift'])) {
+            $customer->hearing_gift = $validatedData['hearing_gift'];
+        }
+        $customer->save();
 
         return response()->json(['message' => 'OK'], 200);
     }

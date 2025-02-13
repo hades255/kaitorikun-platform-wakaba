@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
     ReanderField,
     React,
@@ -9,7 +10,13 @@ import {
 } from "../../../components";
 import { reduxForm } from "redux-form";
 import Validate from "../validate";
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 let FormLogin = (props) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
     return (
         <form method="post" onSubmit={props.handleSubmit}>
             <Field
@@ -19,15 +26,40 @@ let FormLogin = (props) => {
                 formGroup
                 placeholder="メールアドレスまたはログインID"
             />
-            <Field
-                name="password"
-                type="text"
-                component={ReanderField}
-                placeholder="パスワード"
-                iconFormGroup="fas fa-lock"
-                formGroup
-                customeCss="password-hide-css"
-            />
+            <div style={{ position: 'relative' }}>
+                <Field
+                    name="password"
+                    type="text"
+                    component={ReanderField}
+                    placeholder="パスワード"
+                    iconFormGroup="fas fa-lock"
+                    formGroup
+                    customeCss={showPassword ? '' : 'password-hide-css'}
+                />
+                {showPassword ?
+                    <VisibilityOff
+                        onClick={togglePasswordVisibility}
+                        style={{
+                            position: 'absolute',
+                            cursor: 'pointer',
+                            top: '9px',
+                            right: '45px',
+                            zIndex: '10'
+                        }}
+                    />
+                    :
+                    <Visibility
+                        onClick={togglePasswordVisibility}
+                        style={{
+                            position: 'absolute',
+                            cursor: 'pointer',
+                            top: '9px',
+                            right: '45px',
+                            zIndex: '10'
+                        }}
+                    />
+                }
+            </div>
             <Link
                 aria-label="パスワードを忘れた方はこちら"
                 to="/forgot-password"

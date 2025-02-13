@@ -11,6 +11,13 @@ const CustomerTable = (props) => {
             title: "id",
             dataIndex: "id",
             key: "id",
+            render: (cell, row) => {
+                return (
+                    <div
+                        className="customer-name"
+                    >{cell.toString().padStart(8, '0')}</div>
+                );
+            },
         },
         {
             title: "店舗名",
@@ -90,8 +97,8 @@ const CustomerTable = (props) => {
         },
         {
             title: "職業",
-            dataIndex: "business",
-            key: "business",
+            dataIndex: "job",
+            key: "job",
         },
         {
             title: "来店回数",
@@ -108,6 +115,7 @@ const CustomerTable = (props) => {
             className: "customer-note",
             dataIndex: "note",
             key: "note",
+            width: 100
         },
 
         {
@@ -137,12 +145,13 @@ const CustomerTable = (props) => {
     };
     return (
         <TableMaster
-            rowKey="id"
             disabledSearch="true"
             columns={columns}
             dataSource={props.dataSource}
-            pageSize={10}
-            scrollX={true}
+            scrollX={{ x: "max-content" }}
+            tableLayout="fixed"
+            width={1300}
+            pageSize={15}
         />
     );
 };

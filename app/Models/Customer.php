@@ -35,11 +35,16 @@ class Customer extends Model
         "identification_id2",
         "identification_type2",
         "identification_path2",
+        "document_path",
         "note",
-        "check_plan_date",
         "hearing_item1_id",
         "hearing_item1_value",
         "hearing_item2_value",
+        "hearing_line",
+        "hearing_google",
+        "hearing_coupon",
+        "hearing_gift",
+        "coupon",
     ];
 
     public function user(): BelongsTo
@@ -64,43 +69,40 @@ class Customer extends Model
     {
         $query = self::select([
             'customers.*',
-            'shops.name as shop',
+            'shops.name as shop_name',
             'prefectures.name as address1',
             'cities.name as address2',
         ]);
-        $query->join('shops', function ($join) use ($validatedData) {
+        $query->leftJoin('shops', function ($join) {
             $join->on('shops.id', '=', 'customers.shop_id');
-            if (isset($validatedData['shop_name']) && $validatedData['shop_name'] != "") {
-                $join->where('name', 'like', '%' . $validatedData['shop_name'] . '%');
-            }
-            $join->whereNull('shops.deleted_at');
         });
-        $query->leftJoin('prefectures', function ($join) use ($validatedData) {
+        $query->leftJoin('prefectures', function ($join) {
             $join->on('prefectures.id', '=', 'customers.address1');
         });
-        $query->leftJoin('cities', function ($join) use ($validatedData) {
+        $query->leftJoin('cities', function ($join) {
             $join->on('cities.id', '=', 'customers.address2');
         });
+
+        if (isset($validatedData['shop_id'])) {
+            $query->where('customers.shop_id', $validatedData['shop_id']);
+        }
+        if (isset($validatedData['address1'])) {
+            $query->where('customers.address1', $validatedData['address1']);
+        }
+        if (isset($validatedData['address2'])) {
+            $query->where('customers.address2', $validatedData['address2']);
+        }
         if (isset($validatedData['name_kana']) && $validatedData['name_kana'] != "") {
             $query->where('customers.name_kana', 'like', '%' . $validatedData['name_kana'] . '%');
         }
         if (isset($validatedData['phone_number']) && $validatedData['phone_number'] != "") {
             $query->where(function ($sub) use ($validatedData) {
-                $sub
-                    ->orWhere('customers.phone_number1', 'like', '%' . $validatedData['phone_number'] . '%')
+                $sub->orWhere('customers.phone_number1', 'like', '%' . $validatedData['phone_number'] . '%')
                     ->orWhere('customers.phone_number2', 'like', '%' . $validatedData['phone_number'] . '%');
             });
         }
-        if (isset($validatedData['address']) && $validatedData['address'] != "") {
-            $query->where(function ($sub) use ($validatedData) {
-                $sub
-                    ->orWhere('customers.address1', 'like', '%' . $validatedData['address'] . '%')
-                    ->orWhere('customers.address2', 'like', '%' . $validatedData['address'] . '%')
-                    ->orWhere('customers.address3', 'like', '%' . $validatedData['address'] . '%');
-            });
-        }
-        if (isset($validatedData['address']) && $validatedData['address'] != "") {
-            $query->where('customers.birthday', 'like', '%' . $validatedData['birthday'] . '%');
+        if (isset($validatedData['birthday'])) {
+            $query->where('customers.birthday', $validatedData['birthday']);
         }
         $query->orderBy('id', 'ASC');
 

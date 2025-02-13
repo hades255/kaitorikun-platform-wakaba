@@ -15,10 +15,15 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
 import { actionTheme, utilityAction } from "../../../../reduxStore";
+import { withRouter } from "react-router-dom";
+import CameraCaptureDialog from "../../../../pages/purchase-manage/register/camera"
+import moment from 'moment';
+moment.locale("ja");
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -58,6 +63,8 @@ let FormStaffRegister = (props) => {
     const [filteredCities, setFilteredCities] = useState([])
     const [guarantors, setGuarantors] = useState([])
     const [openImagePreview, setOpenImagePreview] = useState(false)
+    const [openCameraPreview, setOpenCameraPreview] = useState(false)
+    const [cameraCaptureType, setCameraCaptureType] = useState()
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
@@ -80,6 +87,16 @@ let FormStaffRegister = (props) => {
 
         fetchData(); // Execute API call
     }, []); // Empty dependency array means it runs once when mounted
+
+    useEffect(() => {
+        let newCities = [];
+        cities.forEach(element => {
+            if (element.prefecture_id == address1) {
+                newCities.push(element);
+            }
+        });
+        setFilteredCities(newCities);
+    }, [address1, cities]);
 
     // useEffect(() => {
     //     setDocList((Array.isArray(verifyDocList) ? verifyDocList : []).map((item) => {
@@ -158,6 +175,63 @@ let FormStaffRegister = (props) => {
             handlePdfPreview(identificationFile1);
         }
     }
+
+    const handleIdentificationCameraDialogOpen1 = () => {
+        setCameraCaptureType("identification1")
+        setOpenCameraPreview(true)
+    }
+
+    const handleIdentificationCameraDialogOpen2 = () => {
+        setCameraCaptureType("identification2")
+        setOpenCameraPreview(true)
+    }
+
+    const handleHistoryCameraDialogOpen = () => {
+        setCameraCaptureType("history")
+        setOpenCameraPreview(true)
+    }
+
+    const handleWorkingHistoryCameraDialogOpen = () => {
+        setCameraCaptureType("working_history")
+        setOpenCameraPreview(true)
+    }
+
+
+    const handleCameraPreviewClose = () => {
+        setOpenCameraPreview(false)
+    }
+
+    const handleCapturedImage = (type, image) => { // base64
+        setOpenCameraPreview(false)
+        const file = base64ToFile(image, moment().format('YYYYMMDDHHmmss'))
+        if (type == "identification1") {
+            setIdentificationType1(file.type);
+            setIdentificationFile1(file);
+        } else if (type == "identification2") {
+            setIdentificationType2(file.type);
+            setIdentificationFile2(file);
+        } else if (type == "history") {
+            setHistoryType(file.type);
+            setHistoryFile(file);
+        } else if (type == "working_history") {
+            setWorkingHistoryType(file.type);
+            setWorkingHistoryFile(file);
+        }
+    }
+
+    const base64ToFile = (base64String, fileName) => {
+        const arr = base64String.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1]; // Extract MIME type
+        const bstr = atob(arr[1]); // Decode Base64
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new File([u8arr], fileName, { type: mime });
+    };
 
     const handleIdentificationPreview2 = () => {
         if (identificationFile2 === undefined) {
@@ -379,6 +453,37 @@ let FormStaffRegister = (props) => {
         props.history.push("/");
     };
 
+    const handleSearchAddressClick = async () => {
+        let zip = zipCode.replace("-", "")
+        console.log(zip);
+        if (zip && !zip.match(/^\d{7}$/)) {
+            alert("郵便番号は7桁の数字を入力してください。");
+            return;
+        }
+        setAddress1(0);
+        setAddress2(0);
+        setAddress3("");
+
+        try {
+            const response = await fetch(
+                `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`
+            );
+            const data = await response.json();
+
+            if (data.status === 200 && data.results) {
+                const result = data.results[0];
+                const prefecture = prefectures.filter(item => item.name === result.address1)
+                setAddress1(prefecture[0].id);
+                const city = cities.filter(item => item.name === result.address2)
+                setAddress2(city[0].id);
+                setAddress3(result.address3)
+            } else {
+                alert("住所が見つかりませんでした。");
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
     return (
         <div>
             <div className='staff-register-container'>
@@ -450,10 +555,19 @@ let FormStaffRegister = (props) => {
                     </div>
                     <div className="mt-10">
                         <div className="input-label">郵便番号</div>
-                        <div className="input-value">
+                        <div className="input-value flex-left">
                             <ZipcodeInput
                                 className='w-100-pro'
                                 onChange={(e) => handleZipCode(e)}
+                            />
+                            <Button
+                                loading
+                                textLoading="Waiting"
+                                type="submit"
+                                color="outline-secondary"
+                                title="住所検索"
+                                className="w-100"
+                                onClick={handleSearchAddressClick}
                             />
                         </div>
                     </div>
@@ -464,6 +578,7 @@ let FormStaffRegister = (props) => {
                                 onChange={handleChangeAddress1}
                                 className="shop-select w-100-pro"
                                 size='small'
+                                value={address1 ? address1 : 0}
                             >
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">都道府県</span>
@@ -481,6 +596,7 @@ let FormStaffRegister = (props) => {
                                 onChange={handleChangeAddress2}
                                 className="shop-select w-100-pro"
                                 size='small'
+                                value={address2 ? address2 : 0}
                             >
                                 {filteredCities.map((item, key) => (
                                     <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
@@ -499,6 +615,7 @@ let FormStaffRegister = (props) => {
                                 onChange={(e) => setAddress3(e.target.value)}
                                 required
                                 placeholder="住所詳細"
+                                value={address3}
                             />
                         </div>
                     </div>
@@ -606,6 +723,7 @@ let FormStaffRegister = (props) => {
                                             <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
                                             <ImageIcon className='file-icon' />
                                         </label>
+                                        <CameraAltIcon className='file-icon camera-icon' onClick={handleIdentificationCameraDialogOpen1} />
                                         <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                     </div>
                                     {isVisible && (
@@ -624,6 +742,7 @@ let FormStaffRegister = (props) => {
                                                 <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
                                                 <ImageIcon className='file-icon' />
                                             </label>
+                                            <CameraAltIcon className='file-icon camera-icon' onClick={handleIdentificationCameraDialogOpen2} />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                         </div>
                                     )}
@@ -640,6 +759,7 @@ let FormStaffRegister = (props) => {
                                         <input type="file" id={`doc_3`} className='hidden' onChange={(e) => handleFileChange(e, 3)} accept='image/*, .pdf' />
                                         <ImageIcon className='file-icon' />
                                     </label>
+                                    <CameraAltIcon className='file-icon camera-icon' onClick={handleHistoryCameraDialogOpen} />
                                     <div className="flex-center image-show-btn" onClick={handleHistoryPreview}>履歴書</div>
                                 </div>
                                 <div className='flex-center'>
@@ -647,6 +767,7 @@ let FormStaffRegister = (props) => {
                                         <input type="file" id={`doc_4`} className='hidden' onChange={(e) => handleFileChange(e, 4)} accept='image/*, .pdf' />
                                         <ImageIcon className='file-icon' />
                                     </label>
+                                    <CameraAltIcon className='file-icon camera-icon' onClick={handleWorkingHistoryCameraDialogOpen} />
                                     <div className="flex-center image-show-btn" onClick={handleWorkingHistoryPreview}>職務経歴書</div>
                                 </div>
                             </div>
@@ -692,14 +813,30 @@ let FormStaffRegister = (props) => {
                 >登録する</div>
 
             </div>
-            <Dialog
-                open={openImagePreview}
-                onClose={() => handleImagePreviewClose()}
-            >
-                <div className=''>
-                    <img src={previewImage} alt="preview" />
-                </div>
-            </Dialog>
+            <div>
+                <Dialog
+                    open={openImagePreview}
+                    onClose={() => handleImagePreviewClose()}
+                    className='image-preview'
+                >
+                    <div className=''>
+                        <img src={previewImage} alt="preview" />
+                    </div>
+                </Dialog>
+            </div>
+            <div>
+                <Dialog
+                    open={openCameraPreview}
+                    disableEscapeKeyDown={true}
+                    className='image-preview'
+                >
+                    <CameraCaptureDialog
+                        type={cameraCaptureType}
+                        onHandleCameraDialogClose={handleCameraPreviewClose}
+                        onHandleCapturedImage={handleCapturedImage}
+                    />
+                </Dialog>
+            </div>
             <Dialog
                 open={openPdfPreview}
                 onClose={() => handlePdfPreviewClose()}
@@ -730,4 +867,4 @@ let FormStaffRegister = (props) => {
         </div>
     );
 };
-export default FormStaffRegister;
+export default withRouter(FormStaffRegister);

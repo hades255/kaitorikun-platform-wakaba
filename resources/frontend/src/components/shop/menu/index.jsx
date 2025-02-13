@@ -29,15 +29,20 @@ const Menu = (props) => {
 
     const handleCustomerClick = () => {
         setOpenCustomerDialog(false);
-        props.history.push("/purchase/edit");
+        props.history.push("/purchase/customer");
     };
 
     return (
         <div className="staff-menu-items">
             <Link to="#" className="menu-item">始業</Link>
             <Link to="/customer/list" className="menu-item">顧客一覧</Link>
-            <Link to="#" className="menu-item" onClick={handleVisitShopClick}>来店</Link>
-            <Link to="/purchase/register" className="menu-item">買取計算書</Link>
+            <div
+                className="menu-item"
+                onClick={handleVisitShopClick}
+            >
+                来店
+            </div>
+            <Link to="/purchase/list" className="menu-item">買取計算書一覧</Link>
             <Link to="#" className="menu-item">商品一覧</Link>
             <Link to="#" className="menu-item">業者査定シート</Link>
             <Link to="#" className="menu-item">業者卸発送一覧</Link>

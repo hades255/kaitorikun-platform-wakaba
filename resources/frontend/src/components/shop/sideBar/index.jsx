@@ -12,6 +12,7 @@ import ChatSidebar from "./Chat";
 import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
 import SidebarNavList from "./SidebarNavList";
 import Menu4Sidebar from "./Menu4Sidebar";
+import SCSidebarNavList from "./SCSidebarNavList";
 
 const tabs = [
     {
@@ -39,7 +40,9 @@ const Sidebar = (props) => {
 
     useEffect(() => {
         let userData = getItem("userdata");
-        if (userData.role <= 2) {
+        console.log(userData);
+        
+        if (userData.role <= 3) {
             let newMenu = [];
             menu1?.forEach((element) => {
                 if (element.title != "退会") {

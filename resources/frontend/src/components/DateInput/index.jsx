@@ -1,6 +1,8 @@
 import { forwardRef, useState, useEffect, useRef } from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import moment from 'moment';
+moment.locale("ja");
 
 export default forwardRef(function TextInput({ value, onChange, className = '', ...props }, ref) {
   const input = ref ? ref : useRef();
@@ -18,7 +20,7 @@ export default forwardRef(function TextInput({ value, onChange, className = '', 
     if (value) {
       let date = new Date(value);
       setYear(date.getFullYear())
-      setMonth(date.getMonth())
+      setMonth(date.getMonth() + 1)
       setDate(date.getDate())
     }
   }, [value]);
@@ -34,14 +36,15 @@ export default forwardRef(function TextInput({ value, onChange, className = '', 
   }, [year, month, date]);
 
   return (
-    <div className="date-input space-x-5" ref={ref}>
+    <div className="date-input space-x-5" style={{minWidth: "240px"}} ref={ref}>
       {/* Year Select */}
       <Select
         value={year}
         onChange={(e) => setYear(e.target.value)}
         displayEmpty
         size="small"
-        className="shop-select w-100"
+        style={{maxWidth: '85px'}}
+        className="shop-select"
       >
         <MenuItem disabled value="">
           <span className="text-gray-500">年</span>
@@ -56,6 +59,7 @@ export default forwardRef(function TextInput({ value, onChange, className = '', 
         onChange={(e) => setMonth(e.target.value)}
         displayEmpty
         size="small"
+        style={{maxWidth: '70px'}}
         className="shop-select w-70 m-l-5"
       >
         <MenuItem disabled value="">
@@ -71,6 +75,7 @@ export default forwardRef(function TextInput({ value, onChange, className = '', 
         onChange={(e) => setDate(e.target.value)}
         displayEmpty
         size="small"
+        style={{maxWidth: '70px'}}
         className="shop-select w-70 m-l-5"
       >
         <MenuItem disabled value="">

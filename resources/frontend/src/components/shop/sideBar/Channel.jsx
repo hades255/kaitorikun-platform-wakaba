@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo } from "react";
-import { Box, Dialog, Menu, MenuItem } from "@mui/material";
+import {
+    Box,
+    Dialog,
+    IconButton,
+    Menu,
+    MenuItem,
+    Typography,
+} from "@mui/material";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
 import { useDispatch, useSelector } from "../../../components";
@@ -120,20 +127,25 @@ export const AddNewCommunityButton = ({ page = true }) => {
 
     return (
         <>
-            <Box display="flex" justifyContent="flex-end">
-                <div
+            <Box>
+                <Box
                     id="basic-button"
                     aria-controls={open ? "basic-menu" : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
-                    onClick={handleClick}
                     sx={{ color: "white" }}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems={"center"}
                 >
-                    <i
-                        className="far fa-plus nav-icon text-white"
-                        style={{ minWidth: 24, width: 24 }}
-                    />
-                </div>
+                    <Typography>コミュニティ</Typography>
+                    <IconButton onClick={handleClick}>
+                        <i
+                            className="far fa-plus nav-icon text-white"
+                            style={{ minWidth: 24, width: 24 }}
+                        />
+                    </IconButton>
+                </Box>
                 <Menu
                     id="basic-menu"
                     anchorEl={anchorEl}
@@ -149,9 +161,10 @@ export const AddNewCommunityButton = ({ page = true }) => {
                     <MenuItem onClick={handleNewCommunity}>
                         {/* Add Community */}コミュニティを追加
                     </MenuItem>
-                    <MenuItem onClick={handleClose}>
-                        {/* Join Community */}コミュニティに参加
-                    </MenuItem>
+                    {/* <MenuItem onClick={handleClose}> */}
+                    {/* Join Community */}
+                    {/* コミュニティに参加 */}
+                    {/* </MenuItem> */}
                 </Menu>
             </Box>
             {showCommunityEditor && (

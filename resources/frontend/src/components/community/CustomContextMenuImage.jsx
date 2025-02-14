@@ -49,7 +49,7 @@ const CustomContextMenu = ({ data, children }) => {
             {contextMenu && (
                 <Paper
                     sx={{
-                        position: "absolute",
+                        position: "fixed",
                         top: contextMenu.mouseY,
                         left: contextMenu.mouseX,
                         backgroundColor: "white",

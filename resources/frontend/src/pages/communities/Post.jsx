@@ -26,6 +26,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import ImageIcon from "@mui/icons-material/Image";
+import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
 import "moment/locale/ja";
@@ -37,6 +40,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { actionChannel, actionSChannel } from "../../reduxStore";
 import { ToastNotification } from "../../components";
 import Creator from "../../components/community/Creator";
+import CustomContextMenu from "../../components/community/CustomContextMenuImage";
 
 moment.locale("ja");
 
@@ -395,7 +399,6 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                     <Typography variant="subtitle1" color="text.secondary">
                         {post.subject}
                     </Typography>
-                    {post.attachment && <PostMedia file={post.attachment} />}
                     <Box
                         maxHeight={showFull ? "100%" : 100}
                         overflow={"hidden"}
@@ -437,6 +440,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                             </Button>
                         )}
                     </Box>
+                    {post.attachment && <PostMedia file={post.attachment} />}
                     <Box display={"flex"} alignItems={"center"} gap={1}>
                         {Array.isArray(reactions) &&
                             reactions?.map((item) => (
@@ -687,6 +691,7 @@ const EmojiItem = ({ reaction, onClick, users }) => {
 
 const PostMedia = ({ file }) => {
     const [data, setData] = useState(null);
+    const [show, setShow] = useState(false);
 
     const convertFileStr = useCallback(async () => {
         try {
@@ -701,26 +706,54 @@ const PostMedia = ({ file }) => {
         convertFileStr();
     }, [convertFileStr]);
 
+    const handleClickShow = useCallback(() => {
+        setShow(!show);
+    }, [show]);
+
     return (
         data && (
-            <Box p={2} bgcolor={"white"} borderRadius={2} width={"100%"}>
-                {data.type && data.type.includes("image") && (
-                    <img
-                        alt={data.content}
-                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
-                        width={"100%"}
-                        style={{ borderRadius: 8 }}
-                    />
-                )}
-                {data.type && data.type.includes("video") && (
-                    <video
-                        controls
-                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
-                        width={"100%"}
-                        style={{ borderRadius: 8 }}
-                    >
-                        Your browser does not support the video tag.
-                    </video>
+            <Box
+                onClick={handleClickShow}
+                sx={{ cursor: "pointer", maxWidth: 500 }}
+                border={"1px solid lightgray"}
+                borderRadius={2}
+            >
+                {show ? (
+                    <Box p={2} bgcolor={"white"} width={"100%"}>
+                        <CustomContextMenu data={data}>
+                            <>
+                                {data.type && data.type.includes("image") && (
+                                    <img
+                                        alt={data.content}
+                                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
+                                        width={"100%"}
+                                    />
+                                )}
+                                {data.type && data.type.includes("video") && (
+                                    <video
+                                        controls
+                                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
+                                        width={"100%"}
+                                        style={{ borderRadius: 8 }}
+                                    >
+                                        Your browser does not support the video
+                                        tag.
+                                    </video>
+                                )}
+                            </>
+                        </CustomContextMenu>
+                    </Box>
+                ) : (
+                    <Box display={"flex"} p={2} alignItems={"center"} gap={2}>
+                        {data.type.includes("image") ? (
+                            <ImageIcon />
+                        ) : data.type.includes("video") ? (
+                            <OndemandVideoIcon />
+                        ) : (
+                            <InsertDriveFileIcon />
+                        )}
+                        {data.content}
+                    </Box>
                 )}
             </Box>
         )

@@ -44,7 +44,6 @@ class Customer extends Model
         "hearing_google",
         "hearing_coupon",
         "hearing_gift",
-        "coupon",
     ];
 
     public function user(): BelongsTo

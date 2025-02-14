@@ -8,6 +8,7 @@ let TablePurchaseContract = (props) => {
     const [summaryItems, setSummaryItems] = useState([]);
     const [total, setTotal] = useState()
     const [totalPrice, setTotalPrice] = useState()
+    const [coupon, setCoupon] = useState(0)
 
     useEffect(() => {
         setSummaryItems([]);
@@ -36,12 +37,19 @@ let TablePurchaseContract = (props) => {
                     )
                 }
             });
+            if (props.coupon == 1) {
+                setCoupon(3000)
+            } else if (props.coupon == 2) {
+                setCoupon(5000)
+            } else if (props.coupon == 3) {
+                setCoupon(10000)
+            }
             setSummaryItems(newItems)
             setTotal(totalAmount)
-            setTotalPrice(totalPrice)
-            props.onHandleCalcPrice(totalPrice)
+            setTotalPrice(totalPrice - coupon)
+            props.onHandleCalcPrice(totalPrice - coupon)
         }
-    }, [props.items, props.categories1]);
+    }, [props.items, props.categories1, props.coupon]);
 
     const columns = [
         {
@@ -84,17 +92,40 @@ let TablePurchaseContract = (props) => {
 
     return (
         <div>
-            <TableMaster
+            {/* <TableMaster
                 disabledSearch="true"
                 columns={columns}
                 dataSource={summaryItems}
                 scrollX={{ x: "max-content" }}
                 tableLayout="fixed"
                 pageSize={50}
-            />
-            <div className='flex-right'>
-                <label>買取点数 {total? total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}点</label>
-                <label>買取合計 {totalPrice? totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}円</label>
+            /> */}
+            <div style={{ textAlign: "center", display: "flex", justifyContent: "center", marginTop: '20px' }}>
+                <table border="1">
+                    <thead>
+                        <tr style={{backgroundColor: '#e6e6e6'}}>
+                            <th style={{ width: "200px", padding: "10px" }}>カテゴリー1</th>
+                            <th style={{ width: "600px", padding: "10px" }}>商品名</th>
+                            <th style={{ width: "100px", padding: "10px" }}>個数</th>
+                            <th style={{ width: "100px", padding: "10px" }}>買取金額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {summaryItems.map((item) => (
+                            <tr key={item.id}>
+                                <td style={{ textAlign: "center" }}>{item.category1}</td>
+                                <td style={{ textAlign: "center" }}>{item.name}</td>
+                                <td style={{ textAlign: "center" }}>{item.amount}</td>
+                                <td style={{ textAlign: "center" }}>{item.purchase_price ? item.purchase_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div style={{ textAlign: "center", display: "flex", justifyContent: "right", gap: '10px', marginTop: '10px' }}>
+                <label>買取点数 {total ? total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}点</label>
+                {coupon > 0 && <label>{coupon ? coupon.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}円のクーポンを利用</label>}
+                <label>買取合計 {totalPrice ? totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}円</label>
             </div>
         </div>
     );

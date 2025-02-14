@@ -13,23 +13,27 @@ import moment from 'moment';
 moment.locale("ja");
 import { EditOutlined } from '@ant-design/icons';
 
-const PurchaseTable = (props) => {
-    const data = props.purchases
+const FilterableTable = (props) => {
+    const data = [
+        { id: 1, no: '001', shop_name: 'Store A', カテゴリーNo: 'C1', 氏名: 'John Doe', カタカナ名: 'ジョン・ドウ', 電話番号: '090-1234-5678', 生年月日: '1990-01-01', 住所: 'Tokyo', 職業: 'Engineer', 本人確認書類: 'Passport', 特記事項: 'N/A' },
+        { id: 2, no: '002', shop_name: 'Store B', カテゴリーNo: 'C2', 氏名: 'Jane Smith', カタカナ名: 'ジェーン・スミス', 電話番号: '090-2345-6789', 生年月日: '1985-02-15', 住所: 'Osaka', 職業: 'Teacher', 本人確認書類: 'ID', 特記事項: 'Urgent' },
+    ];
+
     const [filters, setFilters] = useState({
         no: [],
         shop_name: [],
-        name: [],
-        name_kana: [],
-        phone_number: [],
-        birthday: [],
-        address: [],
-        job: [],
-        identification1: [],
-        note: [],
+        カテゴリーNo: [],
+        氏名: [],
+        カタカナ名: [],
+        電話番号: [],
+        生年月日: [],
+        住所: [],
+        職業: [],
+        本人確認書類: [],
+        特記事項: [],
     });
 
     const [visible, setVisible] = useState(false);
-    const [itemData, setItemData] = useState([]);
     const [currentColumn, setCurrentColumn] = useState();
     const [currentColumnName, setCurrentColumnName] = useState();
     const [dateFilterType, setDateFilterType] = useState(null);
@@ -48,26 +52,14 @@ const PurchaseTable = (props) => {
 
     useEffect(() => {
         handleClearAllFilters();
-    }, [data]);
+    }, []);
 
     const showFilterModal = (column) => {
         setCurrentColumnName(column.name);
         setCurrentColumn(column.dataIndex);
-        const c_col = column.dataIndex
-        if (column.dataIndex == 'birthday') {
+        if (column.dataIndex == '生年月日') {
             setOpen(true);
         } else {
-            let items = []
-            data.filter((item) => {
-                for (const column of Object.keys(filters)) {
-                    if (column == c_col) {
-                        if ((item[c_col] && item[c_col] !== '') && !items.includes(item[c_col])) {
-                            items.push(item[c_col])
-                        }
-                    }
-                }
-            });
-            setItemData(items)
             setVisible(true);
         }
     };
@@ -131,9 +123,7 @@ const PurchaseTable = (props) => {
                 // Apply filters for each column
                 for (const column of Object.keys(filters)) {
                     if (column == _column) {
-                        // if (item[_column]) {
-                            items.push(item[_column])
-                        // }
+                        items.push(item[_column])
                     }
                 }
             });
@@ -151,14 +141,15 @@ const PurchaseTable = (props) => {
     const columns = [
         { name: '買取計算書No', title: <Button type="link">買取計算書No</Button>, dataIndex: 'no' },
         { name: '店舗名', title: <Button type="link">店舗名</Button>, dataIndex: 'shop_name' },
-        { name: '氏名', title: <Button type="link">氏名</Button>, dataIndex: 'name' },
-        { name: 'カタカナ名', title: <Button type="link">カタカナ名</Button>, dataIndex: 'name_kana' },
-        { name: '電話番号', title: <Button type="link">電話番号</Button>, dataIndex: 'phone_number' },
-        { name: '生年月日', title: <Button type="link">生年月日</Button>, dataIndex: 'birthday' },
-        { name: '住所', title: <Button type="link">住所</Button>, dataIndex: 'address' },
-        { name: '職業', title: <Button type="link">職業</Button>, dataIndex: 'job' },
-        { name: '本人確認書類', title: <Button type="link">本人確認書類</Button>, dataIndex: 'identification1', width: 100 },
-        { name: '特記事項', title: <Button type="link">特記事項</Button>, dataIndex: 'note', className: "customer-note" },
+        { name: 'カテゴリーNo', title: <Button type="link">カテゴリーNo</Button>, dataIndex: 'カテゴリーNo' },
+        { name: '氏名', title: <Button type="link">氏名</Button>, dataIndex: '氏名' },
+        { name: 'カタカナ名', title: <Button type="link">カタカナ名</Button>, dataIndex: 'カタカナ名' },
+        { name: '電話番号', title: <Button type="link">電話番号</Button>, dataIndex: '電話番号' },
+        { name: '生年月日', title: <Button type="link">生年月日</Button>, dataIndex: '生年月日' },
+        { name: '住所', title: <Button type="link">住所</Button>, dataIndex: '住所' },
+        { name: '職業', title: <Button type="link">職業</Button>, dataIndex: '職業' },
+        { name: '本人確認書類', title: <Button type="link">本人確認書類</Button>, dataIndex: '本人確認書類', width: 100 },
+        { name: '特記事項', title: <Button type="link">特記事項</Button>, dataIndex: '特記事項', className: "customer-note" },
         {
             name: "",
             title: "",
@@ -188,38 +179,34 @@ const PurchaseTable = (props) => {
     const filteredData = useMemo(() => {
         return data.filter((item) => {
             return Object.keys(filters).every((key) => {
+                console.log(key);
                 for (const column of Object.keys(filters)) {
                     if (filters[column].length && !filters[column].includes(item[column])) {
                         return false;
                     }
                 }
                 const filterValue = filters[key];
-                
-                if (key === 'birthday' && filterValue) {
-                    if (item[key]) {
-                        const date = moment(item[key]);
-                        switch (dateFilterType) {
-                            case '年':
-                                return date.format('YYYY') == years[selectedYear];
-                            case '月':
-                                return date.format('MM') == months[selectedMonth];
-                            case '日':
-                                return date.format('DD') == dates[selectedDay];
-                            case '期間':
-                                return (
-                                    (selectedStartDate && selectedEndDate) && date.isBetween(moment(selectedStartDate), moment(selectedEndDate))
-                                );
-                            default:
-                                return true;
-                        }
-                    } else {
-                        return true;
+                if (key === '生年月日' && filterValue) {
+                    const date = moment(item[key]);
+                    switch (dateFilterType) {
+                        case '年':
+                            return date.format('YYYY') == years[selectedYear];
+                        case '月':
+                            return date.format('MM') == months[selectedMonth];
+                        case '日':
+                            return date.format('DD') == dates[selectedDay];
+                        case '期間':
+                            return (
+                                (selectedStartDate && selectedEndDate) && date.isBetween(moment(selectedStartDate), moment(selectedEndDate))
+                            );
+                        default:
+                            return true;
                     }
                 }
                 return true;
             });
         });
-    }, [filters, data, dateFilterType, selectedYear, selectedMonth, selectedDay, selectedStartDate, selectedEndDate]);
+    }, [filters, data, dateFilterType, selectedStartDate, selectedEndDate]);
 
     return (
         <div>
@@ -240,9 +227,9 @@ const PurchaseTable = (props) => {
             />
 
             {/* Filter Modal */}
-            {currentColumn == "birthday" ? (
+            {currentColumn == "生年月日" ? (
                 <Dialog open={open} onClose={handleCloseDateFilterDialog}>
-                    <DialogTitle>birthday フィルタ</DialogTitle>
+                    <DialogTitle>生年月日 フィルタ</DialogTitle>
                     <DialogContent>
                         <Button onClick={handleDateDeselectAll}>全選択解除</Button>
                         <div>
@@ -361,7 +348,7 @@ const PurchaseTable = (props) => {
                         <Button onClick={handleDeselectAll}>全選択解除</Button>
                         <List
                             style={{ maxHeight: 200, overflowY: 'scroll' }}
-                            dataSource={itemData}
+                            dataSource={Array.from(new Set(data.map((item) => item[currentColumn])))}
                             renderItem={(item) => (
                                 <List.Item>
                                     <Checkbox
@@ -384,4 +371,4 @@ const PurchaseTable = (props) => {
     );
 };
 
-export default PurchaseTable;
+export default FilterableTable;

@@ -79,7 +79,9 @@ let LeaveItemsDialog = (props) => {
         newWindow.document.close();
         newWindow.focus();
         newWindow.print();
-        newWindow.close();
+        setTimeout(() => {
+            newWindow.close();
+        }, 1000);
         setIsPrint(false)
         props.onHandleLeaveItemsConfirm();
     };
@@ -196,7 +198,7 @@ let LeaveItemsDialog = (props) => {
                 <div style={{ textAlign: "center", marginTop: "20px", fontSize: "14px" }}>
                     <label>商品内容</label>
                 </div>
-                <div style={{textAlign: "center", display: "flex", justifyContent: "center"}}>
+                <div style={{textAlign: "center", display: "flex", justifyContent: "center", marginTop: '20px'}}>
                     <table border="1">
                         <thead>
                             <tr>

@@ -352,6 +352,10 @@ input {
     .screen-div3 {
         width: 33%;
     }
+
+    .staff-menu-items {
+        gap: 50px;
+    }
 }
 
 @media (max-width: 1500px) {
@@ -389,6 +393,22 @@ input {
 
     .screen-div3 {
         width: 100%;
+    }
+
+    .staff-menu-items {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .staff-menu-items {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .staff-menu-items {
+        gap: 5px;
     }
 }
 
@@ -632,8 +652,9 @@ input {
 }
 
 .sign-board {
-    width: 80%;
-    height: 150px;
+    width: 100%;
+    height: 100%;
+    margin: 10px;
     touch-action: none;
     border: solid 1px #B9B9B9;
     border-radius: 5px;

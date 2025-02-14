@@ -121,6 +121,7 @@ let PurchaseEdit = (props) => {
         'SNS',
     ];
     const jobList = [
+        '',
         '自営業',
         '自由業',
         '会社員',

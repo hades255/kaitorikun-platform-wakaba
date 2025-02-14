@@ -87,18 +87,14 @@ class PurchaseController extends Controller
         $result = array();
         foreach ($purchases as $key => $purchase) {
             $data = array();
-            $data['purchase_id'] = $purchase->id;
-            $data['type'] = $purchase->type;
+            $data['id'] = $purchase->id;
+            $data['no'] = str_pad($purchase->id, 6, '0', STR_PAD_LEFT);
             $data['shop_name'] = $purchase->shop_name;
             $data['name'] = $purchase->name;
             $data['name_kana'] = $purchase->name_kana;
+            $data['phone_number'] = $purchase->phone_number1;
             $data['birthday'] = $purchase->birthday;
-            $data['age'] = Carbon::parse($purchase->birthday)->age;
-            $data['phone_number1'] = $purchase->phone_number1;
-            $data['phone_number2'] = $purchase->phone_number2;
-            $data['address1'] = $purchase->address1;
-            $data['address2'] = $purchase->address2;
-            $data['address3'] = $purchase->address3;
+            $data['address'] = $purchase->address1 . $purchase->address2 . $purchase->address3;
             if ($purchase->identification_id1) {
                 if ($purchase->identification_id1 == 1) {
                     $data['identification1'] = "マイナンバー";
@@ -137,22 +133,7 @@ class PurchaseController extends Controller
                     $data['job'] = "";
                     break;
             }
-            $data['visit_date'] = $purchase->created_at;
-            $data['purchase_date'] = $purchase->purchase_date;
-            switch ($purchase->status) {
-                case 2:
-                    $data['status'] = "お預かり証発行";
-                    break;
-                case 3:
-                    $data['status'] = "成約";
-                    break;
-
-                default:
-                    $data['job'] = "";
-                    break;
-            }
-            $data['purchase_price'] = $purchase->purchase_price;
-            $data['purchase_estimate_price'] = $purchase->purchase_estimate_price;
+            $data['note'] = $purchase->note;
             $result[] = $data;
         }
         return response()->json([
@@ -329,6 +310,7 @@ class PurchaseController extends Controller
         $purchase->payment_officer_id = $validatedData['payment_officer_id'];
         $purchase->service_officer_id = $validatedData['service_officer_id'];
         $purchase->check_plan_date = $validatedData['check_plan_date'];
+        $purchase->coupon = $validatedData['coupon'];
         $purchase->status = 2;
         $purchase->save();
 
@@ -424,7 +406,6 @@ class PurchaseController extends Controller
         $customer->gender = $validatedData['gender'];
         $customer->zipcode = $validatedData['zipcode'];
         $customer->job = $validatedData['job'];
-        $customer->coupon = $validatedData['coupon'];
         $customer->address1 = $validatedData['address1'];
         $customer->address2 = $validatedData['address2'];
         $customer->address3 = $validatedData['address3'];

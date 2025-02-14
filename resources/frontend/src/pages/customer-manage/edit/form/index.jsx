@@ -213,18 +213,6 @@ let FormCustomerEdit = (props) => {
     }, []); // Empty dependency array means it runs once when mounted
 
     useEffect(() => {
-        // API Call
-        const initRegisterAPI = async () => {
-            let result = await getData("purchase/init-register")
-            if (result.status === 200) {
-                let data = result.data;
-                setPurchaseId(data.purchase.id);
-            }
-        };
-        initRegisterAPI();
-    }, []);
-
-    useEffect(() => {
         let newCities = [];
         cities.forEach(element => {
             if (element.prefecture_id == address1) {
@@ -794,7 +782,7 @@ let FormCustomerEdit = (props) => {
                             <div className="input-label">郵便番号</div>
                             <div className="input-value flex-left">
                                 <ZipcodeInput
-                                    value={customer ? customer.zipcode : ""}
+                                    value={zipCode ? zipCode : ""}
                                     onChange={(e) => handleZipCode(e)}
                                 />
                                 <Button

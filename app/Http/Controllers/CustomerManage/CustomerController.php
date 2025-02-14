@@ -64,6 +64,7 @@ class CustomerController extends Controller
             foreach ($results as $key => $data) {
                 $customer = array();
                 $customer['id'] = $data->id;
+                $customer['no'] = str_pad($data->id, 6, '0', STR_PAD_LEFT);
                 $customer['type'] = $data->type;
                 $customer['shop_name'] = $data->shop_name;
                 $customer['gender'] = $data->gender;
@@ -73,9 +74,7 @@ class CustomerController extends Controller
                 $customer['age'] = Carbon::parse($data->birthday)->age;
                 $customer['phone_number1'] = $data->phone_number1;
                 $customer['phone_number2'] = $data->phone_number2;
-                $customer['address1'] = $data->address1;
-                $customer['address2'] = $data->address2;
-                $customer['address3'] = $data->address3;
+                $customer['address'] = $data->address1 . $data->address2 . $data->address3;
                 if ($data->identification_id1) {
                     if ($data->identification_id1 == 1) {
                         $customer['identification1'] = "マイナンバー";

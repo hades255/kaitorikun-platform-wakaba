@@ -25,6 +25,7 @@ class Purchase extends Model
         "signature_img_path",
         "document_path",
         "check_plan_date",
+        "coupon",
         "purchase_date",
         "status",
     ];
@@ -53,7 +54,6 @@ class Purchase extends Model
         $query = self::select([
             'purchases.*',
             'customers.shop_id',
-            'customers.type',
             'customers.name',
             'customers.name_kana',
             'customers.phone_number1',
@@ -64,6 +64,7 @@ class Purchase extends Model
             'customers.address2',
             'customers.address3',
             'customers.identification_id1',
+            'customers.note',
             'shops.name as shop_name',
             'prefectures.name as address1',
             'cities.name as address2',

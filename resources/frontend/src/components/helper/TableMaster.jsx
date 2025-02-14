@@ -165,7 +165,7 @@ const TableMaster = (props) => {
                     columns={columns}
                     loading={utility.getLoading.table || isLoading}
                     rowKey={rowKey}
-                    scroll={{ x: scrollX ? (width ? width : 320) : 0 }}
+                    scroll={{ x: width ? width : 320 }}
                     pagination={
                         disabledPagenation
                             ? false

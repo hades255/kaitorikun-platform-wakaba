@@ -95,6 +95,7 @@ let FormPurchaseContract = (props) => {
     const dispatch = useDispatch();
 
     const [purchaseId, setPurchaseId] = useState(0)
+    const [coupon, setCoupon] = useState()
 
     const [items, setItems] = useState([]);
     const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
@@ -106,6 +107,7 @@ let FormPurchaseContract = (props) => {
     const [openLeaveItemDialog, setOpenLeaveItemDialog] = useState(false);
     const [openHearingDialog, setOpenHearingDialog] = useState(false)
     const [openStatusDialog, setOpenStatusDialog] = useState(false)
+    const [openCouponDialog, setOpenCouponDialog] = useState(false)
     const [selectedItemHearingValue1, setSelectedItemHearingValue1] = useState()
     const [selectedItemHearingValue2, setSelectedItemHearingValue2] = useState()
     const [selectedItemHearingValue3, setSelectedItemHearingValue3] = useState()
@@ -152,6 +154,7 @@ let FormPurchaseContract = (props) => {
     ];
     const results = ["買取", "不正約", "預り", "返品"];
     const coupons = ["利用なし", "クーポン1", "クーポン2", "現金還元"];
+    const purchase_coupons = ["3,000円", "5,000円", "10,000円"];
     const gifts = ["なし", "テイッシュボックス", "その他"];
 
     //For OCR
@@ -442,6 +445,10 @@ let FormPurchaseContract = (props) => {
         setOpenStatusDialog(false)
     }
 
+    const handleCouponDialogClose = () => {
+        setOpenCouponDialog(false)
+    }
+
     const handleAddItemsClose = () => {
         setOpenAddItemDialog(false)
     }
@@ -588,6 +595,14 @@ let FormPurchaseContract = (props) => {
         }
     }
 
+    const handleCouponItemsClick = () => {
+        if (items.length <= 0) {
+            alert("まず、商品を追加していただけますでしょうか？");
+            return;
+        }
+        setOpenCouponDialog(true)
+    }
+
     const handleStampSheetClick = () => {
         const selectedItems = items.filter(item => item.category1 === '切手')
         if (selectedItems.length <= 0) {
@@ -601,6 +616,10 @@ let FormPurchaseContract = (props) => {
 
     const handleResultSelectChange = (value) => {
         setItems(items.map(item => ({ ...item, result: value })));
+    };
+
+    const handleCouponSelectChange = (value) => {
+        setCoupon(value)
     };
 
     const handleToCustomerPageClick = async () => {
@@ -627,6 +646,10 @@ let FormPurchaseContract = (props) => {
         }
         if (items.length == 0) {
             ToastNotification("error", "商品は必須です。");
+            return;
+        }
+        if (coupon === undefined) {
+            ToastNotification("error", "クーポンは必須です。");
             return;
         }
         let requestPriceCheck = true
@@ -731,9 +754,10 @@ let FormPurchaseContract = (props) => {
                 formData.append("files[]", documentFile);
             }
             formData.append("status", 2);
+            formData.append("coupon", coupon);
             setItems(items.map(item => ({ ...item, image_files: JSON.stringify(item.image_files) })));
             items.forEach(item => formData.append("items[]", JSON.stringify(item)));
-            
+
             if (window.confirm("お客様提示画面に遷移してもよろしいですか？")) {
                 let feedback = await multiPostData("purchase/update", formData)
                 if (feedback.status === 200) {
@@ -1145,7 +1169,7 @@ let FormPurchaseContract = (props) => {
                             <div className="input-label">本人確認書類</div>
                             <div className="input-value">
                                 <div className='flex-left'>
-                                <div>
+                                    <div>
                                         <div><AddIcon className='add-icon' onClick={handleAddIdentification} /></div>
                                     </div>
                                     <div>
@@ -1548,6 +1572,14 @@ let FormPurchaseContract = (props) => {
                     loading
                     textLoading="Waiting"
                     type="submit"
+                    color="outline-info"
+                    title="クーポン利用"
+                    onClick={handleCouponItemsClick}
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
                     color="success"
                     title="切手査定シート"
                     onClick={handleStampSheetClick}
@@ -1573,6 +1605,12 @@ let FormPurchaseContract = (props) => {
                     onHandleItemImagesClick={handleItemImagesClick}
                 />
             </DataContext.Provider>
+            {
+                coupon &&
+                <div className='flex-right'>
+                    <label>{purchase_coupons[coupon - 1]}のクーポンを利用</label>
+                </div>
+            }
             <div>
                 <Dialog
                     open={openImagePreview}
@@ -1760,6 +1798,36 @@ let FormPurchaseContract = (props) => {
                             title="閉じる"
                             className="w-100-pro"
                             onClick={handleStatusDialogClose}
+                        />
+                    </div>
+                </div>
+            </Dialog>
+            <Dialog
+                open={openCouponDialog}
+                onClose={() => handleCouponDialogClose()}
+            >
+                <div className='item-status-container'>
+                    <label className='mt-20'>クーポンを設定してください。</label>
+                    <div>
+                        <Select
+                            onChange={(e) => handleCouponSelectChange(e.target.value)}
+                            displayEmpty
+                            className="shop-select"
+                        >
+                            {purchase_coupons.map((item, key) => (
+                                <MenuItem key={key} value={key + 1}>{item}</MenuItem>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className="mt-5">
+                        <Button
+                            loading
+                            textLoading="Waiting"
+                            type="submit"
+                            color="outline-secondary"
+                            title="閉じる"
+                            className="w-100-pro"
+                            onClick={handleCouponDialogClose}
                         />
                     </div>
                 </div>

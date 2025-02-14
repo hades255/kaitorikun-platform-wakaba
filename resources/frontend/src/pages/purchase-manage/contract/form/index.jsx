@@ -60,6 +60,7 @@ let FormPurchaseContract = (props) => {
     const [note, setNote] = useState()
     const [signFile, setSignFile] = useState()
     const [cameraCaptureType, setCameraCaptureType] = useState()
+    const [openSignDialog, setOpenSignDialog] = useState(false)
 
     const [shops, setShops] = useState([])
     const [prefectures, setPrefectures] = useState([])
@@ -84,6 +85,7 @@ let FormPurchaseContract = (props) => {
     const [items, setItems] = useState([]);
 
     const jobList = [
+        '',
         '自営業',
         '自由業',
         '会社員',
@@ -92,8 +94,15 @@ let FormPurchaseContract = (props) => {
         '学生',
         '無職',
     ];
-    const coupons = ["利用なし", "3,000円", "5,000円", "10,000円"];
     const terms = "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO |OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+    const identificationList = [
+        '',
+        'マイナンバー',
+        '運転免許証',
+        '会社員',
+        '健康保険証',
+        'パスポート',
+    ];
 
     //For OCR
     const videoRef = useRef(null);
@@ -131,6 +140,7 @@ let FormPurchaseContract = (props) => {
     const getPurchaseData = async () => {
         const formData = new FormData();
         formData.append("purchase_id", props.purchaseId);
+        // formData.append("purchase_id", 1);
         let result = await postData("purchase/index", formData)
         if (result.status === 200) {
             let data = result.data;
@@ -196,13 +206,13 @@ let FormPurchaseContract = (props) => {
             if (customerData.zipcode) {
                 setZipCode(customerData.zipcode)
             }
-            if (customerData.coupon) {
-                setCoupon(customerData.coupon)
-            }
             setType('顧客');
 
             const purchaseData = data.purchase;
             setPurchaseId(purchaseData.id)
+            if (purchaseData.coupon) {
+                setCoupon(purchaseData.coupon)
+            }
 
             const itemsData = data.items
             itemsData.forEach(item => {
@@ -435,13 +445,15 @@ let FormPurchaseContract = (props) => {
         setZipCode(e);
     }
 
-    const handleSignClear = () => signCanvas.current.clear();
-
-    const handleSignSave = () => {
-        const dataURL = signCanvas.current.toDataURL(); // Get signature as image
-        const file = base64ToFile(dataURL, moment().format('YYYYMMDDHHmmss'))
-        setSignFile(file);
+    const handleSignClick = () => {
+        setOpenSignDialog(true)
     };
+
+    const handleSignDialogClose = () => {
+        setOpenSignDialog(false)
+    }
+
+    const handleSignClear = () => signCanvas.current.clear();
 
     const handleCalcPrice = (price) => {
         console.log(price);
@@ -450,6 +462,10 @@ let FormPurchaseContract = (props) => {
     }
 
     const handleContractCloseClick = async () => {
+        setOpenSignDialog(false)
+        const dataURL = signCanvas.current.toDataURL(); // Get signature as image
+        const file = base64ToFile(dataURL, moment().format('YYYYMMDDHHmmss'))
+        setSignFile(file);
         // check validate
         if (shop === undefined) {
             ToastNotification("error", "店舗名は必須です。");
@@ -518,10 +534,6 @@ let FormPurchaseContract = (props) => {
             ToastNotification("error", "本人確認書類は必須です。");
             return;
         }
-        if (coupon === undefined) {
-            ToastNotification("error", "クーポンは必須です。");
-            return;
-        }
         if (noInvoice === undefined) {
             ToastNotification("error", "適格請求書事業者のチェックは必須です。");
             return;
@@ -549,7 +561,6 @@ let FormPurchaseContract = (props) => {
                 formData.append("gender", gender);
                 formData.append("zipcode", zipCode);
                 formData.append("job", job);
-                formData.append("coupon", coupon);
                 formData.append("address1", address1);
                 formData.append("address2", address2);
                 formData.append("address3", address3);
@@ -599,8 +610,27 @@ let FormPurchaseContract = (props) => {
         }
     }
 
+    const printRef = useRef();
+    const [isPrint, setIsPrint] = useState(false)
+    const printStyle = {
+        display: isPrint ? "block" : "none"
+    };
     const handlePrintPageClick = () => {
+        const printContent = printRef.current.innerHTML;
+        const newWindow = window.open("", "_blank");
+        newWindow.document.write(`
+      <html>
+        <body>${printContent}</body>
+      </html>
+    `);
+        newWindow.document.close();
+        newWindow.focus();
+        newWindow.print();
+        setTimeout(() => {
+            newWindow.close();
+        }, 1000);
 
+        setIsPrint(false)
     }
 
     const handleSearchAddressClick = async () => {
@@ -637,293 +667,258 @@ let FormPurchaseContract = (props) => {
 
     return (
         <div>
-            <div style={{ position: 'relative' }}>
-                <div className='flex-left' style={{ alignItems: 'baseline' }}>
-                    <label className='flex-right'>No.<div>{purchaseId.toString().padStart(6, '0')}</div></label>
-                    <div>
-                        <label className='flex-right'>接客担当<div>{getItem("userdata").name}</div></label>
-                    </div>
-                </div>
-                <div className='customer-header-name'>
-                    <label className='flex-right'>来店時間<div>{moment().format('YYYY/MM/DD(ddd) HH:mm')}</div></label>
-                </div>
-                <div className='flex-center' style={{ position: 'absolute', top: '-20px', left: '0', right: '0' }}>
-                    <Button
-                        loading
-                        textLoading="Waiting"
-                        type="submit"
-                        color="info"
-                        className="w-200"
-                        title="切手明細書"
-                        onClick={handleToStampPageClick}
-                    />
-                    <Button
-                        loading
-                        textLoading="Waiting"
-                        type="submit"
-                        color="primary"
-                        className="w-200"
-                        title="印刷"
-                        onClick={handlePrintPageClick}
-                    />
-                </div>
-            </div>
-            <div className='purchase-register-container'>
-                <div className='screen-div2 purchase-register-container'>
-                    <div className='screen-div2'>
+            <div style={{ display: 'block' }}>
+                <div style={{ position: 'relative' }}>
+                    <div className='flex-left' style={{ alignItems: 'baseline' }}>
+                        <label className='flex-right'>No.<div>{purchaseId.toString().padStart(6, '0')}</div></label>
                         <div>
-                            <div className="input-label">店舗名</div>
-                            <div className="input-value">
-                                <Select
-                                    onChange={(e) => handleShopChange(e.target.value)}
-                                    displayEmpty
-                                    className="shop-select"
-                                    size='small'
-                                    value={shop ? shop : 0}
-                                    >
-                                    <MenuItem disabled value="">
-                                        <span className="text-gray-500">店舗名</span>
-                                    </MenuItem>
-                                    {shops.map(item => (
-                                        <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">来店経緯</div>
-                            <div className="input-value">
-                                <TextInput
-                                    type="text"
-                                    name="type"
-                                    value={type}
-                                    className="mt-1 block w-full w-100-pro"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">名前</div>
-                            <div className="input-value">
-                                <TextInput
-                                    id="name"
-                                    type="text"
-                                    name="name"
-                                    value={name ? name : ""}
-                                    className="mt-1 block w-full w-100-pro"
-                                    onChange={(e) => setName(e.target.value)}
-                                    required
-                                    placeholder="名前"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">カタカナ名</div>
-                            <div className="input-value">
-                                <TextInput
-                                    id="name_kana"
-                                    type="text"
-                                    name="name_kana"
-                                    value={nameKana ? nameKana : ""}
-                                    className="mt-1 block w-full w-100-pro"
-                                    onChange={(e) => setNameKana(e.target.value)}
-                                    required
-                                    placeholder="カタカナ名"
-                                />
-                            </div>
+                            <label className='flex-right'>接客担当<div>{getItem("userdata").name}</div></label>
                         </div>
                     </div>
-                    <div className='screen-div2'>
-                        <div className='flex-left'>
-                            <div className="mt-5" style={{ width: '100%' }}>
-                                <div className="input-label">生年月日</div>
+                    <div className='customer-header-name'>
+                        <label className='flex-right'>来店時間<div>{moment().format('YYYY/MM/DD(ddd) HH:mm')}</div></label>
+                    </div>
+                    <div className='flex-center' style={{ position: 'absolute', top: '-20px', left: '0', right: '0' }}>
+                        <Button
+                            loading
+                            textLoading="Waiting"
+                            type="submit"
+                            color="info"
+                            className="w-200 no-print"
+                            title="切手明細書"
+                            onClick={handleToStampPageClick}
+                        />
+                        <Button
+                            loading
+                            textLoading="Waiting"
+                            type="submit"
+                            color="primary"
+                            className="w-200 no-print"
+                            title="印刷"
+                            onClick={handlePrintPageClick}
+                        />
+                    </div>
+                </div>
+                <div className='purchase-register-container'>
+                    <div className='screen-div2 purchase-register-container'>
+                        <div className='screen-div2'>
+                            <div>
+                                <div className="input-label">店舗名</div>
                                 <div className="input-value">
-                                    <DateInput
+                                    <Select
+                                        onChange={(e) => handleShopChange(e.target.value)}
+                                        displayEmpty
                                         className="shop-select"
-                                        value={birthday ? birthday : 0}
-                                        onChange={(e) => setBirthday(e)}
+                                        size='small'
+                                        value={shop ? shop : 0}
+                                    >
+                                        <MenuItem disabled value="">
+                                            <span className="text-gray-500">店舗名</span>
+                                        </MenuItem>
+                                        {shops.map(item => (
+                                            <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">来店経緯</div>
+                                <div className="input-value">
+                                    <TextInput
+                                        type="text"
+                                        name="type"
+                                        value={type}
+                                        className="mt-1 block w-full w-100-pro"
+                                        disabled
                                     />
                                 </div>
                             </div>
-                            <div className="mt-5" style={{ width: '80px' }}>
-                                <div className="input-label">性別</div>
+                            <div className="mt-5">
+                                <div className="input-label">名前</div>
+                                <div className="input-value">
+                                    <TextInput
+                                        id="name"
+                                        type="text"
+                                        name="name"
+                                        value={name ? name : ""}
+                                        className="mt-1 block w-full w-100-pro"
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                        placeholder="名前"
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">カタカナ名</div>
+                                <div className="input-value">
+                                    <TextInput
+                                        id="name_kana"
+                                        type="text"
+                                        name="name_kana"
+                                        value={nameKana ? nameKana : ""}
+                                        className="mt-1 block w-full w-100-pro"
+                                        onChange={(e) => setNameKana(e.target.value)}
+                                        required
+                                        placeholder="カタカナ名"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className='screen-div2'>
+                            <div className='flex-left'>
+                                <div className="mt-5" style={{ width: '100%' }}>
+                                    <div className="input-label">生年月日</div>
+                                    <div className="input-value">
+                                        <DateInput
+                                            className="shop-select"
+                                            value={birthday ? birthday : 0}
+                                            onChange={(e) => setBirthday(e)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-5" style={{ width: '80px' }}>
+                                    <div className="input-label">性別</div>
+                                    <div className="input-value">
+                                        <Select
+                                            onChange={(e) => setGender(e.target.value)}
+                                            className="shop-select"
+                                            value={gender ? gender : 0}
+                                            size='small'
+                                        >
+                                            <MenuItem value={1}>男</MenuItem>
+                                            <MenuItem value={2}>女</MenuItem>
+                                        </Select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">電話番号(自宅)</div>
+                                <div className="input-value">
+                                    <PhoneInput
+                                        id="phone"
+                                        name="phone"
+                                        value={phoneNumber1 ? phoneNumber1 : ""}
+                                        className="mt-1 block w-full w-100-pro"
+                                        placeholder='電話番号'
+                                        onChange={(e) => setPhoneNumber1(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">電話番号(携帯)</div>
+                                <div className="input-value">
+                                    <PhoneInput
+                                        id="phone"
+                                        name="phone"
+                                        value={phoneNumber2 ? phoneNumber2 : ""}
+                                        className="mt-1 block w-full w-100-pro"
+                                        placeholder='電話番号'
+                                        onChange={(e) => setPhoneNumber2(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">職業</div>
                                 <div className="input-value">
                                     <Select
-                                        onChange={(e) => setGender(e.target.value)}
+                                        onChange={(e) => setJob(e.target.value)}
+                                        displayEmpty
                                         className="shop-select"
-                                        value={gender ? gender : 0}
+                                        value={job ? job : 0}
                                         size='small'
                                     >
-                                        <MenuItem value={1}>男</MenuItem>
-                                        <MenuItem value={2}>女</MenuItem>
+                                        {jobList.map((item, key) => (
+                                            <MenuItem value={key} key={key}>{item}</MenuItem>
+                                        ))}
                                     </Select>
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-5">
-                            <div className="input-label">電話番号(自宅)</div>
-                            <div className="input-value">
-                                <PhoneInput
-                                    id="phone"
-                                    name="phone"
-                                    value={phoneNumber1 ? phoneNumber1 : ""}
-                                    className="mt-1 block w-full w-100-pro"
-                                    placeholder='電話番号'
-                                    onChange={(e) => setPhoneNumber1(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">電話番号(携帯)</div>
-                            <div className="input-value">
-                                <PhoneInput
-                                    id="phone"
-                                    name="phone"
-                                    value={phoneNumber2 ? phoneNumber2 : ""}
-                                    className="mt-1 block w-full w-100-pro"
-                                    placeholder='電話番号'
-                                    onChange={(e) => setPhoneNumber2(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">職業</div>
-                            <div className="input-value">
-                                <Select
-                                    onChange={(e) => setJob(e.target.value)}
-                                    displayEmpty
-                                    className="shop-select"
-                                    value={job ? job : 0}
-                                    size='small'
-                                >
-                                    {jobList.map((item, key) => (
-                                        <MenuItem value={key} key={key}>{item}</MenuItem>
-                                    ))}
-                                </Select>
-                            </div>
-                        </div>
                     </div>
-                </div>
-                <div className='screen-div2 purchase-register-container'>
-                    <div className='screen-div2'>
-                        <div>
-                            <div className="input-label">郵便番号</div>
-                            <div className="input-value flex-left">
-                                <ZipcodeInput
-                                    className='w-200'
-                                    value={zipCode ? zipCode : ""}
-                                    onChange={(e) => handleZipCode(e)}
-                                />
-                                <Button
-                                    loading
-                                    textLoading="Waiting"
-                                    type="submit"
-                                    color="outline-secondary"
-                                    title="住所検索"
-                                    className="w-100"
-                                    onClick={handleSearchAddressClick}
-                                />
+                    <div className='screen-div2 purchase-register-container'>
+                        <div className='screen-div2'>
+                            <div>
+                                <div className="input-label">郵便番号</div>
+                                <div className="input-value flex-left">
+                                    <ZipcodeInput
+                                        className='w-200'
+                                        value={zipCode ? zipCode : ""}
+                                        onChange={(e) => handleZipCode(e)}
+                                    />
+                                    <Button
+                                        loading
+                                        textLoading="Waiting"
+                                        type="submit"
+                                        color="outline-secondary"
+                                        title="住所検索"
+                                        className="w-100"
+                                        onClick={handleSearchAddressClick}
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">都道府県</div>
+                                <div className="input-value">
+                                    <Select
+                                        onChange={handleChangeAddress1}
+                                        className="shop-select"
+                                        size='small'
+                                        value={address1 ? address1 : 0}
+                                    >
+                                        <MenuItem disabled value="">
+                                            <span className="text-gray-500">都道府県</span>
+                                        </MenuItem>
+                                        {prefectures.map((item, key) => (
+                                            <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">市町村</div>
+                                <div className="input-value">
+                                    <Select
+                                        onChange={handleChangeAddress2}
+                                        className="shop-select"
+                                        size='small'
+                                        value={address2 ? address2 : 0}
+                                    >
+                                        {filteredCities.map((item, key) => (
+                                            <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">住所詳細</div>
+                                <div className="input-value">
+                                    <TextInput
+                                        id="address3"
+                                        type="text"
+                                        name="address3"
+                                        className="mt-1 block w-full w-100-pro"
+                                        onChange={(e) => setAddress3(e.target.value)}
+                                        required
+                                        placeholder="住所詳細"
+                                        value={address3 ? address3 : ""}
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div className="mt-5">
-                            <div className="input-label">都道府県</div>
-                            <div className="input-value">
-                                <Select
-                                    onChange={handleChangeAddress1}
-                                    className="shop-select"
-                                    size='small'
-                                    value={address1 ? address1 : 0}
-                                >
-                                    <MenuItem disabled value="">
-                                        <span className="text-gray-500">都道府県</span>
-                                    </MenuItem>
-                                    {prefectures.map((item, key) => (
-                                        <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">市町村</div>
-                            <div className="input-value">
-                                <Select
-                                    onChange={handleChangeAddress2}
-                                    className="shop-select"
-                                    size='small'
-                                    value={address2 ? address2 : 0}
-                                >
-                                    {filteredCities.map((item, key) => (
-                                        <MenuItem value={item.id} key={key}>{item.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">住所詳細</div>
-                            <div className="input-value">
-                                <TextInput
-                                    id="address3"
-                                    type="text"
-                                    name="address3"
-                                    className="mt-1 block w-full w-100-pro"
-                                    onChange={(e) => setAddress3(e.target.value)}
-                                    required
-                                    placeholder="住所詳細"
-                                    value={address3 ? address3 : ""}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className='screen-div2'>
-                        <div>
-                            <div className="input-label">クーポン</div>
-                            <div className="input-value">
-                                <Select
-                                    onChange={(e) => setCoupon(e.target.value)}
-                                    displayEmpty
-                                    className="shop-select"
-                                    value={coupon ? coupon  : 0}
-                                    size='small'
-                                >
-                                    {coupons.map((item, key) => (
-                                        <MenuItem value={key} key={key}>{item}</MenuItem>
-                                    ))}
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="mt-5">
-                            <div className="input-label">本人確認書類</div>
-                            <div className="input-value">
-                                <div className='flex-left' style={{ height: '35px' }}>
-                                    {/* <div>
+                        <div className='screen-div2'>
+                            <div>
+                                <div className="input-label">本人確認書類</div>
+                                <div className="input-value">
+                                    <div className='flex-left' style={{ height: '35px' }}>
+                                        {/* <div>
                                         <div><AddIcon className='add-icon' onClick={handleAddIdentification} /></div>
                                     </div> */}
-                                    <div>
-                                        <div className='flex-center'>
-                                            <Select
-                                                onChange={(e) => setIdentificationId1(e.target.value)}
-                                                className="shop-select w-150"
-                                                value={identificationId1 ? identificationId1 : 0}
-                                                size='small'
-                                            >
-                                                <MenuItem value={1}>マイナンバー</MenuItem>
-                                                <MenuItem value={2}>運転免許証</MenuItem>
-                                                <MenuItem value={3}>健康保険証</MenuItem>
-                                                <MenuItem value={4}>パスポート</MenuItem>
-                                            </Select>
-                                            <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
-                                                <ImageIcon className='file-icon' />
-                                            </label>
-                                            <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen} />
-                                            <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
-                                        </div>
-                                        {isVisible && (
+                                        <div>
                                             <div className='flex-center'>
                                                 <Select
-                                                    onChange={(e) => setIdentificationId2(e.target.value)}
+                                                    onChange={(e) => setIdentificationId1(e.target.value)}
                                                     className="shop-select w-150"
-                                                    value={identificationId2 ? identificationId2 : 0}
+                                                    value={identificationId1 ? identificationId1 : 0}
                                                     size='small'
                                                 >
                                                     <MenuItem value={1}>マイナンバー</MenuItem>
@@ -931,217 +926,448 @@ let FormPurchaseContract = (props) => {
                                                     <MenuItem value={3}>健康保険証</MenuItem>
                                                     <MenuItem value={4}>パスポート</MenuItem>
                                                 </Select>
-                                                <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                    <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
+                                                    <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
                                                     <ImageIcon className='file-icon' />
                                                 </label>
-                                                <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
+                                                <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen} />
+                                                <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                             </div>
-                                        )}
+                                            {isVisible && (
+                                                <div className='flex-center'>
+                                                    <Select
+                                                        onChange={(e) => setIdentificationId2(e.target.value)}
+                                                        className="shop-select w-150"
+                                                        value={identificationId2 ? identificationId2 : 0}
+                                                        size='small'
+                                                    >
+                                                        <MenuItem value={1}>マイナンバー</MenuItem>
+                                                        <MenuItem value={2}>運転免許証</MenuItem>
+                                                        <MenuItem value={3}>健康保険証</MenuItem>
+                                                        <MenuItem value={4}>パスポート</MenuItem>
+                                                    </Select>
+                                                    <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
+                                                        <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                        <ImageIcon className='file-icon' />
+                                                    </label>
+                                                    <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <div className="input-label">特記事項</div>
+                                <div className="input-value">
+                                    <textarea
+                                        rows={10}
+                                        variant="outlined"
+                                        value={note ? note : ""}
+                                        className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
+                                        onChange={(e) => setNote(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className='hidden'>
+                    <div>
+                        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: 'auto' }} />
+                    </div>
+
+                    <button onClick={captureImage}>Capture Image</button>
+
+                    {/* Hidden Canvas to Draw Image */}
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+                    {/* Display Captured Image */}
+                    {imageSrc && (
+                        <div>
+                            <h3>Captured Image:</h3>
+                            <img src={imageSrc} alt="Captured" style={{ maxWidth: '100%' }} />
+                        </div>
+                    )}
+
+                    {/* Display OCR Result */}
+                    {isProcessing ? (
+                        <p>Processing...</p>
+                    ) : (
+                        <div>
+                            <h3>OCR Result:</h3>
+                            <p>{ocrResult}</p>
+                        </div>
+                    )}
+                </div>
+                <div className='hidden'>
+                    <h1>OCR from Image</h1>
+
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+
+                    {/* Display Image Preview */}
+                    {imageSrc && (
+                        <div>
+                            <h3>Image Preview:</h3>
+                            <img src={imageSrc} alt="Selected" style={{ maxWidth: '100%' }} />
+                        </div>
+                    )}
+
+                    {/* Display OCR Result */}
+                    {isProcessing ? (
+                        <p>Processing...</p>
+                    ) : (
+                        <div>
+                            <h3>OCR Result:</h3>
+                            <p>{ocrResult}</p>
+                        </div>
+                    )}
+                </div>
+                <TablePurchaseContract
+                    categories1={categories1}
+                    items={items}
+                    coupon={coupon}
+                    onHandleCalcPrice={handleCalcPrice}
+                />
+                <div className='flex-center'>
+                    <div style={{ maxWidth: '800px' }}>
+                        <div>・売却後は、商品に対して一切に返却を申し立てを行いません。</div>
+                        <div>・売却商品は全て本物です。売却後貴社基準外商品と判明した場合は、即座に返金いたします。</div>
+                        <div>・個人情報の取扱について、了承いたしました。</div>
+                        <div>・私は反社会性力ではないことを表明し、確約いたします。</div>
+                        <div className='mt-10'>
+                            <label className='flex-left custom-radio-label'>
+                                <input
+                                    type="checkbox"
+                                    name="hearing_line"
+                                    onChange={(e) => handleNoInvoice(e)}
+                                />
+                                私は適格請求書事業者ではありません。
+                            </label>
+                        </div>
+                        <div className='mt-10'>
+                            <textarea
+                                rows={10}
+                                variant="outlined"
+                                value={terms}
+                                className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
+                            />
+                        </div>
+                        <div className='mt-10'>
+                            <label className='flex-left custom-radio-label'>
+                                <input
+                                    type="checkbox"
+                                    name="hearing_line"
+                                    onChange={(e) => handleAgreeTerms(e)}
+                                />
+                                規約を熟読して了承しました。
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div className='flex-center mt-10'>
+                    <label>上記の全てを了承した上で、売却に同意してサインいたします。</label>
+                </div>
+                <div className='flex-center mt-10'>
+                    <Button
+                        loading
+                        textLoading="Waiting"
+                        type="submit"
+                        color="secondary"
+                        className="w-200"
+                        title="お客様サイン"
+                        onClick={handleSignClick}
+                    />
+                </div>
+                <div>
+                    <Dialog
+                        open={openImagePreview}
+                        onClose={() => handleImagePreviewClose()}
+                        className='image-preview'
+                    >
+                        <div className=''>
+                            <img src={previewImage} alt="preview" />
+                        </div>
+                    </Dialog>
+                </div>
+                <div>
+                    <Dialog
+                        open={openCameraPreview}
+                        disableEscapeKeyDown={true}
+                        className='image-preview'
+                    >
+                        <CameraCaptureDialog
+                            type={cameraCaptureType}
+                            onHandleCameraDialogClose={handleCameraPreviewClose}
+                            onHandleCapturedImage={handleCapturedImage}
+                        />
+                    </Dialog>
+                </div>
+                <Dialog
+                    open={openPdfPreview}
+                    onClose={() => handlePdfPreviewClose()}
+                    fullWidth maxWidth="md">
+                    <DialogContent dividers>
+                        {previewPdf && (
+                            <div className='pdf-viewer-container'>
+                                <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
+                                    onLoadError={(error) => console.error("Error loading PDF:", error)}
+                                    onLoadSuccess={onDocumentLoadSuccess}>
+                                    <Page pageNumber={pageNumber} />
+                                </Document>
+                                <div className='pdf-viewer-content'>
+                                    <p>
+                                        合計{numPages}ページ中 {pageNumber}ページ
+                                    </p>
+                                    <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
+                                        以前
+                                    </button>
+                                    <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
+                                        次へ
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
+                <div>
+                    <Dialog
+                        open={openSignDialog}
+                        className='image-preview'
+                        onClose={() => handleSignDialogClose()}
+                    >
+                        <div style={{height: '500px', padding: '10px'}}>
+                            <div className='flex-center' style={{height: '440px'}}>
+                                <SignatureCanvas
+                                    ref={signCanvas}
+                                    penColor="black"
+                                    canvasProps={{ className: "sign-board" }}
+                                />
+                            </div>
+                            <div className="flex-center mt-5">
+                                <Button
+                                    loading
+                                    textLoading="Waiting"
+                                    type="submit"
+                                    color="outline-secondary"
+                                    title="キャンセル"
+                                    className="w-200"
+                                    onClick={handleSignDialogClose}
+                                />
+                                <Button
+                                    loading
+                                    textLoading="Waiting"
+                                    type="submit"
+                                    color="secondary"
+                                    className="w-200"
+                                    title="クリア"
+                                    onClick={handleSignClear}
+                                />
+                                <Button
+                                    loading
+                                    textLoading="Waiting"
+                                    type="submit"
+                                    color="warning"
+                                    className="w-200"
+                                    title="買取了承"
+                                    onClick={handleContractCloseClick}
+                                />
+                            </div>
+                        </div>
+                    </Dialog>
+                </div>
+
+            </div>
+
+            <div ref={printRef} style={printStyle}>
+                <h2 style={{ textAlign: 'center' }}>買取明細書</h2>
+                <div style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', gap: '10px' }}>No.<div>{purchaseId.toString().padStart(6, '0')}</div></label>
+                    <div>
+                        <label style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', gap: '10px' }}>接客担当<div>{getItem("userdata").name}</div></label>
+                    </div>
+                </div>
+                <div style={{ position: 'absolute', top: '-35px', right: '20px' }}>
+                    <label style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', gap: '10px' }}>来店時間<div>{moment().format('YYYY/MM/DD(ddd) HH:mm')}</div></label>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '30px', padding: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '30px', width: '50%' }}>
+                        <div style={{ width: '50%' }}>
+                            <div>
+                                <div style={{ fontSize: '15px' }}>店舗名</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {shop ? shops[shop].name : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>来店経緯</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {type ? type : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>名前</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {name ? name : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>カタカナ名</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {nameKana ? nameKana : ""}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-5">
-                            <div className="input-label">特記事項</div>
-                            <div className="input-value">
-                                <textarea
-                                    rows={10}
-                                    variant="outlined"
-                                    value={note ? note : ""}
-                                    className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
-                                    onChange={(e) => setNote(e.target.value)}
+                        <div style={{ width: '50%' }}>
+                            <div style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ marginTop: '5px', width: '60%' }}>
+                                    <div style={{ fontSize: '15px' }}>生年月日</div>
+                                    <div style={{ fontSize: '15px' }}>
+                                        <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                            {birthday ? birthday : ""}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: '5px', width: '40%' }}>
+                                    <div style={{ fontSize: '15px' }}>性別</div>
+                                    <div style={{ fontSize: '15px' }}>
+                                        <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                            {gender ? (gender == 1 ? "男" : "女") : ""}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>電話番号(自宅)</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {phoneNumber1 ? phoneNumber1 : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>電話番号(携帯)</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {phoneNumber2 ? phoneNumber2 : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>職業</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {job ? jobList[job] : ""}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '30px', width: '50%' }}>
+                        <div style={{ width: '50%' }}>
+                            <div>
+                                <div style={{ fontSize: '15px' }}>郵便番号</div>
+                                <div style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {zipCode ? zipCode : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>都道府県</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {(address1 && prefectures) ? prefectures[address1].name : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>市町村</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {(address2 && cities) ? cities[address2].name : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>住所詳細</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {address3 ? address3 : ""}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ width: '50%' }}>
+                            <div>
+                                <div style={{ fontSize: '15px' }}>本人確認書類</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '30px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {identificationId1 ? identificationList[identificationId1] : ""}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px' }}>
+                                <div style={{ fontSize: '15px' }}>特記事項</div>
+                                <div style={{ fontSize: '15px' }}>
+                                    <div style={{ width: '100%', height: '150px', padding: '5px', border: 'solid 1px #B9B9B9', borderRadius: '5px' }}>
+                                        {note ? note : ""}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <TablePurchaseContract
+                    categories1={categories1}
+                    items={items}
+                    onHandleCalcPrice={handleCalcPrice}
+                />
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ maxWidth: '800px' }}>
+                        <div>・売却後は、商品に対して一切に返却を申し立てを行いません。</div>
+                        <div>・売却商品は全て本物です。売却後貴社基準外商品と判明した場合は、即座に返金いたします。</div>
+                        <div>・個人情報の取扱について、了承いたしました。</div>
+                        <div>・私は反社会性力ではないことを表明し、確約いたします。</div>
+                        <div style={{ marginTop: '10px' }}>
+                            <label style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '10px' }}>
+                                <input
+                                    type="checkbox"
+                                    name="hearing_line"
+                                    onChange={(e) => handleNoInvoice(e)}
                                 />
-                            </div>
+                                私は適格請求書事業者ではありません。
+                            </label>
+                        </div>
+                        <div style={{ marginTop: '10px' }}>
+                            <textarea
+                                rows={10}
+                                variant="outlined"
+                                value={terms}
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                        <div style={{ marginTop: '10px' }}>
+                            <label style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: '10px' }}>
+                                <input
+                                    type="checkbox"
+                                    name="hearing_line"
+                                    onChange={(e) => handleAgreeTerms(e)}
+                                />
+                                規約を熟読して了承しました。
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='hidden'>
-                <div>
-                    <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: 'auto' }} />
-                </div>
-
-                <button onClick={captureImage}>Capture Image</button>
-
-                {/* Hidden Canvas to Draw Image */}
-                <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-                {/* Display Captured Image */}
-                {imageSrc && (
-                    <div>
-                        <h3>Captured Image:</h3>
-                        <img src={imageSrc} alt="Captured" style={{ maxWidth: '100%' }} />
-                    </div>
-                )}
-
-                {/* Display OCR Result */}
-                {isProcessing ? (
-                    <p>Processing...</p>
-                ) : (
-                    <div>
-                        <h3>OCR Result:</h3>
-                        <p>{ocrResult}</p>
-                    </div>
-                )}
-            </div>
-            <div className='hidden'>
-                <h1>OCR from Image</h1>
-
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-
-                {/* Display Image Preview */}
-                {imageSrc && (
-                    <div>
-                        <h3>Image Preview:</h3>
-                        <img src={imageSrc} alt="Selected" style={{ maxWidth: '100%' }} />
-                    </div>
-                )}
-
-                {/* Display OCR Result */}
-                {isProcessing ? (
-                    <p>Processing...</p>
-                ) : (
-                    <div>
-                        <h3>OCR Result:</h3>
-                        <p>{ocrResult}</p>
-                    </div>
-                )}
-            </div>
-            <TablePurchaseContract
-                categories1={categories1}
-                items={items}
-                onHandleCalcPrice={handleCalcPrice}
-            />
-            <div className='flex-center'>
-                <div style={{ maxWidth: '800px' }}>
-                    <div>・売却後は、商品に対して一切に返却を申し立てを行いません。</div>
-                    <div>・売却商品は全て本物です。売却後貴社基準外商品と判明した場合は、即座に返金いたします。</div>
-                    <div>・個人情報の取扱について、了承いたしました。</div>
-                    <div>・私は反社会性力ではないことを表明し、確約いたします。</div>
-                    <div className='mt-10'>
-                        <label className='flex-left custom-radio-label'>
-                            <input
-                                type="checkbox"
-                                name="hearing_line"
-                                onChange={(e) => handleNoInvoice(e)}
-                            />
-                            私は適格請求書事業者ではありません。
-                        </label>
-                    </div>
-                    <div className='mt-10'>
-                        <textarea
-                            rows={10}
-                            variant="outlined"
-                            value={terms}
-                            className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
-                        />
-                    </div>
-                    <div className='mt-10'>
-                        <label className='flex-left custom-radio-label'>
-                            <input
-                                type="checkbox"
-                                name="hearing_line"
-                                onChange={(e) => handleAgreeTerms(e)}
-                            />
-                            規約を熟読して了承しました。
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div className='flex-center mt-10'>
-                <label>上記の全てを了承した上で、売却に同意してサインいたします。</label>
-            </div>
-            <div className='flex-center'>
-                <label>お客様　サイン</label>
-            </div>
-            <div className='flex-center'>
-                <SignatureCanvas
-                    ref={signCanvas}
-                    penColor="black"
-                    canvasProps={{ className: "sign-board" }}
-                />
-            </div>
-            <div className='flex-center mt-10'>
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="secondary"
-                    className="w-200"
-                    title="クリア"
-                    onClick={handleSignClear}
-                />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="primary"
-                    className="w-200"
-                    title="保存"
-                    onClick={handleSignSave}
-                />
-                <Button
-                    loading
-                    textLoading="Waiting"
-                    type="submit"
-                    color="warning"
-                    className="w-200"
-                    title="買取了承"
-                    onClick={handleContractCloseClick}
-                />
-            </div>
-            <div>
-                <Dialog
-                    open={openImagePreview}
-                    onClose={() => handleImagePreviewClose()}
-                    className='image-preview'
-                >
-                    <div className=''>
-                        <img src={previewImage} alt="preview" />
-                    </div>
-                </Dialog>
-            </div>
-            <div>
-                <Dialog
-                    open={openCameraPreview}
-                    disableEscapeKeyDown={true}
-                    className='image-preview'
-                >
-                    <CameraCaptureDialog
-                        type={cameraCaptureType}
-                        onHandleCameraDialogClose={handleCameraPreviewClose}
-                        onHandleCapturedImage={handleCapturedImage}
-                    />
-                </Dialog>
-            </div>
-            <Dialog
-                open={openPdfPreview}
-                onClose={() => handlePdfPreviewClose()}
-                fullWidth maxWidth="md">
-                <DialogContent dividers>
-                    {previewPdf && (
-                        <div className='pdf-viewer-container'>
-                            <Document file={previewPdf ? URL.createObjectURL(previewPdf) : null}
-                                onLoadError={(error) => console.error("Error loading PDF:", error)}
-                                onLoadSuccess={onDocumentLoadSuccess}>
-                                <Page pageNumber={pageNumber} />
-                            </Document>
-                            <div className='pdf-viewer-content'>
-                                <p>
-                                    合計{numPages}ページ中 {pageNumber}ページ
-                                </p>
-                                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
-                                    以前
-                                </button>
-                                <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
-                                    次へ
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </DialogContent>
-            </Dialog>
         </div>
     );
 };

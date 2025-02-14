@@ -184,7 +184,7 @@ const ChatItem = ({ chat, selectedUser }) => {
                 // title={chat.content}
                 text={chat.content}
                 data={data}
-                // replyButton={true}
+                replyButton={true}
                 removeButton={true}
                 download={true}
                 date={chat.created_at}
@@ -194,9 +194,12 @@ const ChatItem = ({ chat, selectedUser }) => {
                 // onDownload={(e) => {
                 //     console.log(e);
                 // }}
-                // onReplyClick={(e) => {
-                //     console.log(e);
-                // }}
+                onReplyClick={(e) => {
+                    console.log(e);
+                }}
+                onReplyMessageClick={(e) => {
+                    console.log(e);
+                }}
                 onRemoveMessageClick={handleClickRemove}
             />
             {/* {type != "text" && data.uri && (

@@ -27,6 +27,7 @@ const ChatsPage = () => {
 
     const lastmessage = useRef(null);
     const [sending, setSending] = useState(false);
+    const [reply, setReply] = useState(null);
 
     const chats = useMemo(() => {
         if (auth && selectedUser && Array.isArray(_chats) && _chats.length > 0)
@@ -83,6 +84,7 @@ const ChatsPage = () => {
                                     key={index}
                                     chat={msg}
                                     selectedUser={selectedUser}
+                                    setReply={setReply}
                                 />
                             ))}
                             {sending && (
@@ -101,6 +103,8 @@ const ChatsPage = () => {
                             sending={sending}
                             setSending={setSending}
                             selectedUser={selectedUser}
+                            reply={reply}
+                            setReply={setReply}
                         />
                     </>
                 ) : (
@@ -121,7 +125,7 @@ const ChatsPage = () => {
 
 export default ChatsPage;
 
-const ChatItem = ({ chat, selectedUser }) => {
+const ChatItem = ({ chat, selectedUser, setReply }) => {
     const dispatch = useDispatch();
 
     const type = chat.type.startsWith("video/")
@@ -143,6 +147,10 @@ const ChatItem = ({ chat, selectedUser }) => {
                   PUBLIC_HOST + "/storage/" + JSON.parse(chat.other)?.path,
               audioType: chat.type,
               size: JSON.parse(chat.other)?.size,
+              status: {
+                  download: true,
+                  click: true,
+              },
           }
         : null;
 
@@ -159,7 +167,6 @@ const ChatItem = ({ chat, selectedUser }) => {
     }, [dispatch, chat]);
 
     const handleDownload = (e) => {
-        console.log(e.target.nodeName);
         if (
             e.target.nodeName == "IMG" ||
             e.target.nodeName == "AUD" ||
@@ -173,6 +180,10 @@ const ChatItem = ({ chat, selectedUser }) => {
                 link.click();
                 document.body.removeChild(link);
             }
+    };
+
+    const handleReplyClick = () => {
+        setReply(chat);
     };
 
     return (
@@ -191,16 +202,26 @@ const ChatItem = ({ chat, selectedUser }) => {
                 status={chat.status == "read" ? "read" : "sent"} //  'waiting' | 'sent' | 'received' | 'read'
                 dateString={moment(chat.created_at).fromNow()}
                 onClick={handleDownload}
-                // onDownload={(e) => {
-                //     console.log(e);
-                // }}
-                onReplyClick={(e) => {
-                    console.log(e);
+                onDownload={(e) => {
+                    console.log("onDownload", e);
                 }}
+                onReplyClick={handleReplyClick}
                 onReplyMessageClick={(e) => {
-                    console.log(e);
+                    console.log("onReplyMessageClick", e);
                 }}
                 onRemoveMessageClick={handleClickRemove}
+                reply={
+                    chat.reply && {
+                        photoURL:
+                            "https://facebook.github.io/react/img/logo.svg",
+                        title:
+                            chat.reply.from === selectedUser.id
+                                ? "あなた"
+                                : selectedUser.name,
+                        titleColor: "#8717ae",
+                        message: chat.reply.content,
+                    }
+                }
             />
             {/* {type != "text" && data.uri && (
                 <button onClick={() => handleDownload(data.uri)}>

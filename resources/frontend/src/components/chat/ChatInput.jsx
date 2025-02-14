@@ -4,8 +4,10 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
-import { Box, Popover, TextField } from "@mui/material";
+import { Box, Popover, TextField, Typography } from "@mui/material";
 import { AttachFileOutlined } from "@mui/icons-material";
+import ReplyIcon from "@mui/icons-material/Reply";
+import CloseIcon from "@mui/icons-material/Close";
 import MoodIcon from "@mui/icons-material/Mood";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -14,7 +16,7 @@ import { API_ROUTE } from "../../config";
 import api from "../../api";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 
-const ChatInput = ({ sending, setSending, selectedUser }) => {
+const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
     const dispatch = useDispatch();
 
     const fileInput = useRef(null);
@@ -39,12 +41,13 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
                 content: message,
                 to: selectedUser.id,
                 status: "unread",
-                reply: 0,
+                reply: reply ? reply.id : 0,
                 emoji: "",
             };
             try {
                 const response = await api.post("chats", newMessage);
                 dispatch(actionChat.handleReceiveChat(response.data.chat));
+                setReply(null);
                 setMessage("");
             } catch (error) {
                 console.log(error);
@@ -52,7 +55,7 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
                 setSending(false);
             }
         }
-    }, [dispatch, message, setSending, selectedUser]);
+    }, [dispatch, message, setSending, selectedUser, reply, setReply]);
 
     const handleSubmit = useCallback(
         (e) => {
@@ -116,11 +119,54 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
         [handleCloseEmojiOpen, message]
     );
 
+    const handleRemoveReply = useCallback(() => {
+        setReply(null);
+    }, [setReply]);
+
     // const handleMessageChange = useCallback((e) => setMessage(e), []);
 
     return (
         <>
             <Box sx={{ position: "relative" }}>
+                {reply && (
+                    <Box
+                        position={"absolute"}
+                        left={0}
+                        bottom={"105%"}
+                        width={"100%"}
+                        px={2}
+                        m={1}
+                        borderRadius={2}
+                        bgcolor={"lightgray"}
+                    >
+                        <Box
+                            display={"flex"}
+                            justifyContent={"space-between"}
+                            alignItems={"center"}
+                            gap={2}
+                        >
+                            <Box display={"flex"} alignItems={"center"} gap={2}>
+                                <ReplyIcon fontSize="large" color="primary" />
+                                <Box display={"flex"} flexDirection={"column"}>
+                                    <Typography
+                                        variant="subtitle1"
+                                        color="primary"
+                                    >
+                                        {selectedUser.id == reply.from
+                                            ? selectedUser.name
+                                            : "あなた"}
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        {reply.content}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <IconButton onClick={handleRemoveReply}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Box>
+                    </Box>
+                )}
                 <form onSubmit={handleSubmit}>
                     <Box display="flex" alignItems={"center"} width={"100%"}>
                         <IconButton

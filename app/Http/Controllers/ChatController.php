@@ -16,13 +16,7 @@ class ChatController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $chats = Chat::where(function ($query) use ($userId) {
-            $query->where('from', $userId)
-                ->orWhere('to', $userId);
-        })
-            ->where('deleted', '!=', $userId)
-            ->with(['fromUser', 'toUser'])
-            ->get();
+        $chats = Chat::getChatListWithReplies($userId);
         return response()->json($chats);
     }
 

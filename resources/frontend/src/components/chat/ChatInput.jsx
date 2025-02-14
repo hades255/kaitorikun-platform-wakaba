@@ -1,9 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import InputEmoji from "react-input-emoji";
+// import InputEmoji from "react-input-emoji";
 import axios from "axios";
-import { Box } from "@mui/material";
+import Picker from "@emoji-mart/react";
+import emojiData from "@emoji-mart/data";
+import { Box, Popover, TextField } from "@mui/material";
 import { AttachFileOutlined } from "@mui/icons-material";
+import MoodIcon from "@mui/icons-material/Mood";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
@@ -17,6 +20,17 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
     const fileInput = useRef(null);
 
     const [message, setMessage] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const showEmojiPicker = Boolean(anchorEl);
+
+    const handleClickEmojiOpen = useCallback((event) => {
+        setAnchorEl(event.currentTarget);
+    }, []);
+
+    const handleCloseEmojiOpen = useCallback(() => {
+        setAnchorEl(null);
+    }, []);
 
     const sendMessage = useCallback(async () => {
         if (message.trim() && selectedUser) {
@@ -94,51 +108,115 @@ const ChatInput = ({ sending, setSending, selectedUser }) => {
         }
     }, []);
 
-    const handleMessageChange = useCallback((e) => setMessage(e), []);
+    const handleNewEmojiClick = useCallback(
+        (emojiData) => {
+            setMessage(message + emojiData.native);
+            handleCloseEmojiOpen();
+        },
+        [handleCloseEmojiOpen, message]
+    );
+
+    // const handleMessageChange = useCallback((e) => setMessage(e), []);
 
     return (
-        <Box sx={{ position: "relative" }}>
-            <form onSubmit={handleSubmit}>
-                <Box display="flex" alignItems={"center"} width={"100%"} mt={1}>
-                    <IconButton
-                        onClick={handleClickFileInput}
-                        sx={{ p: "10px" }}
-                        aria-label="menu"
-                    >
-                        <AttachFileOutlined />
-                        <input
-                            type="file"
-                            onChange={handleFileSelect}
-                            multiple
-                            ref={fileInput}
-                            style={{ display: "none" }}
-                            disabled={sending}
-                        />
-                    </IconButton>
-                    <InputEmoji
+        <>
+            <Box sx={{ position: "relative" }}>
+                <form onSubmit={handleSubmit}>
+                    <Box display="flex" alignItems={"center"} width={"100%"}>
+                        <IconButton
+                            onClick={handleClickFileInput}
+                            sx={{ p: "10px" }}
+                            aria-label="menu"
+                        >
+                            <AttachFileOutlined />
+                            <input
+                                type="file"
+                                onChange={handleFileSelect}
+                                multiple
+                                ref={fileInput}
+                                style={{ display: "none" }}
+                                disabled={sending}
+                            />
+                        </IconButton>
+                        {/* <InputEmoji
                         value={message}
                         theme="auto"
                         placeholder="メッセージを入力してください"
                         language="ja"
                         onChange={handleMessageChange}
                         onEnter={sendMessage}
+                    /> */}
+                        <TextField
+                            fullWidth
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            // placeholder="Type a message..."
+                            placeholder="メッセージを入力..."
+                            sx={{ mr: 1, py: 0, borderRadius: 20 }}
+                            disabled={sending}
+                        />
+                        <IconButton
+                            color="primary"
+                            onClick={handleClickEmojiOpen}
+                            sx={{ p: "10px" }}
+                            disabled={sending}
+                        >
+                            <MoodIcon />
+                        </IconButton>
+                        <Divider
+                            sx={{ height: 28, m: 0.5 }}
+                            orientation="vertical"
+                        />
+                        <IconButton
+                            type="submit"
+                            disabled={sending}
+                            color="primary"
+                            sx={{ p: "10px" }}
+                            aria-label="directions"
+                        >
+                            <SendIcon />
+                        </IconButton>
+                    </Box>
+                </form>
+            </Box>
+            <Popover
+                id={"open-emogi-popover-chat"}
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                }}
+                transformOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                }}
+                open={showEmojiPicker}
+                onClose={handleCloseEmojiOpen}
+            >
+                <Box sx={{ minWidth: 320 }}>
+                    <Picker
+                        locale="ja"
+                        theme="light"
+                        previewPosition="none"
+                        skinTonePosition="none"
+                        emojiButtonSize={44}
+                        emojiSize={28}
+                        emojiButtonRadius={"6px"}
+                        emojiButtonColors={[
+                            "rgba(155,223,88,.7)",
+                            "rgba(149,211,254,.7)",
+                            "rgba(247,233,34,.7)",
+                            "rgba(238,166,252,.7)",
+                            "rgba(255,213,143,.7)",
+                            "rgba(211,209,255,.7)",
+                        ]}
+                        icons={"solid"}
+                        data={emojiData}
+                        onEmojiSelect={handleNewEmojiClick}
                     />
-                    <Divider
-                        sx={{ height: 28, m: 0.5 }}
-                        orientation="vertical"
-                    />
-                    <IconButton
-                        type="submit"
-                        disabled={sending}
-                        color="primary"
-                        sx={{ p: "10px" }}
-                        aria-label="directions"
-                    >
-                        <SendIcon />
-                    </IconButton>
                 </Box>
-            </form>
-        </Box>
+            </Popover>
+        </>
     );
 };
 

@@ -216,6 +216,7 @@ const Communities = ({ match }) => {
                         <Invitation
                             onClose={setShowInviteDialog}
                             community={community}
+                            channel={channel}
                         />
                     </Dialog>
                 )}
@@ -323,7 +324,7 @@ const SepItems = ({ children, type, onClick, active }) => {
     );
 };
 
-const Invitation = ({ community, onClose }) => {
+const Invitation = ({ community, channel, onClose }) => {
     const [inviteEmail, setInviteEmail] = useState("");
     const [selected, setSelected] = useState([]);
     const [timer, setTimer] = useState(null);
@@ -334,6 +335,7 @@ const Invitation = ({ community, onClose }) => {
             await api.post("invitations", {
                 users: selected,
                 community_id: community.id,
+                channel_id: channel.id,
             });
             ToastNotification("success", "招待が正常に送信されました");
             setInviteEmail("");
@@ -346,20 +348,20 @@ const Invitation = ({ community, onClose }) => {
                     "登録ユーザーに招待を送信できます"
                 );
         }
-    }, [community, onClose, selected]);
+    }, [community, channel, onClose, selected]);
 
     const getUsers = useCallback(
         async (input) => {
             try {
                 const response = await api(
-                    `invitations/users/search?search=${input}&community_id=${community.id}`
+                    `invitations/users/search?search=${input}&channel_id=${channel.id}`
                 );
                 setUsers(response.data);
             } catch (error) {
                 console.log(error);
             }
         },
-        [community]
+        [channel]
     );
 
     const handleInputChange = useCallback(

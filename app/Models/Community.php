@@ -16,11 +16,6 @@ class Community extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'community_users');
-    }
-
     public function communityUsers()
     {
         return $this->hasMany(CommunityUser::class);
@@ -41,10 +36,33 @@ class Community extends Model
         return self::where('user_id', $userId)->with(['channels'])->orderBy('updated_at', 'desc')->get();
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'community_users');
+    }
+
+    public function channelsWithUsers($userId)
+    {
+        return $this->hasMany(Channel::class)->whereHas('users', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        });
+    }
+
+    // public static function getCommunitiesForUser($userId)
+    // {
+    //     return self::whereHas('users', function ($query) use ($userId) {
+    //         $query->where('user_id', $userId);
+    //     })->with(['channels'])->orderBy('updated_at', 'desc')->get();
+    // }
+
     public static function getCommunitiesForUser($userId)
     {
-        return self::whereHas('users', function ($query) use ($userId) {
+        return self::whereHas('channels.users', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->with(['channels'])->orderBy('updated_at', 'desc')->get();
+        })->with(['channels' => function ($query) use ($userId) {
+            $query->whereHas('users', function ($userQuery) use ($userId) {
+                $userQuery->where('user_id', $userId);
+            });
+        }])->orderBy('updated_at', 'desc')->get();
     }
 }

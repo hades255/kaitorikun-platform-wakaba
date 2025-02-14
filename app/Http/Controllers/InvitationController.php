@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
+use App\Models\ChannelUser;
 use App\Models\CommunityUser;
 use App\Models\Invitation;
 use App\Models\User;
@@ -39,10 +40,12 @@ class InvitationController extends Controller
             'users.*.email' => 'required|email',
             'users.*.name' => 'required|string',
             'community_id' => 'required|integer|exists:communities,id',
+            'channel_id' => 'required|integer|exists:channels,id',
         ]);
 
         $userId = Auth::id();
         $communityId = $validatedData['community_id'];
+        $channel_id = $validatedData['channel_id'];
         $users = $validatedData['users'];
 
         DB::beginTransaction();
@@ -55,6 +58,7 @@ class InvitationController extends Controller
                 $invitation = Invitation::create([
                     'sender_id' => $userId,
                     'community_id' => $communityId,
+                    'channel_id' => $channel_id,
                     'receiver_id' => $receiver['id'],
                     'token' => $token,
                 ]);
@@ -142,14 +146,22 @@ class InvitationController extends Controller
         if ($invitation->status === 'accepted') {
             return response()->json(['message' => '招待はすでに承諾されています.'], 400);
         }
-        $old = CommunityUser::where("community_id", $invitation->community_id)->where("user_id", $invitation->receiver_id)->first();
-        if ($old) {
-            return response()->json(['message' => '招待はすでに承諾されています.'], 400);
-        }
-        $newCom = new CommunityUser();
-        $newCom->community_id = $invitation->community_id;
-        $newCom->user_id = $invitation->receiver_id;
-        $newCom->save();
+        // $old = ChannelUser::where("channel_id", $invitation->channel_id)->where("user_id", $invitation->receiver_id)->first();
+        // if ($old) {
+        //     return response()->json(['message' => '招待はすでに承諾されています.'], 400);
+        // }
+        // $newCom = new ChannelUser();
+        // $newCom->channel_id = $invitation->channel_id;
+        // $newCom->user_id = $invitation->receiver_id;
+        // $newCom->save();
+        ChannelUser::firstOrCreate([
+            "channel_id" => $invitation->channel_id,
+            "user_id" => $invitation->receiver_id,
+        ], []);
+        CommunityUser::firstOrCreate([
+            "community_id" => $invitation->community_id,
+            "user_id" => $invitation->receiver_id,
+        ], []);
         $invitation->status = 'accepted';
         $invitation->save();
 
@@ -159,13 +171,13 @@ class InvitationController extends Controller
     public function search_users(Request $request)
     {
         $search = $request->search;
-        $community_id = $request->community_id;
+        $channel_id = $request->channel_id;
         $users = User::where(function ($query) use ($search) {
             $query->where('name', 'like', '%' . $search . '%')
                 ->orWhere('email', 'like', '%' . $search . '%');
         })
-            ->whereDoesntHave('communityUsers', function ($query) use ($community_id) {
-                $query->where('community_id', $community_id);
+            ->whereDoesntHave('channelUsers', function ($query) use ($channel_id) {
+                $query->where('channel_id', $channel_id);
             })
             ->select('id', 'name', 'email')
             ->get();

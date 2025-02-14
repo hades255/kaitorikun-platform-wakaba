@@ -6,7 +6,7 @@ use App\Events\NewChannel;
 use App\Jobs\NewChannelJob;
 use App\Jobs\RemoveChannelJob;
 use App\Models\Channel;
-use App\Models\CommunityUser;
+use App\Models\ChannelUser;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -37,9 +37,9 @@ class ChannelController extends Controller
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             NewChannelJob::dispatch($channel, Auth::user()->name);
-            CommunityUser::firstOrCreate(
+            ChannelUser::firstOrCreate(
                 [
-                    'community_id' => $validatedData['community_id'],
+                    'channel_id' => $channel->id,
                     'user_id' => Auth::id(),
                 ],
                 []
@@ -58,7 +58,7 @@ class ChannelController extends Controller
         $sortOrder = $request->input('sort_order', 'desc');
         $posts = $channel->limitedPosts($limit, $offset, $sortBy, $sortOrder);
 
-        $users = $channel->community->users;
+        $users = $channel->users;
 
         return response()->json(["posts" => $posts, "users" => $users, "channel" => $channel, "community" => $channel->community]);
     }
@@ -75,9 +75,10 @@ class ChannelController extends Controller
                 $data = ["name" => $channel->name, "id" => $channel->id, "user_id" => $channel->user_id, "community_id" => $channel->community_id];
                 // $channel->posts()->reactions()->delete();
                 // $channel->posts()->replies()->delete();
-                $channel->posts()->delete();
                 if ($channel->delete()) {
                     RemoveChannelJob::dispatch($data, Auth::user()->name);
+                    $channel->channelUsers()->delete();
+                    $channel->posts()->delete();
                     return response()->json($data);
                 }
             } catch (\Throwable $th) {
@@ -93,6 +94,7 @@ class ChannelController extends Controller
         $channels = Channel::where("community_id", 0)->get();
         return response()->json($channels);
     }
+
     public function show_schannel(Request $request, Channel $channel)
     {
         $validatedData = $request->validate([

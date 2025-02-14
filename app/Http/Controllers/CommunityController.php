@@ -64,11 +64,12 @@ class CommunityController extends Controller
                 $channel->type = 0;
                 $channel->save();
 
-                if ($community->isPublic) {
-                    NewCommunityJob::dispatch($community, $channel, Auth::user()->name);
-                }
+                // if ($community->isPublic) {
+                //     NewCommunityJob::dispatch($community, $channel, Auth::user()->name);
+                // }
 
                 $community->users()->attach(Auth::id());
+                $channel->users()->attach(Auth::id());
 
                 return ["community" => $community, "channel" => $channel];
             });
@@ -140,9 +141,6 @@ class CommunityController extends Controller
 
         $communities = Community::where('isPublic', true)
             ->where('user_id', '!=', $currentUserId)
-            ->whereDoesntHave('communityUsers', function ($query) use ($currentUserId) {
-                $query->where('user_id', $currentUserId);
-            })
             ->with(['channels'])
             ->orderBy('updated_at', 'desc')
             ->get();

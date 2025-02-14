@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('post_reactions', function (Blueprint $table) {
-            $table->dropForeign(['channel_id']);
-            $table->dropColumn('channel_id');
+        Schema::table('invitations', function (Blueprint $table) {
+            $table->foreignId('channel_id');
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('post_reactions', function (Blueprint $table) {
-            $table->unsignedBigInteger('channel_id')->nullable();
+        Schema::table('invitations', function (Blueprint $table) {
+            $table->dropColumn("channel_id");
         });
     }
 };

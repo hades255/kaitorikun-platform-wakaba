@@ -66,4 +66,9 @@ class Channel extends Model
             $query->where('user_id', $userId);
         })->get();
     }
+
+    public function channelUsers()
+    {
+        return $this->hasMany(ChannelUser::class);
+    }
 }

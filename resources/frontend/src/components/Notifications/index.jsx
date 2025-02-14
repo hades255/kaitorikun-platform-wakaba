@@ -218,18 +218,6 @@ const Notifications = () => {
             //         console.log(error);
             //     }
             // };
-            const getJoinedCommunities = async () => {
-                try {
-                    const response = await api.get(`communities/joined`);
-                    dispatch(
-                        actionChannel.handleSetCommunity(
-                            response.data.communities
-                        )
-                    );
-                } catch (error) {
-                    console.log(error);
-                }
-            };
             const getMenusFunc = async () => {
                 try {
                     const response = await api.get("schannels");
@@ -242,6 +230,23 @@ const Notifications = () => {
             getMyChats();
             getMenusFunc();
             // getMineCommunities();
+        }
+    }, [dispatch, auth]);
+
+    useEffect(() => {
+        if (auth) {
+            const getJoinedCommunities = async () => {
+                try {
+                    const response = await api.get(`communities/joined`);
+                    dispatch(
+                        actionChannel.handleSetCommunity(
+                            response.data.communities
+                        )
+                    );
+                } catch (error) {
+                    console.log(error);
+                }
+            };
             getJoinedCommunities();
         }
     }, [dispatch, auth]);

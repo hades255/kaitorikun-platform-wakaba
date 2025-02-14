@@ -39,7 +39,6 @@ const Sidebar = (props) => {
 
     useEffect(() => {
         let userData = getItem("userdata");
-        console.log(userData);
         
         if (userData.role <= 3) {
             let newMenu = [];

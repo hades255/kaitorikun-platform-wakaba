@@ -6,7 +6,7 @@ use App\Events\NewPost;
 use App\Jobs\DeletePostJob;
 use App\Jobs\EditPostJob;
 use App\Jobs\NewPostJob;
-use App\Models\CommunityUser;
+use App\Models\ChannelUser;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,13 +57,6 @@ class PostController extends Controller
         $post->user_id = Auth::id();
         if ($post->save()) {
             NewPostJob::dispatch($post, Auth::user()->name);
-            CommunityUser::firstOrCreate(
-                [
-                    'community_id' => $validatedData['community_id'],
-                    'user_id' => Auth::id(),
-                ],
-                []
-            );
             return response()->json($post, 201);
         }
         return response()->json(['error' => 'Failed to create post'], 500);

@@ -9,12 +9,15 @@ import {
     Alert,
     Box,
 } from "@mui/material";
-import { actionTheme } from "../../reduxStore";
+import { actionChannel, actionTheme } from "../../reduxStore";
 import { useQuery } from "../../components/helper";
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../../api";
 
 const AcceptInvitation = ({ history, location }) => {
     const query = useQuery(location);
     const invitationId = query.get("token");
+    const { auth } = useAuth();
 
     const dispatch = useDispatch();
 
@@ -63,6 +66,21 @@ const AcceptInvitation = ({ history, location }) => {
                 `/api/invitations/${invitationId}/accept`
             );
             setMessage(response.data.message);
+            if (auth) {
+                const getJoinedCommunities = async () => {
+                    try {
+                        const response = await api.get(`communities/joined`);
+                        dispatch(
+                            actionChannel.handleSetCommunity(
+                                response.data.communities
+                            )
+                        );
+                    } catch (error) {
+                        console.log(error);
+                    }
+                };
+                getJoinedCommunities();
+            }
             setTimeout(() => {
                 history.push("/communities");
             }, 2000);

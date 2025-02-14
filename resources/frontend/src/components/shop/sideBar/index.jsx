@@ -9,10 +9,9 @@ import menu1 from "./menu1";
 import menu2 from "./menu2";
 import menu3 from "./menu3";
 import ChatSidebar from "./Chat";
-import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
+import ChannelSidebar from "./Channel";
 import SidebarNavList from "./SidebarNavList";
 import Menu4Sidebar from "./Menu4Sidebar";
-import SCSidebarNavList from "./SCSidebarNavList";
 
 const tabs = [
     {
@@ -153,7 +152,7 @@ const Sidebar = (props) => {
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <AddNewCommunityButton page={false} />
+                                    {/* <AddNewCommunityButton page={false} /> */}
                                     <p>生駒OOOOOOOO店</p>
                                 </div>
                             </li>

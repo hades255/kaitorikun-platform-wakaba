@@ -1,0 +1,6 @@
+.rce-mbox-body {
+    max-width: 500px; /* Adjust this value as needed */
+    max-height: 300px; /* Adjust this value as needed */
+    overflow: auto; /* Add overflow property to handle content that exceeds max height */
+  }
+  

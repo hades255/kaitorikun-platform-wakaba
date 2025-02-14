@@ -14,6 +14,7 @@ import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 import ChatInput from "../../components/chat/ChatInput";
 import { PanelContent, useDispatch, useSelector } from "../../components";
+import "./style.css";
 
 moment.locale("ja");
 

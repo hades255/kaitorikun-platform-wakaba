@@ -716,6 +716,11 @@ const PostMedia = ({ file }) => {
         setShow(!show);
     }, [show]);
 
+    const handleOnLoad = useCallback(() => {
+        console.log("load");
+        setShow(true);
+    }, []);
+
     return (
         data && (
             <Box
@@ -724,32 +729,37 @@ const PostMedia = ({ file }) => {
                 border={"1px solid lightgray"}
                 borderRadius={2}
             >
-                {show ? (
-                    <Box p={2} bgcolor={"white"} width={"100%"}>
-                        <CustomContextMenu data={data}>
-                            <>
-                                {data.type && data.type.includes("image") && (
-                                    <img
-                                        alt={data.content}
-                                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
-                                        width={"100%"}
-                                    />
-                                )}
-                                {data.type && data.type.includes("video") && (
-                                    <video
-                                        controls
-                                        src={`${PUBLIC_HOST}/storage/${data.other.path}`}
-                                        width={"100%"}
-                                        style={{ borderRadius: 8 }}
-                                    >
-                                        Your browser does not support the video
-                                        tag.
-                                    </video>
-                                )}
-                            </>
-                        </CustomContextMenu>
-                    </Box>
-                ) : (
+                <Box
+                    p={2}
+                    bgcolor={"white"}
+                    width={"100%"}
+                    display={show ? "block" : "none"}
+                >
+                    <CustomContextMenu data={data}>
+                        <>
+                            {data.type && data.type.includes("image") && (
+                                <img
+                                    onLoad={handleOnLoad}
+                                    alt={data.content}
+                                    src={`${PUBLIC_HOST}/storage/${data.other.path}`}
+                                    width={"100%"}
+                                />
+                            )}
+                            {data.type && data.type.includes("video") && (
+                                <video
+                                    onLoad={handleOnLoad}
+                                    controls
+                                    src={`${PUBLIC_HOST}/storage/${data.other.path}`}
+                                    width={"100%"}
+                                    style={{ borderRadius: 8 }}
+                                >
+                                    Your browser does not support the video tag.
+                                </video>
+                            )}
+                        </>
+                    </CustomContextMenu>
+                </Box>
+                {!show && (
                     <Box display={"flex"} p={2} alignItems={"center"} gap={2}>
                         {data.type.includes("image") ? (
                             <ImageIcon />

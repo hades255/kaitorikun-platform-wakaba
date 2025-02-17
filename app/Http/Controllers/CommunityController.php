@@ -69,7 +69,7 @@ class CommunityController extends Controller
                 // }
 
                 $community->users()->attach(Auth::id());
-                $channel->users()->attach(Auth::id());
+                // $channel->users()->attach(Auth::id());
 
                 return ["community" => $community, "channel" => $channel];
             });

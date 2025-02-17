@@ -48,21 +48,21 @@ class Community extends Model
         });
     }
 
-    // public static function getCommunitiesForUser($userId)
-    // {
-    //     return self::whereHas('users', function ($query) use ($userId) {
-    //         $query->where('user_id', $userId);
-    //     })->with(['channels'])->orderBy('updated_at', 'desc')->get();
-    // }
-
     public static function getCommunitiesForUser($userId)
     {
-        return self::whereHas('channels.users', function ($query) use ($userId) {
+        return self::whereHas('users', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->with(['channels' => function ($query) use ($userId) {
-            $query->whereHas('users', function ($userQuery) use ($userId) {
-                $userQuery->where('user_id', $userId);
-            });
-        }])->orderBy('updated_at', 'desc')->get();
+        })->with(['channels'])->orderBy('updated_at', 'desc')->get();
     }
+
+    // public static function getCommunitiesForUser($userId)
+    // {
+    //     return self::whereHas('channels.users', function ($query) use ($userId) {
+    //         $query->where('user_id', $userId);
+    //     })->with(['channels' => function ($query) use ($userId) {
+    //         $query->whereHas('users', function ($userQuery) use ($userId) {
+    //             $userQuery->where('user_id', $userId);
+    //         });
+    //     }])->orderBy('updated_at', 'desc')->get();
+    // }
 }

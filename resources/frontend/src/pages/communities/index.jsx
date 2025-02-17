@@ -298,12 +298,12 @@ const ComHeader = ({
                             <Button onClick={handleClickInvite}>
                                 <GroupAddIcon />
                             </Button>
-                            <Button>
+                            {/* <Button>
                                 <LinkIcon />
                             </Button>
                             <Button>
                                 <SettingsIcon />
-                            </Button>
+                            </Button> */}
                         </ButtonGroup>
                     </Box>
                 </Box>

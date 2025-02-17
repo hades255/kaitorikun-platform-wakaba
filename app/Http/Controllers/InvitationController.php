@@ -154,10 +154,10 @@ class InvitationController extends Controller
         // $newCom->channel_id = $invitation->channel_id;
         // $newCom->user_id = $invitation->receiver_id;
         // $newCom->save();
-        ChannelUser::firstOrCreate([
-            "channel_id" => $invitation->channel_id,
-            "user_id" => $invitation->receiver_id,
-        ], []);
+        // ChannelUser::firstOrCreate([
+        //     "channel_id" => $invitation->channel_id,
+        //     "user_id" => $invitation->receiver_id,
+        // ], []);
         CommunityUser::firstOrCreate([
             "community_id" => $invitation->community_id,
             "user_id" => $invitation->receiver_id,

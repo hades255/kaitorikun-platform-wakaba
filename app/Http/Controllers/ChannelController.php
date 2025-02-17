@@ -7,6 +7,7 @@ use App\Jobs\NewChannelJob;
 use App\Jobs\RemoveChannelJob;
 use App\Models\Channel;
 use App\Models\ChannelUser;
+use App\Models\CommunityUser;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -37,9 +38,9 @@ class ChannelController extends Controller
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             NewChannelJob::dispatch($channel, Auth::user()->name);
-            ChannelUser::firstOrCreate(
+            CommunityUser::firstOrCreate(
                 [
-                    'channel_id' => $channel->id,
+                    'community_id' => $validatedData['community_id'],
                     'user_id' => Auth::id(),
                 ],
                 []
@@ -77,7 +78,7 @@ class ChannelController extends Controller
                 // $channel->posts()->replies()->delete();
                 if ($channel->delete()) {
                     RemoveChannelJob::dispatch($data, Auth::user()->name);
-                    $channel->channelUsers()->delete();
+                    // $channel->channelUsers()->delete();
                     $channel->posts()->delete();
                     return response()->json($data);
                 }

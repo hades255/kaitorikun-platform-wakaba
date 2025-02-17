@@ -37,6 +37,7 @@ class PostReactionController extends Controller
             'reaction' => 'required|string|max:1000',
             'post_id' => 'required|integer',
         ]);
+        PostReaction::where('post_id', $validatedData['post_id'])->where('user_id', Auth::id())->delete();
         $reaction = new PostReaction();
         $reaction->reaction = $validatedData['reaction'];
         $reaction->post_id = $validatedData['post_id'];

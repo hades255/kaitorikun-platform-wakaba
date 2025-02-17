@@ -614,9 +614,15 @@ const EmojiItem = ({ reaction, onClick, users }) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handlePopoverClose = () => {
-        setAnchorEl(null);
-    };
+    const handlePopoverClose = useCallback(() => {
+        let timer = null;
+        timer = setTimeout(() => {
+            setAnchorEl(null);
+        }, 1000);
+        return () => {
+            clearTimeout(timer);
+        };
+    });
 
     const open = Boolean(anchorEl);
 

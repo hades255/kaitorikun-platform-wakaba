@@ -315,7 +315,11 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                         onClick={handleClickPin}
                         className={classes.pinButton}
                     >
-                        <PushPinOutlinedIcon fontSize="small" color="white" />
+                        <PushPinOutlinedIcon
+                            fontSize="small"
+                            htmlColor={"#9ca3af"}
+                            sx={{ transform: pinned ? "" : "rotate(45deg)" }}
+                        />
                     </button>
                 </div>
             </div>
@@ -389,17 +393,19 @@ const useStyles = makeStyles((theme) => ({
     },
     pinWrapper: {
         position: "absolute",
-        top: 0,
-        right: "16px",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
+        top: 16,
+        right: 4,
     },
     pinButton: {
-        padding: "4px",
+        width: 32,
+        height: 32,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         borderRadius: "50%",
-        color: (props) => (props.isPinned ? "#111827" : "#9ca3af"),
-        opacity: 0,
+        border: "none",
+        opacity: 0.5,
+        backgroundColor: "transparent",
         "&:hover": {
             backgroundColor: "#4b5563",
             opacity: 1,

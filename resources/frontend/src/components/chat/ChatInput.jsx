@@ -239,7 +239,7 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
                 open={showEmojiPicker}
                 onClose={handleCloseEmojiOpen}
             >
-                <Box sx={{ minWidth: 320 }}>
+                <Box sx={{ minWidth: 360 }}>
                     <Picker
                         locale="ja"
                         theme="light"

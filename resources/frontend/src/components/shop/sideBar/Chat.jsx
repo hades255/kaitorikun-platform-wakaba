@@ -1,8 +1,19 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Box, List, Typography, Badge } from "@mui/material";
-import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import {
+    Avatar,
+    Box,
+    List,
+    Typography,
+    Badge,
+    IconButton,
+    InputBase,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { format, isThisYear, isToday } from "date-fns";
 import { getUserStatusColor } from "../../../feature/action";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -21,7 +32,6 @@ export const formatDate = (dateString) => {
 };
 
 const ChatSidebar = () => {
-    const classes = useStyles();
     const { auth } = useAuth();
     const dispatch = useDispatch();
 
@@ -30,6 +40,8 @@ const ChatSidebar = () => {
     const pinnedUsers = useSelector(selectorChat.handleGetPinned);
     const recentlyUsers = useSelector(selectorChat.handleGetRecently);
     const chats = useSelector(selectorChat.handleGetChats);
+
+    const [showFilter, setShowFilter] = useState(false);
 
     const newChatCounts = useMemo(() => {
         let newChats = {};
@@ -92,13 +104,62 @@ const ChatSidebar = () => {
         [dispatch]
     );
 
+    const handleClickOpenFitler = useCallback(() => setShowFilter(true), []);
+    const handleClickCloseFitler = useCallback(() => setShowFilter(false), []);
+    const handleClickNewChat = useCallback(() => {
+        // dispatch(    //  todo    new chat
+        //     actionChat.handleSetCurrentUser({ id: "new", name: "New Chat" })
+        // );
+    }, [dispatch]);
+
     return (
-        <Box
-            sx={{
-                borderColor: "divider",
-                py: 2,
-            }}
-        >
+        <Box sx={{ py: 2 }}>
+            {showFilter ? (
+                <Box
+                    component="form"
+                    sx={{
+                        px: "2px",
+                        display: "flex",
+                        alignItems: "center",
+                        borderBottom: "1px solid gray",
+                    }}
+                >
+                    {/* <IconButton sx={{ p: "10px" }} aria-label="menu">
+                        <MenuIcon />
+                    </IconButton> */}
+                    <InputBase
+                        sx={{ ml: 1, flex: 1, color: "white" }}
+                        placeholder="Search"
+                        inputProps={{ "aria-label": "search" }}
+                    />
+                    {/* <IconButton
+                        type="button"
+                        sx={{ p: "10px" }}
+                        aria-label="search"
+                    >
+                        <TuneOutlinedIcon />
+                    </IconButton> */}
+                    {/* <Divider
+                        sx={{ height: 24, m: 0.5, bgcolor: "white" }}
+                        orientation="vertical"
+                    /> */}
+                    <IconButton onClick={handleClickCloseFitler}>
+                        <CloseOutlinedIcon htmlColor="white" />
+                    </IconButton>
+                </Box>
+            ) : (
+                <Box display={"flex"} justifyContent={"end"}>
+                    <Box display={"flex"} alignItems={"center"}>
+                        <IconButton onClick={handleClickOpenFitler}>
+                            <FilterListIcon htmlColor="white" />
+                        </IconButton>
+                        <IconButton onClick={handleClickNewChat}>
+                            <RateReviewOutlinedIcon htmlColor="white" />
+                        </IconButton>
+                    </Box>
+                </Box>
+            )}
+
             <Typography variant="p" fontSize={12} color="white" pl={2}>
                 {/* Pinned */}固定
             </Typography>
@@ -120,6 +181,16 @@ const ChatSidebar = () => {
                 {/* Recent */}最近
             </Typography>
             <List>
+                {selectedUser && selectedUser.id == "new" && (
+                    <ChatItem
+                        user={selectedUser}
+                        selected={selectedUser}
+                        onClick={handleSetSelectedUser}
+                        pinned={false}
+                        setPin={handleSetPinUser}
+                        count={0}
+                    />
+                )}
                 {recentChats?.map((user) => (
                     <ChatItem
                         key={user.id}

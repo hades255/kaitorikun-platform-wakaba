@@ -4,8 +4,9 @@ import "react-chat-elements/dist/main.css";
 import moment from "moment";
 import "moment/locale/ja";
 import clsx from "clsx";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import api from "../../api";
 import { PUBLIC_HOST } from "../../config";
 import { AnimTypingIcon } from "../../assets/loader";
@@ -68,45 +69,93 @@ const ChatsPage = () => {
         }
     }, [handleReadChat, chats, selectedUser, sending]);
 
+    useEffect(() => {
+        dispatch(actionChat.handleSetCurrentUser(null));
+        // dispatch(    //  todo new chat
+        //     actionChat.handleSetCurrentUser({ id: "new", name: "New Chat" })
+        // );
+    }, [dispatch]);
+
     return (
         <PanelContent title="メッセージ">
             <Box className={classes.container}>
                 {selectedUser ? (
-                    <>
-                        <Box
-                            className={clsx(
-                                "non-scrollbar",
-                                classes.chatWrapper
-                            )}
-                        >
-                            {chats?.map((msg, index) => (
-                                <ChatItem
-                                    key={index}
-                                    chat={msg}
-                                    selectedUser={selectedUser}
-                                    setReply={setReply}
-                                />
-                            ))}
-                            {sending && (
-                                <Box
-                                    display={"flex"}
-                                    justifyContent={"end"}
-                                    px={4}
-                                    py={2}
-                                >
-                                    <AnimTypingIcon />
+                    selectedUser.id == "new" ? (
+                        <>
+                            <Box
+                                className={clsx(
+                                    "non-scrollbar",
+                                    classes.chatWrapper
+                                )}
+                            >
+                                <Box>
+                                    <Box
+                                        display={"flex"}
+                                        alignItems={"center"}
+                                        justifyContent={"stretch"}
+                                        gap={2}
+                                        borderBottom={"1px solid gray"}
+                                    >
+                                        <Typography>To:</Typography>
+                                        <Box width={"100%"}>
+                                            <Typography>
+                                                Enter name, email or phone
+                                                number:
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            display={"flex"}
+                                            alignItems={"center"}
+                                            gap={1}
+                                            flexWrap={"nowrap"}
+                                        >
+                                            <GroupsOutlinedIcon />
+                                            <Typography noWrap>
+                                                Add group name
+                                            </Typography>
+                                        </Box>
+                                    </Box>
                                 </Box>
-                            )}
-                            <Box ref={lastmessage}></Box>
-                        </Box>
-                        <ChatInput
-                            sending={sending}
-                            setSending={setSending}
-                            selectedUser={selectedUser}
-                            reply={reply}
-                            setReply={setReply}
-                        />
-                    </>
+                            </Box>
+                            <ChatInput sending={true} />
+                        </>
+                    ) : (
+                        <>
+                            <Box
+                                className={clsx(
+                                    "non-scrollbar",
+                                    classes.chatWrapper
+                                )}
+                            >
+                                {chats?.map((msg, index) => (
+                                    <ChatItem
+                                        key={index}
+                                        chat={msg}
+                                        selectedUser={selectedUser}
+                                        setReply={setReply}
+                                    />
+                                ))}
+                                {sending && (
+                                    <Box
+                                        display={"flex"}
+                                        justifyContent={"end"}
+                                        px={4}
+                                        py={2}
+                                    >
+                                        <AnimTypingIcon />
+                                    </Box>
+                                )}
+                                <Box ref={lastmessage}></Box>
+                            </Box>
+                            <ChatInput
+                                sending={sending}
+                                setSending={setSending}
+                                selectedUser={selectedUser}
+                                reply={reply}
+                                setReply={setReply}
+                            />
+                        </>
+                    )
                 ) : (
                     <Box
                         display="flex"

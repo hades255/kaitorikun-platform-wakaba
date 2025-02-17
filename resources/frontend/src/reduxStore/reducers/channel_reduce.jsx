@@ -121,7 +121,13 @@ const channels = (state = initialState, actions) => {
                     item.id == data.post_id
                         ? {
                               ...item,
-                              reactions: [...(item.reactions ?? []), data],
+                              // reactions: [...(item.reactions ?? []), data],
+                              reactions: [
+                                  ...(item.reactions ?? []).filter(
+                                      ({ user_id }) => user_id != data.user_id
+                                  ),
+                                  data,
+                              ],
                           }
                         : item
                 ),

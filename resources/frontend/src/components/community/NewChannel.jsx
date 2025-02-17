@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { Box, TextField, Button, Typography, Paper } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import api from "../../api";
+import { useAuth } from "../../contexts/AuthContext";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { ToastNotification, useDispatch, useSelector } from "..";
-import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -34,32 +35,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateChannel = () => {
+    const { auth } = useAuth();
     const classes = useStyles();
     const { preSetCommunityId, setShowChannelEditor, preSetCommunityName } =
         useCommunity();
     const dispatch = useDispatch();
-    const _coms = useSelector(selectorChannel.handleGetCommunities);
-    const _pcoms = useSelector(selectorChannel.handleGetPublicCommunities);
-
-    const coms = useMemo(() => {
-        let res = {};
-        _coms?.forEach((item) => {
-            if (!res[item.id]) res[item.id] = item.name;
-        });
-        _pcoms?.forEach((item) => {
-            if (!res[item.id]) res[item.id] = item.name;
-        });
-        let _res = [];
-        for (let item in res) {
-            _res.push({ id: item, name: res[item] });
-        }
-        return _res;
-    }, [_coms, _pcoms]);
+    const coms = useSelector(selectorChannel.handleGetCommunities);
 
     const [comData, setComData] = useState({
         name: preSetCommunityName,
         description: "",
-        community_id: preSetCommunityId || 1,
+        community_id: preSetCommunityId || undefined,
         icon: "",
         requireApproval: false,
         isPublic: true,
@@ -110,12 +96,18 @@ const CreateChannel = () => {
                         }
                         disabled={preSetCommunityId > 0}
                         className={classes.select}
+                        required
                     >
-                        {coms?.map((item) => (
-                            <option key={item.id} value={item.id}>
-                                {item.name}
-                            </option>
-                        ))}
+                        {coms &&
+                            Array.isArray(coms) &&
+                            auth &&
+                            coms
+                                .filter((item) => item.user_id == auth.id)
+                                .map((item) => (
+                                    <option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </option>
+                                ))}
                     </select>
                 </div>
                 <TextField

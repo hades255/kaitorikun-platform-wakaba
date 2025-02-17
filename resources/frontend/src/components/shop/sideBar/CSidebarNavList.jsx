@@ -28,6 +28,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 const CSidebarNavList = (props) => {
     const dataId = props.data.id;
+    const { auth } = useAuth();
     const classes = useStyles();
     const { unreadTab, clearScomUnreadTab } = useNotification();
     const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
@@ -85,7 +86,9 @@ const CSidebarNavList = (props) => {
                         <i className="right fas fa-angle-left" />
                     </p>
                     <div className={"CSidebarNavListItem-setting"}>
-                        <MoreButton data={props.data} />
+                        {auth && auth.id == props.data.user_id && (
+                            <MoreButton data={props.data} />
+                        )}
                     </div>
                 </div>
             ) : (
@@ -103,7 +106,9 @@ const CSidebarNavList = (props) => {
                     />
                     <p>{props.data.title}</p>
                     <div className={"CSidebarNavListItem-setting"}>
-                        <MoreButton data={props.data} />
+                        {auth && auth.id == props.data.user_id && (
+                            <MoreButton data={props.data} />
+                        )}
                     </div>
                 </Link>
             )}
@@ -120,19 +125,21 @@ const CSidebarNavList = (props) => {
                                 submenu="active"
                             />
                         ))}
-                    <div
-                        className={clsx(
-                            "nav-link nav-link-font",
-                            classes.menuItem
-                        )}
-                        onClick={handleClickNew}
-                    >
-                        <i
-                            className="far fa-plus nav-icon"
-                            style={{ minWidth: 24, width: 24 }}
-                        />
-                        <p>チャンネルを作成</p>
-                    </div>
+                    {auth && auth.id == props.data.user_id && (
+                        <div
+                            className={clsx(
+                                "nav-link nav-link-font",
+                                classes.menuItem
+                            )}
+                            onClick={handleClickNew}
+                        >
+                            <i
+                                className="far fa-plus nav-icon"
+                                style={{ minWidth: 24, width: 24 }}
+                            />
+                            <p>チャンネルを作成</p>
+                        </div>
+                    )}
                 </ul>
             )}
             {count > 0 && <div className={classes.countBox}>{count}</div>}

@@ -1,11 +1,20 @@
-import { useMemo, useState } from "react";
-import { Box, TextField, Button, Typography, Paper } from "@mui/material";
+import { useCallback, useMemo, useState } from "react";
+import {
+    Box,
+    TextField,
+    Button,
+    Typography,
+    Paper,
+    Avatar,
+    IconButton,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import { ToastNotification, useDispatch, useSelector } from "..";
+import { CloseOutlined } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -34,13 +43,77 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CreateChannel = () => {
+const preChannelItems = [
+    { title: "一般", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "全体周知", color: "lightgray", icon: "far fa-circle nav-icon" },
+    {
+        title: "WAKAVAパスワード",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    { title: "ヤフオク", color: "lightgray", icon: "far fa-circle nav-icon" },
+    {
+        title: "幹部会議連絡",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    { title: "基準外", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "研修", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "店舗間連絡", color: "lightgray", icon: "far fa-circle nav-icon" },
+    {
+        title: "月毎のキャンペーン",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    {
+        title: "買取り実績ブログ",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    {
+        title: "生駒OOOOOOOO店",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    { title: "一般", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "業務連絡", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "1日の報告", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "決裁", color: "lightgray", icon: "far fa-circle nav-icon" },
+    {
+        title: "業者の売却報告",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    { title: "入出金", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "発注依頼", color: "lightgray", icon: "far fa-circle nav-icon" },
+    {
+        title: "購入依頼と送料支払報告",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    { title: "出張買取", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "業者来訪", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "シフト", color: "lightgray", icon: "far fa-circle nav-icon" },
+    {
+        title: "業務情報/引継ぎ",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+    {
+        title: "スターフ会議",
+        color: "lightgray",
+        icon: "far fa-circle nav-icon",
+    },
+];
+
+const CreateChannel = ({ page }) => {
     const { auth } = useAuth();
     const classes = useStyles();
     const { preSetCommunityId, setShowChannelEditor, preSetCommunityName } =
         useCommunity();
     const dispatch = useDispatch();
     const coms = useSelector(selectorChannel.handleGetCommunities);
+    const [hidePre, sethidePre] = useState(page);
 
     const [comData, setComData] = useState({
         name: preSetCommunityName,
@@ -75,84 +148,167 @@ const CreateChannel = () => {
         saveChannel();
     };
 
+    const handleClickShowPre = useCallback(() => sethidePre(false), []);
+    const handleClose = useCallback(() => {
+        setShowChannelEditor(false);
+    }, [setShowChannelEditor]);
+    const handleClickPreItem = useCallback(
+        (param) => {
+            setComData({ ...comData, name: param });
+            sethidePre(true);
+        },
+        [comData]
+    );
+
     return (
-        <Paper sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
+        <Paper sx={{ p: 4, maxWidth: "100%", position: "relative" }}>
+            <IconButton
+                onClick={handleClose} 
+                sx={{
+                    position: "absolute",
+                    top: 16,
+                    right: 16,
+                }}
+            >
+                <CloseOutlined />
+            </IconButton>
             <Typography variant="h5" sx={{ mb: 3 }}>
                 チャネルの作成
             </Typography>
 
-            <form onSubmit={handleSubmit} className={classes.formContainer}>
-                <div className={classes.formGroup}>
-                    <span className={classes.label}>
-                        チャネルをチームに追加する*
-                    </span>
-                    <select
-                        value={comData.community_id}
+            {!hidePre && (
+                <Box
+                    sx={{ maxHeight: 400, overflowY: "scroll" }}
+                    className="non-scrollbar"
+                >
+                    <Box display={"flex"} flexWrap={"wrap"}>
+                        <PreChannelItem
+                            title={"自分で作る"}
+                            color={"lightgray"}
+                            icon={"far fa-plus nav-icon"}
+                            value={""}
+                            onClick={handleClickPreItem}
+                        />
+                    </Box>
+                    <Typography my={1}>テンプレートから始める</Typography>
+                    <Box display={"flex"} flexWrap={"wrap"}>
+                        {preChannelItems.map((item, index) => (
+                            <PreChannelItem
+                                key={index}
+                                {...item}
+                                value={item.title}
+                                onClick={handleClickPreItem}
+                            />
+                        ))}
+                    </Box>
+                </Box>
+            )}
+
+            {hidePre && (
+                <form onSubmit={handleSubmit} className={classes.formContainer}>
+                    <div className={classes.formGroup}>
+                        {!page && (
+                            <Button onClick={handleClickShowPre}>戻る</Button>
+                        )}
+                        <span className={classes.label}>
+                            チャネルをチームに追加する*
+                        </span>
+                        <select
+                            value={comData.community_id}
+                            onChange={(e) =>
+                                setComData({
+                                    ...comData,
+                                    community_id: e.target.value,
+                                })
+                            }
+                            disabled={preSetCommunityId > 0}
+                            className={classes.select}
+                            required
+                        >
+                            {coms &&
+                                Array.isArray(coms) &&
+                                auth &&
+                                coms
+                                    .filter((item) => item.user_id == auth.id)
+                                    .map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </option>
+                                    ))}
+                        </select>
+                    </div>
+                    <TextField
+                        fullWidth
+                        label="チャネル名"
+                        placeholder="文字、数字、スペースを使用できます"
+                        value={comData.name}
                         onChange={(e) =>
                             setComData({
                                 ...comData,
-                                community_id: e.target.value,
+                                name: e.target.value,
                             })
                         }
-                        disabled={preSetCommunityId > 0}
-                        className={classes.select}
                         required
-                    >
-                        {coms &&
-                            Array.isArray(coms) &&
-                            auth &&
-                            coms
-                                .filter((item) => item.user_id == auth.id)
-                                .map((item) => (
-                                    <option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </option>
-                                ))}
-                    </select>
-                </div>
-                <TextField
-                    fullWidth
-                    label="チャネル名"
-                    placeholder="文字、数字、スペースを使用できます"
-                    value={comData.name}
-                    onChange={(e) =>
-                        setComData({
-                            ...comData,
-                            name: e.target.value,
-                        })
-                    }
-                    required
-                    sx={{ mb: 2 }}
-                />
-                <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="説明"
-                    placeholder="他のユーザーが、適切なチャネルを見つけられるように説明を入力します"
-                    value={comData.description}
-                    onChange={(e) =>
-                        setComData({
-                            ...comData,
-                            description: e.target.value,
-                        })
-                    }
-                    sx={{ mb: 2 }}
-                />
-                <Box display="flex" justifyContent={"end"} sx={{ gap: 2 }}>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setShowChannelEditor(false)}
-                    >
-                        キャンセル
-                    </Button>
-                    <Button variant="contained" type="submit">
-                        作成
-                    </Button>
-                </Box>
-            </form>
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="説明"
+                        placeholder="他のユーザーが、適切なチャネルを見つけられるように説明を入力します"
+                        value={comData.description}
+                        onChange={(e) =>
+                            setComData({
+                                ...comData,
+                                description: e.target.value,
+                            })
+                        }
+                        sx={{ mb: 2 }}
+                    />
+                    <Box display="flex" justifyContent={"end"} sx={{ gap: 2 }}>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setShowChannelEditor(false)}
+                        >
+                            キャンセル
+                        </Button>
+                        <Button variant="contained" type="submit">
+                            作成
+                        </Button>
+                    </Box>
+                </form>
+            )}
         </Paper>
     );
 };
 
 export default CreateChannel;
+
+const PreChannelItem = ({ title, icon, color, value, onClick }) => {
+    const handleClick = () => onClick(value);
+
+    return (
+        <Box pr={2} py={1} width={"50%"}>
+            <Box
+                onClick={handleClick}
+                display={"flex"}
+                alignItems={"center"}
+                gap={1}
+                borderRadius={2}
+                border={"1px solid lightgrey"}
+                p={2}
+                boxShadow={"2px 3px 4px #0004"}
+                sx={{ cursor: "pointer" }}
+            >
+                <Avatar
+                    sx={{ bgcolor: color, width: 48, height: 48 }}
+                    variant="rounded"
+                >
+                    <i className={icon}></i>
+                </Avatar>
+                <Box>{title}</Box>
+            </Box>
+        </Box>
+    );
+};

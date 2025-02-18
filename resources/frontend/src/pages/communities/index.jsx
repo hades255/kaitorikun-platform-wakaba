@@ -54,12 +54,15 @@ const Communities = ({ match }) => {
             const fetchPosts = async () => {
                 try {
                     const response = await api.get(`channels/${param}`);
+                    const channel = response.data.channel;
+                    const community = channel.community;
+                    const users = community.users;
                     dispatch(
                         actionChannel.handleSelectChannel({
-                            community: response.data.community,
-                            channel: response.data.channel,
                             posts: response.data.posts,
-                            users: response.data.users,
+                            community,
+                            channel,
+                            users,
                         })
                     );
                 } catch (error) {

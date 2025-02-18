@@ -9,7 +9,7 @@ import menu1 from "./menu1";
 import menu2 from "./menu2";
 import menu3 from "./menu3";
 import ChatSidebar from "./Chat";
-import ChannelSidebar from "./Channel";
+import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
 import SidebarNavList from "./SidebarNavList";
 import Menu4Sidebar from "./Menu4Sidebar";
 
@@ -39,7 +39,7 @@ const Sidebar = (props) => {
 
     useEffect(() => {
         let userData = getItem("userdata");
-        
+
         if (userData.role <= 3) {
             let newMenu = [];
             menu1?.forEach((element) => {
@@ -145,19 +145,16 @@ const Sidebar = (props) => {
                                 <div
                                     className="nav-link nav-link-font"
                                     style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: 4,
                                         cursor: "pointer",
                                     }}
                                 >
-                                    {/* <AddNewCommunityButton page={false} /> */}
-                                    <p>生駒OOOOOOOO店</p>
+                                    <AddNewCommunityButton page={false} />
+                                    {/* <p>生駒OOOOOOOO店</p> */}
                                 </div>
                             </li>
                         </ul>
-                        {/* <ChannelSidebar page={false} /> */}
-                        <Menu4Sidebar />
+                        <ChannelSidebar page={false} />
+                        {/* <Menu4Sidebar /> */}
                     </nav>
                 )}
             </div>

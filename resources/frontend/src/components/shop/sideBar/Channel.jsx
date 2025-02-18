@@ -127,46 +127,46 @@ export const AddNewCommunityButton = ({ page = true }) => {
 
     return (
         <>
-            <Box>
-                <Box
-                    id="basic-button"
-                    aria-controls={open ? "basic-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                    sx={{ color: "white" }}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems={"center"}
-                >
-                    <Typography>コミュニティ</Typography>
-                    <IconButton onClick={handleClick}>
-                        <i
-                            className="far fa-plus nav-icon text-white"
-                            style={{ minWidth: 24, width: 24 }}
-                        />
-                    </IconButton>
-                </Box>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                    MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                    }}
-                >
+            <Box
+                id="basic-button"
+                aria-controls={open ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                sx={{ color: "white" }}
+                display="flex"
+                justifyContent="space-between"
+                alignItems={"center"}
+            >
+                <Typography>コミュニティ</Typography>
+                <IconButton onClick={handleClick}>
+                    <i
+                        className="far fa-plus nav-icon text-white"
+                        style={{ minWidth: 24, width: 24 }}
+                    />
+                </IconButton>
+            </Box>
+            <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                }}
+            >
+                {page && (
                     <MenuItem onClick={handleNewChannel}>
                         {/* Add Channel */}チャンネルを追加
                     </MenuItem>
-                    <MenuItem onClick={handleNewCommunity}>
-                        {/* Add Community */}コミュニティを追加
-                    </MenuItem>
-                    {/* <MenuItem onClick={handleClose}> */}
-                    {/* Join Community */}
-                    {/* コミュニティに参加 */}
-                    {/* </MenuItem> */}
-                </Menu>
-            </Box>
+                )}
+                <MenuItem onClick={handleNewCommunity}>
+                    {/* Add Community */}コミュニティを追加
+                </MenuItem>
+                {/* <MenuItem onClick={handleClose}> */}
+                {/* Join Community */}
+                {/* コミュニティに参加 */}
+                {/* </MenuItem> */}
+            </Menu>
             {showCommunityEditor && (
                 <Dialog
                     open={showCommunityEditor}
@@ -181,8 +181,10 @@ export const AddNewCommunityButton = ({ page = true }) => {
                 <Dialog
                     open={showChannelEditor}
                     onClose={() => setShowChannelEditor(false)}
+                    maxWidth={"md"}
+                    fullWidth={true}
                 >
-                    <CreateChannel />
+                    <CreateChannel page={page} />
                 </Dialog>
             )}
         </>

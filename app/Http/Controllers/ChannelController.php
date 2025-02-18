@@ -59,9 +59,9 @@ class ChannelController extends Controller
         $sortOrder = $request->input('sort_order', 'desc');
         $posts = $channel->limitedPosts($limit, $offset, $sortBy, $sortOrder);
 
-        $users = $channel->users;
+        $users = $channel->community->users;
 
-        return response()->json(["posts" => $posts, "users" => $users, "channel" => $channel, "community" => $channel->community]);
+        return response()->json(["posts" => $posts, "channel" => $channel,]);
     }
 
     public function update(Request $request, Channel $channel)

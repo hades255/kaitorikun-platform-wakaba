@@ -46,7 +46,9 @@ const CreateCommunity = ({ page = true }) => {
                 dispatch(
                     actionChannel.handleAddCommunity({
                         ...response.data.community,
-                        channels: [response.data.channel],
+                        channels: response.data.channel
+                            ? [response.data.channel]
+                            : [],
                     })
                 );
                 setShowCommunityEditor(false);

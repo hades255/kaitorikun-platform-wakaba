@@ -8,6 +8,7 @@ use App\Http\Controllers\StaffManage\StaffController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatgroupController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\CustomerManage\ItemsController;
 use App\Http\Controllers\FileUploadController;
@@ -91,12 +92,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('postreaction/toggle', [PostReactionController::class, 'toggle'])->name('postreaction.toggle');
 
     Route::get('chats', [ChatController::class, 'index']);
+    Route::get('chats/users', [ChatController::class, 'users'])->name('chats.users');
     Route::post('chats', [ChatController::class, 'store'])->name('chats.store');
     Route::post('chats/files', [ChatController::class, 'store_files'])->name('chats.store_files');
     Route::patch('chats', [ChatController::class, 'read'])->name('chats.read');
     Route::delete('chats/{chat}', [ChatController::class, 'destroy'])->name('chats.destroy');
+    Route::post('chatgroups', [ChatgroupController::class, 'store'])->name('chatgroups.store');
 
     Route::get('users', [UserController::class, 'index']);
+    Route::get('users/search', [UserController::class, 'search_users'])->name('users.search');
 
     Route::get('events', [CalendarEventController::class, 'index']);
     Route::post('events', [CalendarEventController::class, 'store'])->name('events.store');

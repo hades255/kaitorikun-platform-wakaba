@@ -34,10 +34,13 @@ const chats = (state = initialState, actions) => {
             };
         case SET_CHATS:
             let recently = [];
-            actions.payload.data.forEach((item) => {
-                if (!recently?.includes(item.from)) recently.push(item.from);
-                if (!recently?.includes(item.to)) recently.push(item.to);
-            });
+            // actions.payload.data.forEach((item) => {
+            //     if (item.type == "chat") {
+            //         if (!recently?.includes(item.from))
+            //             recently.push(item.from);
+            //         if (!recently?.includes(item.to)) recently.push(item.to);
+            //     }
+            // });
             return { ...state, chats: actions.payload.data, recently };
         case READ_CHATS:
             return {
@@ -60,36 +63,27 @@ const chats = (state = initialState, actions) => {
                 ),
             };
         case ADD_USER:
-            return { ...state };
+            return { ...state, users: [actions.payload.data, ...state.users] };
         case SET_USER_STATUS:
             return { ...state };
         case PIN_USER:
             if (actions.payload.data.pinned) {
+                const pinned = [...state.pinned, actions.payload.data.userId];
                 localStorage.setItem(
                     "pinned_chat_user",
-                    JSON.stringify([
-                        ...state.pinned,
-                        actions.payload.data.userId,
-                    ])
+                    JSON.stringify(pinned)
                 );
+                return { ...state, pinned };
             } else {
+                const pinned = state.pinned?.filter(
+                    (item) => item != actions.payload.data.userId
+                );
                 localStorage.setItem(
                     "pinned_chat_user",
-                    JSON.stringify(
-                        state.pinned?.filter(
-                            (item) => item != actions.payload.data.userId
-                        )
-                    )
+                    JSON.stringify(pinned)
                 );
+                return { ...state, pinned };
             }
-            return {
-                ...state,
-                pinned: actions.payload.data.pinned
-                    ? [...state.pinned, actions.payload.data.userId]
-                    : state.pinned?.filter(
-                          (item) => item != actions.payload.data.userId
-                      ),
-            };
         case SET_CURRENT_USER:
             return { ...state, current: actions.payload.data };
         default:

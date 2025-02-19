@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
 import myEcho from "../helper/Echo";
@@ -8,6 +8,7 @@ import {
     actionChannel,
     actionSChannel,
     selectorChannel,
+    selectorChat,
 } from "../../reduxStore";
 import { actionChat } from "../../reduxStore/actions/chat_action";
 
@@ -16,6 +17,14 @@ const Notifications = () => {
     const { auth } = useAuth();
     const { updateUnreadTab, showNotification } = useNotification();
     const coms = useSelector(selectorChannel.handleGetCommunities);
+    const users = useSelector(selectorChat.handleGetUsers);
+    const groups = useMemo(
+        () =>
+            users
+                .filter((item) => item.type == "group")
+                .map((item) => item.id.toString()),
+        [users]
+    );
 
     const [comIds, setComIds] = useState([]);
     const [scomIds, setSComIds] = useState([]);
@@ -114,8 +123,9 @@ const Notifications = () => {
                 auth &&
                 data &&
                 data.chat &&
-                data.chat.to == auth?.id &&
-                data.chat.from != auth?.id
+                data.chat.from != auth?.id &&
+                (data.chat.to == auth?.id ||
+                    groups.includes(data.chat.group_id.toString()))
             ) {
                 dispatch(actionChat.handleReceiveChat(data.chat));
                 updateUnreadTab("chat", true);
@@ -177,47 +187,44 @@ const Notifications = () => {
                 channel.stopListening(".channel.removed");
             }
         };
-    }, [dispatch, showNotification, updateUnreadTab, auth, comIds, scomIds]);
+    }, [
+        dispatch,
+        showNotification,
+        updateUnreadTab,
+        auth,
+        comIds,
+        scomIds,
+        groups,
+    ]);
 
     useEffect(() => {
         if (auth) {
-            //  todo    get notifications
-            // const getUnreadNotifications = async () => {
-            //     try {
-            //     } catch (error) {
-            //         console.log(error);
-            //     }
-            // };
-            //  get all users
-            const getUsers = async () => {
+            const getChatUsers = async () => {
                 try {
-                    const response = await api.get("users");
-                    dispatch(actionChat.handleSetUsers(response.data));
+                    const response = await api.get("chats/users");
+                    dispatch(
+                        actionChat.handleSetUsers([
+                            ...response.data.users,
+                            ...response.data.groups,
+                        ])
+                    );
                 } catch (error) {
                     console.log(error);
                 }
             };
-            //  get all chats
             const getMyChats = async () => {
                 try {
                     const response = await api.get("chats");
-                    dispatch(actionChat.handleSetChats(response.data));
+                    dispatch(
+                        actionChat.handleSetChats([
+                            ...response.data.chats,
+                            ...response.data.groupChats,
+                        ])
+                    );
                 } catch (error) {
                     console.log(error);
                 }
             };
-            // const getMineCommunities = async () => {
-            //     try {
-            //         const response = await api.get(`communities/mine`);
-            //         dispatch(
-            //             actionChannel.handleSetCommunity(
-            //                 response.data.communities
-            //             )
-            //         );
-            //     } catch (error) {
-            //         console.log(error);
-            //     }
-            // };
             const getMenusFunc = async () => {
                 try {
                     const response = await api.get("schannels");
@@ -226,10 +233,9 @@ const Notifications = () => {
                     console.log(error);
                 }
             };
-            getUsers();
+            getChatUsers();
             getMyChats();
             getMenusFunc();
-            // getMineCommunities();
         }
     }, [dispatch, auth]);
 

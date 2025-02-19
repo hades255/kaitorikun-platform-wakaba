@@ -4,17 +4,17 @@ import "react-chat-elements/dist/main.css";
 import moment from "moment";
 import "moment/locale/ja";
 import clsx from "clsx";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import api from "../../api";
 import { PUBLIC_HOST } from "../../config";
 import { AnimTypingIcon } from "../../assets/loader";
 import { useAuth } from "../../contexts/AuthContext";
 import { selectorChat } from "../../reduxStore/selector/selectorChat";
 import { actionChat } from "../../reduxStore/actions/chat_action";
-import ChatInput from "../../components/chat/ChatInput";
 import { PanelContent, useDispatch, useSelector } from "../../components";
+import ChatInput from "../../components/chat/ChatInput";
+import NewGroupChat from "../../components/chat/NewGroupChat";
 import "./style.css";
 
 moment.locale("ja");
@@ -32,10 +32,13 @@ const ChatsPage = () => {
 
     const chats = useMemo(() => {
         if (auth && selectedUser && Array.isArray(_chats) && _chats.length > 0)
-            return _chats?.filter(
-                ({ from, to }) =>
-                    (from == auth?.id && to == selectedUser.id) ||
-                    (from == selectedUser.id && to == auth?.id)
+            return _chats?.filter(({ from, to, group_id }) =>
+                selectedUser.type == "chat"
+                    ? (from == auth?.id && to == selectedUser.id) ||
+                      (from == selectedUser.id && to == auth?.id)
+                    : selectedUser.type == "group"
+                    ? group_id == selectedUser.id
+                    : false
             );
         return [];
     }, [auth, selectedUser, _chats]);
@@ -71,9 +74,6 @@ const ChatsPage = () => {
 
     useEffect(() => {
         dispatch(actionChat.handleSetCurrentUser(null));
-        // dispatch(    //  todo new chat
-        //     actionChat.handleSetCurrentUser({ id: "new", name: "New Chat" })
-        // );
     }, [dispatch]);
 
     return (
@@ -88,34 +88,7 @@ const ChatsPage = () => {
                                     classes.chatWrapper
                                 )}
                             >
-                                <Box>
-                                    <Box
-                                        display={"flex"}
-                                        alignItems={"center"}
-                                        justifyContent={"stretch"}
-                                        gap={2}
-                                        borderBottom={"1px solid gray"}
-                                    >
-                                        <Typography>To:</Typography>
-                                        <Box width={"100%"}>
-                                            <Typography>
-                                                Enter name, email or phone
-                                                number:
-                                            </Typography>
-                                        </Box>
-                                        <Box
-                                            display={"flex"}
-                                            alignItems={"center"}
-                                            gap={1}
-                                            flexWrap={"nowrap"}
-                                        >
-                                            <GroupsOutlinedIcon />
-                                            <Typography noWrap>
-                                                Add group name
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
+                                <NewGroupChat />
                             </Box>
                             <ChatInput sending={true} />
                         </>
@@ -175,6 +148,7 @@ const ChatsPage = () => {
 export default ChatsPage;
 
 const ChatItem = ({ chat, selectedUser, setReply }) => {
+    const { auth } = useAuth();
     const dispatch = useDispatch();
 
     const type = chat.type.startsWith("video/")
@@ -239,7 +213,7 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
         <div>
             <MessageBox
                 id={chat.id}
-                position={chat.to === selectedUser.id ? "right" : "left"}
+                position={chat.from === auth.id ? "right" : "left"}
                 type={type}
                 // title={chat.content}
                 text={chat.content}
@@ -289,8 +263,8 @@ const useStyles = makeStyles((theme) => ({
         marginRight: "auto",
     },
     chatWrapper: {
-        height: "calc(100% - 56px)",
-        maxHeight: "calc(100% - 56px)",
+        height: "calc(100% - 44px)",
+        maxHeight: "calc(100% - 44px)",
         overflowY: "scroll",
     },
 }));

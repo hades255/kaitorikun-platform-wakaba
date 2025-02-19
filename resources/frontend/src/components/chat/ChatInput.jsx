@@ -39,10 +39,16 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
             setSending(true);
             const newMessage = {
                 content: message,
-                to: selectedUser.id,
+                to:
+                    selectedUser.type == "chat"
+                        ? selectedUser.id
+                        : reply
+                        ? reply.id
+                        : 0,
                 status: "unread",
                 reply: reply ? reply.id : 0,
                 emoji: "",
+                group_id: selectedUser.type == "group" ? selectedUser.id : null,
             };
             try {
                 const response = await api.post("chats", newMessage);
@@ -198,7 +204,8 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
                             onChange={(e) => setMessage(e.target.value)}
                             // placeholder="Type a message..."
                             placeholder="メッセージを入力..."
-                            sx={{ mr: 1, py: 0, borderRadius: 20 }}
+                            sx={{ mr: 1, py: 0 }}
+                            size="small"
                             disabled={sending}
                         />
                         <IconButton

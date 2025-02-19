@@ -62,4 +62,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(ChannelUser::class);
     }
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class, 'from')->orWhere('to', $this->id);
+    }
+
+    public function chatgroups()
+    {
+        return $this->belongsToMany(Chatgroup::class, 'chatgroup_users', 'user_id', 'chatgroup_id')->with("users");
+    }
+
+    public function chatgroupsAccepted()
+    {
+        return $this->belongsToMany(Chatgroup::class, 'chatgroup_users', 'user_id', 'chatgroup_id')->where('status', 'accepted')->with("users");
+    }
 }

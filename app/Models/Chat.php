@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Chat extends Model
 {
     use HasFactory;
-    protected $fillable = ['from', 'to', 'content', 'status', 'reply', 'emoji', 'type', 'deleted', 'other'];
+    protected $fillable = ['from', 'to', 'content', 'status', 'reply', 'emoji', 'type', 'deleted', 'other', 'group_id'];
 
     public function fromUser()
     {
@@ -38,8 +38,22 @@ class Chat extends Model
                 ->orWhere('to', $userId);
         })
             ->where('deleted', '!=', $userId)
+            ->whereNull('group_id')
             ->with('reply')
             // ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    public static function getChatListWithRepliesInGroups($userId)
+    {
+        $groupIds = self::whereNotNull('group_id')
+            ->select('group_id')
+            ->distinct()
+            ->pluck('group_id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Chatgroup::class, 'group_id');
     }
 }

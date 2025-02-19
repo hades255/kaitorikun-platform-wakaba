@@ -1,0 +1,8 @@
+tags.tagify {
+    height: auto;
+    display: inline-flex;
+}
+
+.tagify__tag {
+    border-radius: 25px;
+}

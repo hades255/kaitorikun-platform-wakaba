@@ -14,6 +14,9 @@ import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import DoneAllOutlinedIcon from "@mui/icons-material/DoneAllOutlined";
+import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import { format, isThisYear, isToday } from "date-fns";
 import { getUserStatusColor } from "../../../feature/action";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -32,38 +35,20 @@ export const formatDate = (dateString) => {
 };
 
 const ChatSidebar = () => {
-    const { auth } = useAuth();
     const dispatch = useDispatch();
 
     const users = useSelector(selectorChat.handleGetUsers);
     const selectedUser = useSelector(selectorChat.handleGetCurrentUser);
     const pinnedUsers = useSelector(selectorChat.handleGetPinned);
-    const recentlyUsers = useSelector(selectorChat.handleGetRecently);
-    const chats = useSelector(selectorChat.handleGetChats);
 
     const [showFilter, setShowFilter] = useState(false);
-
-    const newChatCounts = useMemo(() => {
-        let newChats = {};
-        if (Array.isArray(chats))
-            chats
-                .filter(
-                    (item) =>
-                        item.from !== auth?.id &&
-                        item.to == auth?.id &&
-                        item.status == "unread"
-                )
-                .forEach((chat) => {
-                    if (newChats[chat.from]) newChats[chat.from] += 1;
-                    else newChats[chat.from] = 1;
-                });
-        return newChats;
-    }, [chats, auth]);
 
     const pinnedChats = useMemo(
         () =>
             Array.isArray(users)
-                ? users.filter((item) => pinnedUsers?.includes(item.id))
+                ? users.filter((item) =>
+                      pinnedUsers?.includes((item.type || "") + item.id)
+                  )
                 : [],
         [users, pinnedUsers]
     );
@@ -72,23 +57,23 @@ const ChatSidebar = () => {
             Array.isArray(users)
                 ? users.filter(
                       (item) =>
-                          recentlyUsers?.includes(item.id) &&
-                          !pinnedUsers?.includes(item.id)
+                          //   recentlyUsers?.includes(item.id) &&
+                          !pinnedUsers?.includes((item.type || "") + item.id)
                   )
                 : [],
-        [users, recentlyUsers, pinnedUsers]
+        [users, pinnedUsers]
     );
-    const suggestedUsers = useMemo(
-        () =>
-            Array.isArray(users)
-                ? users.filter(
-                      (item) =>
-                          !recentlyUsers?.includes(item.id) &&
-                          !pinnedUsers?.includes(item.id)
-                  )
-                : [],
-        [users, recentlyUsers, pinnedUsers]
-    );
+    // const suggestedUsers = useMemo(
+    //     () =>
+    //         Array.isArray(users)
+    //             ? users.filter(
+    //                   (item) =>
+    //                       !recentlyUsers?.includes(item.id) &&
+    //                       !pinnedUsers?.includes(item.id)
+    //               )
+    //             : [],
+    //     [users, recentlyUsers, pinnedUsers]
+    // );
 
     const handleSetSelectedUser = useCallback(
         (user) => {
@@ -107,9 +92,9 @@ const ChatSidebar = () => {
     const handleClickOpenFitler = useCallback(() => setShowFilter(true), []);
     const handleClickCloseFitler = useCallback(() => setShowFilter(false), []);
     const handleClickNewChat = useCallback(() => {
-        // dispatch(    //  todo    new chat
-        //     actionChat.handleSetCurrentUser({ id: "new", name: "New Chat" })
-        // );
+        dispatch(
+            actionChat.handleSetCurrentUser({ id: "new", name: "New Chat" })
+        );
     }, [dispatch]);
 
     return (
@@ -170,9 +155,10 @@ const ChatSidebar = () => {
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
-                        pinned={pinnedUsers?.includes(user.id)}
+                        pinned={pinnedUsers?.includes(
+                            (user.type || "") + user.id
+                        )}
                         setPin={handleSetPinUser}
-                        count={newChatCounts[user.id] || 0}
                     />
                 ))}
             </List>
@@ -188,7 +174,6 @@ const ChatSidebar = () => {
                         onClick={handleSetSelectedUser}
                         pinned={false}
                         setPin={handleSetPinUser}
-                        count={0}
                     />
                 )}
                 {recentChats?.map((user) => (
@@ -197,15 +182,16 @@ const ChatSidebar = () => {
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
-                        pinned={pinnedUsers?.includes(user.id)}
+                        pinned={pinnedUsers?.includes(
+                            (user.type || "") + user.id
+                        )}
                         setPin={handleSetPinUser}
-                        count={newChatCounts[user.id] || 0}
                     />
                 ))}
             </List>
 
-            <Typography variant="p" fontSize={12} color="white" pl={2}>
-                {/* Suggested */}おすすめ
+            {/* <Typography variant="p" fontSize={12} color="white" pl={2}>
+                おすすめ
             </Typography>
             <List>
                 {suggestedUsers?.map((user) => (
@@ -214,32 +200,52 @@ const ChatSidebar = () => {
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
-                        pinned={pinnedUsers?.includes(user.id)}
+                        pinned={pinnedUsers?.includes((user.type || "") + user.id)}
                         setPin={handleSetPinUser}
-                        count={newChatCounts[user.id] || 0}
                     />
                 ))}
-            </List>
+            </List> */}
         </Box>
     );
 };
 
 export default ChatSidebar;
 
-const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
+const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
     const chats = useSelector(selectorChat.handleGetChats);
 
     const classes = useStyles();
     const { auth } = useAuth();
+    const count = useMemo(
+        () =>
+            chats.filter((item) => {
+                if (item.group_id && user.type == "group") {
+                    return item.group_id == user.id && item.status == "unread";
+                }
+                if (!item.group_id && user.type == "chat") {
+                    return (
+                        item.from !== auth?.id &&
+                        item.to == auth?.id &&
+                        item.status == "unread"
+                    );
+                }
+                return false;
+            }).length,
+        [chats, user, auth]
+    );
 
     const lastChat = useMemo(() => {
         if (user && Array.isArray(chats) && chats.length > 0) {
             return chats
-                .filter(({ from, to }) =>
-                    auth?.id == user?.id
-                        ? from == auth?.id && to == auth?.id
-                        : from == user?.id || to == user?.id
-                )
+                .filter((item) => {
+                    if (item.group_id && user.type == "group") {
+                        return item.group_id == user.id;
+                    }
+                    if (!item.group_id && user.type == "chat") {
+                        return item.from == auth?.id || item.to == auth?.id;
+                    }
+                    return false;
+                })
                 .sort((a, b) => {
                     if (a.created_at < b.created_at) return 1;
                     if (a.created_at > b.created_at) return -1;
@@ -256,7 +262,7 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
     const handleClickPin = useCallback(
         (e) => {
             e.stopPropagation();
-            setPin(user.id, !pinned);
+            setPin((user.type || "") + user.id, !pinned);
         },
         [setPin, user, pinned]
     );
@@ -286,7 +292,13 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                             )
                         }
                     >
-                        <Avatar alt="Remy Sharp">{user.name[0]}</Avatar>
+                        <Avatar alt="Remy Sharp">
+                            {user.type == "group" ? (
+                                <GroupsOutlinedIcon color="primary" />
+                            ) : (
+                                user.name[0]
+                            )}
+                        </Avatar>
                     </Badge>
                     {/* <Avatar sx={{ width: 32, height: 32, color: "black" }}></Avatar> */}
                     <div
@@ -306,6 +318,21 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin, count }) => {
                             </div>
                         </Box>
                         <div className={classes.userTime}>
+                            {lastChat?.from == auth?.id && (
+                                <>
+                                    {lastChat?.status == "read" ? (
+                                        <DoneAllOutlinedIcon
+                                            fontSize="12"
+                                            color="success"
+                                        />
+                                    ) : (
+                                        <CheckOutlinedIcon
+                                            fontSize="12"
+                                            color="success"
+                                        />
+                                    )}
+                                </>
+                            )}
                             {formatDate(lastChat?.updated_at)}
                         </div>
                     </div>
@@ -382,6 +409,7 @@ const useStyles = makeStyles((theme) => ({
         color: "#9ca3af",
         fontSize: "12px",
         lineHeight: "16px",
+        display: "flex",
     },
     lastMessage: {
         color: "#9ca3af",

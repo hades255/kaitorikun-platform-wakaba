@@ -135,24 +135,6 @@ const Sidebar = (props) => {
                                 />
                             ))}
                         </ul>
-                        <ul
-                            className="nav nav-pills nav-sidebar flex-column"
-                            data-widget="treeview"
-                            role="menu"
-                            data-accordion="false"
-                        >
-                            <li className="nav-item">
-                                <div
-                                    className="nav-link nav-link-font"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <AddNewCommunityButton page={false} />
-                                    {/* <p>生駒OOOOOOOO店</p> */}
-                                </div>
-                            </li>
-                        </ul>
                         <ChannelSidebar page={false} />
                         {/* <Menu4Sidebar /> */}
                     </nav>

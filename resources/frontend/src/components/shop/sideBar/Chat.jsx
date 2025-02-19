@@ -42,26 +42,33 @@ const ChatSidebar = () => {
     const pinnedUsers = useSelector(selectorChat.handleGetPinned);
 
     const [showFilter, setShowFilter] = useState(false);
+    const [search, setSearch] = useState("");
 
     const pinnedChats = useMemo(
         () =>
             Array.isArray(users)
-                ? users.filter((item) =>
-                      pinnedUsers?.includes((item.type || "") + item.id)
-                  )
+                ? users
+                      .filter((item) => item.name.indexOf(search) != -1)
+                      .filter((item) =>
+                          pinnedUsers?.includes((item.type || "") + item.id)
+                      )
                 : [],
-        [users, pinnedUsers]
+        [users, pinnedUsers, search]
     );
     const recentChats = useMemo(
         () =>
             Array.isArray(users)
-                ? users.filter(
-                      (item) =>
-                          //   recentlyUsers?.includes(item.id) &&
-                          !pinnedUsers?.includes((item.type || "") + item.id)
-                  )
+                ? users
+                      .filter((item) => item.name.indexOf(search) != -1)
+                      .filter(
+                          (item) =>
+                              //   recentlyUsers?.includes(item.id) &&
+                              !pinnedUsers?.includes(
+                                  (item.type || "") + item.id
+                              )
+                      )
                 : [],
-        [users, pinnedUsers]
+        [users, pinnedUsers, search]
     );
     // const suggestedUsers = useMemo(
     //     () =>
@@ -90,12 +97,19 @@ const ChatSidebar = () => {
     );
 
     const handleClickOpenFitler = useCallback(() => setShowFilter(true), []);
-    const handleClickCloseFitler = useCallback(() => setShowFilter(false), []);
+    const handleClickCloseFitler = useCallback(() => {
+        setShowFilter(false);
+        setSearch("");
+    }, []);
     const handleClickNewChat = useCallback(() => {
         dispatch(
             actionChat.handleSetCurrentUser({ id: "new", name: "New Chat" })
         );
     }, [dispatch]);
+
+    const handleFilterChange = useCallback((e) => {
+        setSearch(e.target.value);
+    }, []);
 
     return (
         <Box sx={{ py: 2 }}>
@@ -114,8 +128,10 @@ const ChatSidebar = () => {
                     </IconButton> */}
                     <InputBase
                         sx={{ ml: 1, flex: 1, color: "white" }}
-                        placeholder="Search"
-                        inputProps={{ "aria-label": "search" }}
+                        placeholder="検索"
+                        inputProps={{ "aria-label": "検索" }}
+                        onChange={handleFilterChange}
+                        value={search}
                     />
                     {/* <IconButton
                         type="button"

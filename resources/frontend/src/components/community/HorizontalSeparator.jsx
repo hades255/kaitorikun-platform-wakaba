@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-const HorizontalSeparator = ({ TopComponent, BottomComponent }) => {
+const HorizontalSeparator = ({ children, BottomComponent, divider }) => {
     const [splitPosition, setSplitPosition] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -57,7 +56,7 @@ const HorizontalSeparator = ({ TopComponent, BottomComponent }) => {
         setSplitPosition(100);
     };
 
-    return (
+    return divider ? (
         <Box
             id="split-container"
             sx={{
@@ -75,7 +74,7 @@ const HorizontalSeparator = ({ TopComponent, BottomComponent }) => {
                     borderRadius: 0,
                 }}
             >
-                <TopComponent />
+                {children}
             </Box>
 
             <Box
@@ -148,6 +147,8 @@ const HorizontalSeparator = ({ TopComponent, BottomComponent }) => {
                 {BottomComponent}
             </Box>
         </Box>
+    ) : (
+        <>{children}</>
     );
 };
 

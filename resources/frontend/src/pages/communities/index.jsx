@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { withRouter } from "react-router-dom";
 import {
     Avatar,
@@ -13,9 +13,7 @@ import {
     Typography,
 } from "@mui/material";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import LinkIcon from "@mui/icons-material/Link";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import SettingsIcon from "@mui/icons-material/Settings";
 import api from "../../api";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import {
@@ -28,6 +26,8 @@ import Creator from "../../components/community/Creator";
 import { stringAvatar } from "../../components/helper/func";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
+import HorizontalSeparator from "../../components/community/HorizontalSeparator";
+import { preChannelItems } from "../../components/community/NewChannel";
 
 const sepItems = [
     { type: "posts", title: "投稿" },
@@ -48,6 +48,14 @@ const Communities = ({ match }) => {
 
     const [showPostEditor, setShowPostEditor] = useState(false);
     const [showInviteDialog, setShowInviteDialog] = useState(false);
+
+    const divider = useMemo(
+        () =>
+            community?.type == 1 &&
+            preChannelItems.map(({ title }) => title).includes(channel?.name),
+
+        [community, channel]
+    );
 
     const getChannel = useCallback(
         (param) => {
@@ -141,89 +149,99 @@ const Communities = ({ match }) => {
 
     return (
         <PanelContent>
-            <>
-                <ComHeader
-                    community={community}
-                    channel={channel}
-                    handleClickSepCom={handleClickSepCom}
-                    sepCom={comSepType}
-                    setShowInviteDialog={setShowInviteDialog}
-                />
-                <Box display={"flex"} justifyContent={"center"}>
-                    <Box width={"100%"} maxWidth={1024} position={"relative"}>
-                        {channel && (
-                            <>
-                                <Card
-                                    sx={{
-                                        mb: 2,
-                                        bgcolor: "#f4f6f9",
-                                        position:
-                                            showPostEditor && post
-                                                ? "sticky"
-                                                : "static",
-                                        zIndex: 1,
-                                        top: 0,
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Box mb={2}>
-                                            <Creator
-                                                creature={channel}
-                                                users={users}
-                                            />
-                                        </Box>
-                                        {showPostEditor ? (
-                                            <PostEditor
-                                                onPost={handleCreatePost}
-                                                onClose={() =>
-                                                    setShowPostEditor(false)
-                                                }
-                                                initPost={post}
-                                            />
-                                        ) : (
-                                            <Box
-                                                display={"flex"}
-                                                alignItems={"center"}
-                                            >
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={handleClickNewPost}
-                                                    sx={{ mr: 1 }}
-                                                >
-                                                    <PostAddIcon />{" "}
-                                                    新しい投稿を開始
-                                                </Button>
+            <HorizontalSeparator BottomComponent={<></>} divider={divider}>
+                <>
+                    <ComHeader
+                        community={community}
+                        channel={channel}
+                        handleClickSepCom={handleClickSepCom}
+                        sepCom={comSepType}
+                        setShowInviteDialog={setShowInviteDialog}
+                    />
+                    <Box display={"flex"} justifyContent={"center"}>
+                        <Box
+                            width={"100%"}
+                            maxWidth={1024}
+                            position={"relative"}
+                        >
+                            {channel && (
+                                <>
+                                    <Card
+                                        sx={{
+                                            mb: 2,
+                                            bgcolor: "#f4f6f9",
+                                            position:
+                                                showPostEditor && post
+                                                    ? "sticky"
+                                                    : "static",
+                                            zIndex: 1,
+                                            top: 0,
+                                        }}
+                                    >
+                                        <CardContent>
+                                            <Box mb={2}>
+                                                <Creator
+                                                    creature={channel}
+                                                    users={users}
+                                                />
                                             </Box>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                                {Array.isArray(posts) &&
-                                    posts?.map((post) => (
-                                        <Post
-                                            key={post.id}
-                                            post={post}
-                                            channel={channel}
-                                            users={users}
-                                            handleOpenEdit={handleClickEditPost}
-                                        />
-                                    ))}
-                            </>
-                        )}
+                                            {showPostEditor ? (
+                                                <PostEditor
+                                                    onPost={handleCreatePost}
+                                                    onClose={() =>
+                                                        setShowPostEditor(false)
+                                                    }
+                                                    initPost={post}
+                                                />
+                                            ) : (
+                                                <Box
+                                                    display={"flex"}
+                                                    alignItems={"center"}
+                                                >
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={
+                                                            handleClickNewPost
+                                                        }
+                                                        sx={{ mr: 1 }}
+                                                    >
+                                                        <PostAddIcon />{" "}
+                                                        新しい投稿を開始
+                                                    </Button>
+                                                </Box>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                    {Array.isArray(posts) &&
+                                        posts?.map((post) => (
+                                            <Post
+                                                key={post.id}
+                                                post={post}
+                                                channel={channel}
+                                                users={users}
+                                                handleOpenEdit={
+                                                    handleClickEditPost
+                                                }
+                                            />
+                                        ))}
+                                </>
+                            )}
+                        </Box>
                     </Box>
-                </Box>
-                {showInviteDialog && (
-                    <Dialog
-                        open={showInviteDialog}
-                        onClose={() => setShowInviteDialog(false)}
-                    >
-                        <Invitation
-                            onClose={setShowInviteDialog}
-                            community={community}
-                            channel={channel}
-                        />
-                    </Dialog>
-                )}
-            </>
+                    {showInviteDialog && (
+                        <Dialog
+                            open={showInviteDialog}
+                            onClose={() => setShowInviteDialog(false)}
+                        >
+                            <Invitation
+                                onClose={setShowInviteDialog}
+                                community={community}
+                                channel={channel}
+                            />
+                        </Dialog>
+                    )}
+                </>
+            </HorizontalSeparator>
         </PanelContent>
     );
 };

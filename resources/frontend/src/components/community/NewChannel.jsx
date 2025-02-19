@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const preChannelItems = [
+export const preChannelItems = [
     { title: "一般", color: "lightgray", icon: "far fa-circle nav-icon" },
     { title: "全体周知", color: "lightgray", icon: "far fa-circle nav-icon" },
     {
@@ -109,14 +109,14 @@ const preChannelItems = [
 const CreateChannel = ({ page }) => {
     const { auth } = useAuth();
     const classes = useStyles();
-    const { preSetCommunityId, setShowChannelEditor, preSetCommunityName } =
-        useCommunity();
+    const { preSetCommunityId, setShowChannelEditor } = useCommunity();
     const dispatch = useDispatch();
     const coms = useSelector(selectorChannel.handleGetCommunities);
     const [hidePre, sethidePre] = useState(page);
+    const [editName, setEditName] = useState(true);
 
     const [comData, setComData] = useState({
-        name: preSetCommunityName,
+        name: "",
         description: "",
         community_id: preSetCommunityId || undefined,
         icon: "",
@@ -156,6 +156,8 @@ const CreateChannel = ({ page }) => {
         (param) => {
             setComData({ ...comData, name: param });
             sethidePre(true);
+            if (param) setEditName(false);
+            else setEditName(true);
         },
         [comData]
     );
@@ -163,7 +165,7 @@ const CreateChannel = ({ page }) => {
     return (
         <Paper sx={{ p: 4, maxWidth: "100%", position: "relative" }}>
             <IconButton
-                onClick={handleClose} 
+                onClick={handleClose}
                 sx={{
                     position: "absolute",
                     top: 16,
@@ -250,6 +252,7 @@ const CreateChannel = ({ page }) => {
                         }
                         required
                         sx={{ mb: 2 }}
+                        disabled={!editName}
                     />
                     <TextField
                         fullWidth

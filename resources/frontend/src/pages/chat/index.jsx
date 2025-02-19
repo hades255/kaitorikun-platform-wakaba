@@ -44,10 +44,18 @@ const ChatsPage = () => {
     }, [auth, selectedUser, _chats]);
 
     const handleReadChat = useCallback(
-        async (userId) => {
+        async (selectedUser) => {
             try {
-                await api.patch("chats", { userId });
-                dispatch(actionChat.handleReadChats(userId));
+                await api.patch("chats", {
+                    userId: selectedUser.id,
+                    type: selectedUser.type,
+                });
+                dispatch(
+                    actionChat.handleReadChats({
+                        id: selectedUser.id,
+                        type: selectedUser.type,
+                    })
+                );
             } catch (error) {
                 console.log(error);
             }
@@ -62,11 +70,15 @@ const ChatsPage = () => {
                 if (
                     chats.find(
                         (item) =>
-                            item.from == selectedUser.id &&
-                            item.status === "unread"
+                            (selectedUser.type == "chat" &&
+                                item.from == selectedUser.id &&
+                                item.status === "unread") ||
+                            (selectedUser.type == "group" &&
+                                item.group_id == selectedUser.id &&
+                                item.status === "unread")
                     )
                 ) {
-                    handleReadChat(selectedUser.id);
+                    handleReadChat(selectedUser);
                 }
             }
         }

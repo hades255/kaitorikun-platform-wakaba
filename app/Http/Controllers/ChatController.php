@@ -171,7 +171,11 @@ class ChatController extends Controller
 
     public function read(Request $request)
     {
-        DB::table("chats")->where("from", $request->userId)->where("to", Auth::id())->where("status", "unread")->update(["status" => "read"]);
+        if ($request->type == "chat")
+            DB::table("chats")->where("from", $request->userId)->where("to", Auth::id())->where("status", "unread")->update(["status" => "read"]);
+        if ($request->type == "group")
+            DB::table("chats")->where("group_id", $request->userId)->where("status", "unread")->update(["status" => "read"]);
+
         return response()->noContent();
     }
 }

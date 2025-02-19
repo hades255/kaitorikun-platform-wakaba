@@ -20,55 +20,54 @@ const initialState = {
     current: null,
 };
 const chats = (state = initialState, actions) => {
+    const data = actions.payload?.data;
     switch (actions.type) {
         case RECEIVE_CHAT:
             let recentlyChat = [];
-            if (!state.recently?.includes(actions.payload.data.from))
-                recentlyChat.push(actions.payload.data.from);
-            if (!state.recently?.includes(actions.payload.data.to))
-                recentlyChat.push(actions.payload.data.to);
+            if (!state.recently?.includes(data.from))
+                recentlyChat.push(data.from);
+            if (!state.recently?.includes(data.to)) recentlyChat.push(data.to);
             return {
                 ...state,
-                chats: [...state.chats, actions.payload.data],
+                chats: [...state.chats, data],
                 recently: [...state.recently, ...recentlyChat],
             };
         case SET_CHATS:
             let recently = [];
-            // actions.payload.data.forEach((item) => {
+            // data.forEach((item) => {
             //     if (item.type == "chat") {
             //         if (!recently?.includes(item.from))
             //             recently.push(item.from);
             //         if (!recently?.includes(item.to)) recently.push(item.to);
             //     }
             // });
-            return { ...state, chats: actions.payload.data, recently };
+            return { ...state, chats: data, recently };
         case READ_CHATS:
             return {
                 ...state,
                 chats: state.chats?.map((item) => ({
                     ...item,
                     status:
-                        item.from == actions.payload.data
+                        (data.type == "chat" && item.from == data.id) ||
+                        (data.type === "group" && item.group_id == data.id)
                             ? "read"
                             : item.status,
                 })),
             };
         case SET_USERS:
-            return { ...state, users: actions.payload.data };
+            return { ...state, users: data };
         case DELETE_CHATS:
             return {
                 ...state,
-                chats: state.chats?.filter(
-                    (item) => item.id !== actions.payload.data
-                ),
+                chats: state.chats?.filter((item) => item.id !== data),
             };
         case ADD_USER:
-            return { ...state, users: [actions.payload.data, ...state.users] };
+            return { ...state, users: [data, ...state.users] };
         case SET_USER_STATUS:
             return { ...state };
         case PIN_USER:
-            if (actions.payload.data.pinned) {
-                const pinned = [...state.pinned, actions.payload.data.userId];
+            if (data.pinned) {
+                const pinned = [...state.pinned, data.userId];
                 localStorage.setItem(
                     "pinned_chat_user",
                     JSON.stringify(pinned)
@@ -76,7 +75,7 @@ const chats = (state = initialState, actions) => {
                 return { ...state, pinned };
             } else {
                 const pinned = state.pinned?.filter(
-                    (item) => item != actions.payload.data.userId
+                    (item) => item != data.userId
                 );
                 localStorage.setItem(
                     "pinned_chat_user",
@@ -85,7 +84,7 @@ const chats = (state = initialState, actions) => {
                 return { ...state, pinned };
             }
         case SET_CURRENT_USER:
-            return { ...state, current: actions.payload.data };
+            return { ...state, current: data };
         default:
             return state;
     }

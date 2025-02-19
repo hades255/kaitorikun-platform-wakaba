@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('chatgroup_id');
             $table->bigInteger('user_id');
             $table->enum("status", ["pending", "viewed", "accepted", "rejected"])->default("pending");
+            $table->string('token')->default("");
             $table->timestamps();
         });
     }

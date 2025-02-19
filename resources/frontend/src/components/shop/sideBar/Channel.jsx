@@ -32,17 +32,21 @@ const ChannelSidebar = ({ page = true }) => {
                     if (page && item.type) return;
                     let children = [];
                     if (item.channels && Array.isArray(item.channels)) {
-                        item.channels.forEach((cha) => {
-                            children.push({
-                                id: cha.id,
-                                path: "#",
-                                title: cha.name,
-                                user_id: cha.user_id,
-                                icon: null,
-                                mood: "cha",
-                                type: cha.type,
+                        item.channels
+                            .sort((a, b) =>
+                                a.type > b.type ? 1 : a.type < b.type ? -1 : 0
+                            )
+                            .forEach((cha) => {
+                                children.push({
+                                    id: cha.id,
+                                    path: "#",
+                                    title: cha.name,
+                                    user_id: cha.user_id,
+                                    icon: null,
+                                    mood: "cha",
+                                    type: cha.type,
+                                });
                             });
-                        });
                     }
                     res.push({
                         id: item.id,

@@ -28,13 +28,14 @@ class ChannelController extends Controller
             'description' => 'nullable|string|max:1000',
             'icon' => 'nullable|string|max:255',
             'community_id' => 'required|integer',
+            'type' => 'required|boolean',
         ]);
         $channel = new Channel();
         $channel->name = $validatedData['name'];
         $channel->description = $validatedData['description'];
         $channel->icon = $validatedData['icon'];
         $channel->community_id = $validatedData['community_id'];
-        $channel->type = 1;
+        $channel->type = $validatedData['type'];
         $channel->user_id = Auth::id();
         if ($channel->save()) {
             NewChannelJob::dispatch($channel, Auth::user()->name);

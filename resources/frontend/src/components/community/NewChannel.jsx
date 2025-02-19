@@ -128,7 +128,10 @@ const CreateChannel = ({ page }) => {
         e.preventDefault();
         const saveChannel = async () => {
             try {
-                const response = await api.post("channels", comData);
+                const response = await api.post("channels", {
+                    ...comData,
+                    type: editName,
+                });
                 ToastNotification(
                     "success",
                     "チャンネルが正常に作成されました"
@@ -149,9 +152,10 @@ const CreateChannel = ({ page }) => {
     };
 
     const handleClickShowPre = useCallback(() => sethidePre(false), []);
-    const handleClose = useCallback(() => {
-        setShowChannelEditor(false);
-    }, [setShowChannelEditor]);
+    const handleClose = useCallback(
+        () => setShowChannelEditor(false),
+        [setShowChannelEditor]
+    );
     const handleClickPreItem = useCallback(
         (param) => {
             setComData({ ...comData, name: param });
@@ -289,7 +293,19 @@ const CreateChannel = ({ page }) => {
 export default CreateChannel;
 
 const PreChannelItem = ({ title, icon, color, value, onClick }) => {
-    const handleClick = () => onClick(value);
+    const { preSetCommunityId } = useCommunity();
+    const coms = useSelector(selectorChannel.handleGetCommunities);
+
+    const disabled = useMemo(() => {
+        const com = coms.find(({ id }) => id == preSetCommunityId);
+        return com && com.channels
+            ? com.channels.map(({ name }) => name).includes(title)
+            : false;
+    }, [coms, preSetCommunityId, title]);
+
+    const handleClick = useCallback(() => {
+        if (!disabled) onClick(value);
+    }, [onClick, disabled, value]);
 
     return (
         <Box pr={2} py={1} width={"50%"}>
@@ -298,11 +314,12 @@ const PreChannelItem = ({ title, icon, color, value, onClick }) => {
                 display={"flex"}
                 alignItems={"center"}
                 gap={1}
-                borderRadius={2}
-                border={"1px solid lightgrey"}
                 p={2}
-                boxShadow={"2px 3px 4px #0004"}
-                sx={{ cursor: "pointer" }}
+                borderRadius={2}
+                border={disabled ? "none" : "1px solid lightgrey"}
+                boxShadow={disabled ? "none" : "2px 3px 4px #0004"}
+                sx={{ cursor: disabled ? "default" : "pointer" }}
+                bgcolor={disabled ? "#0001" : "white"}
             >
                 <Avatar
                     sx={{ bgcolor: color, width: 48, height: 48 }}

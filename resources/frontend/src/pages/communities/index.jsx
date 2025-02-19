@@ -50,9 +50,7 @@ const Communities = ({ match }) => {
     const [showInviteDialog, setShowInviteDialog] = useState(false);
 
     const divider = useMemo(
-        () =>
-            community?.type == 1 &&
-            preChannelItems.map(({ title }) => title).includes(channel?.name),
+        () => community?.type == 1 && channel?.type == 0,
 
         [community, channel]
     );

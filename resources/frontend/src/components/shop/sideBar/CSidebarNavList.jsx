@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
-import { makeStyles } from "@mui/styles";
 import {
     Avatar,
     Button,
@@ -14,17 +14,17 @@ import {
     Menu,
     MenuItem,
 } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { stringAvatar } from "../../helper/func";
-import { useCommunity } from "../../../contexts/CommunityContext";
-import { useNotification } from "../../../contexts/NotificationContext";
-import "./CSidebarNavList.css";
 import { ToastNotification } from "../../helper";
 import api from "../../../api";
-import { useDispatch } from "react-redux";
-import { actionChannel } from "../../../reduxStore";
+import { useCommunity } from "../../../contexts/CommunityContext";
+import { useNotification } from "../../../contexts/NotificationContext";
 import { useAuth } from "../../../contexts/AuthContext";
+import { actionChannel } from "../../../reduxStore";
+import "./CSidebarNavList.css";
 
 const CSidebarNavList = (props) => {
     const dataId = props.data.id;

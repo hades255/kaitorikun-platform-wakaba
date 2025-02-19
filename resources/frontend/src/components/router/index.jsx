@@ -19,6 +19,7 @@ import PurchaseCustomer from "../../pages/purchase-manage/customer";
 import SChannel from "../../pages/schannel";
 import SchannelWithSeparatorBar from "../../pages/schannel/SchannelWithSeparatorBar";
 import Schannel from "../../pages/schannel";
+import AcceptGroupChatInvitation from "../../pages/invitations/AcceptGroupChatInvitation";
 
 const MenuRoutes = [
     {
@@ -166,6 +167,12 @@ const MenuRoutes = [
         exact: true,
         title: "招待を受け入れる",
         component: () => <AcceptInvitation />,
+    },
+    {
+        path: "/chatgroup/accept-invitation",
+        exact: true,
+        title: "招待を受け入れる",
+        component: () => <AcceptGroupChatInvitation />,
     },
 ];
 

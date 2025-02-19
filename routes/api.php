@@ -66,6 +66,9 @@ Route::post('/purchase/item/init-register', [ItemsController::class, 'initRegist
 Route::post('/invitations/{id}/view', [InvitationController::class, 'view'])->name('invitations.view');
 Route::post('/invitations/{id}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
 
+Route::post('chatgroups/invitations/{id}/view', [ChatgroupController::class, 'view'])->name('chatgroups.invitations.view');
+Route::post('chatgroups/invitations/{id}/accept', [ChatgroupController::class, 'accept'])->name('chatgroups.invitations.accept');
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('communities', [CommunityController::class, 'store'])->name('communities.store');
     Route::get('communities/mine', [CommunityController::class, 'getMine'])->name('communities.getMine');

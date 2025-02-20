@@ -83,13 +83,11 @@ const CSidebarNavList = (props) => {
                     />
                     <p>
                         {props.data.title}
-                        <i className="right fas fa-angle-left" />
+                        <i className="right fas fa-angle-left extend-angle-left-icon" />
                     </p>
-                    <div className={"CSidebarNavListItem-setting"}>
-                        {auth && auth.id == props.data.user_id && (
-                            <MoreButton data={props.data} />
-                        )}
-                    </div>
+                    {auth && auth.id == props.data.user_id && (
+                        <MoreButton data={props.data} />
+                    )}
                 </div>
             ) : (
                 <Link
@@ -105,11 +103,9 @@ const CSidebarNavList = (props) => {
                         style={{ minWidth: 24, width: 24 }}
                     />
                     <p>{props.data.title}</p>
-                    <div className={"CSidebarNavListItem-setting"}>
-                        {auth && auth.id == props.data.user_id && (
-                            <MoreButton data={props.data} />
-                        )}
-                    </div>
+                    {auth && auth.id == props.data.user_id && (
+                        <MoreButton data={props.data} />
+                    )}
                 </Link>
             )}
             {isMenuExtended && (
@@ -213,12 +209,21 @@ const MoreButton = ({ data }) => {
     );
 
     return (
-        <>
+        <div
+            className={"CSidebarNavListItem-setting"}
+            style={
+                open
+                    ? {
+                          visibility: "visible",
+                      }
+                    : {}
+            }
+        >
             <IconButton onClick={handleClick}>
-                <MoreHorizIcon color="white" />
+                <MoreHorizIcon htmlColor="white" />
             </IconButton>
             <Menu
-                id="delete-channel-button"
+                id={"delete-channel-button" + data.mood + data.id}
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleClose}
@@ -258,7 +263,7 @@ const MoreButton = ({ data }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </div>
     );
 };
 

@@ -1,4 +1,4 @@
-.CSidebarNavListItem{
+.CSidebarNavListItem {
     position: relative;
 }
 
@@ -10,13 +10,19 @@
     width: 36;
     min-width: 36;
     height: 100%;
-    background-color: #313239;
+    background-color: rgb(70, 71, 77);
+    border-radius: 40px;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.CSidebarNavListItem:hover .CSidebarNavListItem-setting {
+.CSidebarNavListItem:hover .CSidebarNavListItem-setting,
+.CSidebarNavListItem-setting:hover {
     visibility: visible;
+}
+
+.CSidebarNavListItem:hover .extend-angle-left-icon {
+    visibility: hidden;
 }

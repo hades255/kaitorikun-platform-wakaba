@@ -30,3 +30,4 @@ yarn.lock
 /public/mix-manifest.json
 
 run.bat
+/storage/app/public/uploads

@@ -211,17 +211,22 @@ const Communities = ({ match }) => {
                                         </CardContent>
                                     </Card>
                                     {Array.isArray(posts) &&
-                                        posts?.map((post) => (
-                                            <Post
-                                                key={post.id}
-                                                post={post}
-                                                channel={channel}
-                                                users={users}
-                                                handleOpenEdit={
-                                                    handleClickEditPost
-                                                }
-                                            />
-                                        ))}
+                                        posts
+                                            ?.filter(
+                                                ({ channel_id }) =>
+                                                    channel_id == channelId
+                                            )
+                                            .map((post) => (
+                                                <Post
+                                                    key={post.id}
+                                                    post={post}
+                                                    channel={channel}
+                                                    users={users}
+                                                    handleOpenEdit={
+                                                        handleClickEditPost
+                                                    }
+                                                />
+                                            ))}
                                 </>
                             )}
                         </Box>

@@ -468,6 +468,7 @@ const Post = ({ post, users, channel, handleOpenEdit }) => {
                         }}
                         open={showEmojiPicker}
                         onClose={handleCloseEmojiOpen}
+                        sx={{ minWidth: 360 }}
                     >
                         <Picker
                             locale="ja"
@@ -606,7 +607,7 @@ const ReplyItem = ({ reply, users }) => {
     );
 };
 
-const EmojiItem = ({ reaction, onClick, users }) => {
+export const EmojiItem = ({ reaction, onClick, users }) => {
     const emoji = emojiData.emojis[reaction.reaction];
     const [anchorEl, setAnchorEl] = useState(null);
 

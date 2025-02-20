@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "react-chat-elements";
 import "react-chat-elements/dist/main.css";
+import emojiData from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import moment from "moment";
 import "moment/locale/ja";
 import clsx from "clsx";
-import { Box } from "@mui/material";
+import { Box, IconButton, Popover } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { Add as AddIcon } from "@mui/icons-material";
+import MoodIcon from "@mui/icons-material/Mood";
 import api from "../../api";
 import { PUBLIC_HOST } from "../../config";
 import { AnimTypingIcon } from "../../assets/loader";
@@ -17,6 +21,7 @@ import ChatInput from "../../components/chat/ChatInput";
 import NewGroupChat from "../../components/chat/NewGroupChat";
 import "./style.css";
 import { parseMixedTagsToText } from "../../components/helper/func";
+import { EmojiItem } from "../communities/Post";
 
 moment.locale("ja");
 
@@ -164,6 +169,7 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
     const { auth } = useAuth();
     const dispatch = useDispatch();
 
+    const position = chat.from === auth.id ? "right" : "left";
     const type = chat.type.startsWith("video/")
         ? "video"
         : chat.type.startsWith("image/")
@@ -189,6 +195,16 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
               },
           }
         : null;
+
+    const [selectedEmoji, setSelectedEmoji] = useState(null);
+    const [showReactionButton, setShowReactionButton] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const showEmojiPicker = Boolean(anchorEl);
+
+    const handleNewEmojiClick = (emoji) => {
+        setSelectedEmoji(emoji);
+        setAnchorEl(false);
+    };
 
     const handleClickRemove = useCallback(() => {
         const removefunc = async () => {
@@ -222,11 +238,23 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
         setReply(chat);
     };
 
+    const handleCloseEmojiOpen = useCallback(() => {
+        setAnchorEl(null);
+    }, []);
+
     return (
-        <div>
+        <div
+            onMouseEnter={() => setShowReactionButton(true)}
+            onMouseLeave={() => setShowReactionButton(false)}
+            style={{
+                position: "relative",
+                marginBottom: selectedEmoji ? 20 : 0,
+            }}
+        >
             <MessageBox
                 id={chat.id}
-                position={chat.from === auth.id ? "right" : "left"}
+                position={position}
+                notch={false}
                 type={type}
                 // title={chat.content}
                 text={parseMixedTagsToText(chat.content)}
@@ -259,11 +287,98 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
                     }
                 }
             />
-            {/* {type != "text" && data.uri && (
-                <button onClick={() => handleDownload(data.uri)}>
-                    Download Image
-                </button>
-            )} */}
+            {showEmojiPicker && (
+                <div
+                    style={{
+                        position: "absolute",
+                        bottom: "40px",
+                        right: "10px",
+                        zIndex: 2,
+                        minWidth: 360,
+                    }}
+                >
+                    <Popover
+                        id={"open-emogi-popover" + chat.id}
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                        }}
+                        transformOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                        }}
+                        open={showEmojiPicker}
+                        onClose={handleCloseEmojiOpen}
+                    >
+                        <Box sx={{ minWidth: 360 }}>
+                            <Picker
+                                locale="ja"
+                                theme="light"
+                                previewPosition="none"
+                                skinTonePosition="none"
+                                emojiButtonSize={44}
+                                emojiSize={28}
+                                emojiButtonRadius={"6px"}
+                                emojiButtonColors={[
+                                    "rgba(155,223,88,.7)",
+                                    "rgba(149,211,254,.7)",
+                                    "rgba(247,233,34,.7)",
+                                    "rgba(238,166,252,.7)",
+                                    "rgba(255,213,143,.7)",
+                                    "rgba(211,209,255,.7)",
+                                ]}
+                                icons={"solid"}
+                                data={emojiData}
+                                onEmojiSelect={handleNewEmojiClick}
+                            />
+                        </Box>
+                    </Popover>
+                </div>
+            )}
+            <div
+                style={{
+                    position: "absolute",
+                    bottom: selectedEmoji ? -20 : 0,
+                    [position]: 20,
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection:
+                        chat.from === auth.id ? "row" : "row-reverse",
+                }}
+            >
+                {selectedEmoji && (
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <EmojiItem
+                            key={selectedEmoji.native}
+                            reaction={{
+                                reaction: selectedEmoji.id,
+                                count: 0,
+                                users: [],
+                            }}
+                            users={[]}
+                            onClick={() => {}}
+                        />
+                    </div>
+                )}
+                <IconButton
+                    color="primary"
+                    onClick={(event) => setAnchorEl(event.currentTarget)}
+                    sx={{
+                        borderRadius: 20,
+                        opacity: showReactionButton ? 1 : 0,
+                        transition: "all ease-in-out 0.3s",
+                    }}
+                >
+                    <MoodIcon />
+                    <AddIcon />
+                </IconButton>
+            </div>
         </div>
     );
 };

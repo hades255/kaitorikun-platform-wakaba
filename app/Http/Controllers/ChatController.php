@@ -58,7 +58,7 @@ class ChatController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'type' => 'chat',
-                    'users' => [['id' => $user->id, 'name' => $user->name, 'email' => $user->email]]
+                    'users' => [['id' => Auth::id(), 'name' => Auth::user()->name, 'email' => Auth::user()->email], ['id' => $user->id, 'name' => $user->name, 'email' => $user->email]]
                 ];
             }),
             'groups' => $groups->map(function ($group) {

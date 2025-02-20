@@ -16,6 +16,7 @@ import { PanelContent, useDispatch, useSelector } from "../../components";
 import ChatInput from "../../components/chat/ChatInput";
 import NewGroupChat from "../../components/chat/NewGroupChat";
 import "./style.css";
+import { parseMixedTagsToText } from "../../components/helper/func";
 
 moment.locale("ja");
 
@@ -163,19 +164,6 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
     const { auth } = useAuth();
     const dispatch = useDispatch();
 
-    const parseMixedTagsToText = (input) => {
-        const tagPattern = /[[.*?\]]/g;
-        let normalText = input;
-        console.log(tagPattern)
-        normalText = normalText.replace(tagPattern, (match) => {
-            const tags = JSON.parse(match);
-            return tags.map((tag) => tag.text || tag.value).join("");
-        });
-        return normalText;
-    };
-
-    // console.log(parseMixedTagsToText(`hello [[{"value":"100","text":"kenny","title":"Kenny McCormick","prefix":"@"}]]`))
-
     const type = chat.type.startsWith("video/")
         ? "video"
         : chat.type.startsWith("image/")
@@ -241,7 +229,7 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
                 position={chat.from === auth.id ? "right" : "left"}
                 type={type}
                 // title={chat.content}
-                text={chat.content}
+                text={parseMixedTagsToText(chat.content)}
                 data={data}
                 replyButton={true}
                 removeButton={true}

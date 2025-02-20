@@ -36,14 +36,12 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
     const tagifySettings = useMemo(
         () => ({
             enforceWhitelist: true,
-            // whitelist: [
-            //     currentUser?.users.map(({ id, name, email }) => ({
-            //         value: name,
-            //         text: name,
-            //         title: email,
-            //         id,
-            //     })),
-            // ],
+            whitelist: currentUser?.users.map(({ id, name, email }) => ({
+                value: name,
+                text: name,
+                title: email,
+                id,
+            })),
             addTagOnBlur: true,
             mode: "mix",
             pattern: /@|#/,
@@ -160,7 +158,6 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
                 const newValue =
                     currentValue.substring(0, currentValue.length - 2) +
                     emojiData.native;
-                console.log(currentValue, newValue);
                 tagify.DOM.input.innerHTML = newValue;
                 tagify.dropdown.hide();
             }
@@ -174,7 +171,6 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
     }, [setReply]);
 
     useEffect(() => {
-        console.log(tagifySettings);
         const tagify = new Tagify(tagifyRef.current, tagifySettings);
         setTagify(tagify);
         return () => tagify.destroy();

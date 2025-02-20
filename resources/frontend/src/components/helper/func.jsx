@@ -22,3 +22,13 @@ export const stringAvatar = ({ name = "", src = "", sx = {} }) => {
         children: name[0],
     };
 };
+
+export const parseMixedTagsToText = (input) => {
+    const tagPattern = /\[\[.*?\]\]/g;
+    let normalText = input;
+    normalText = normalText.replace(tagPattern, (match) => {
+        const tag = JSON.parse(match.substring(2, match.length - 2));
+        return tag.text || tag.value;
+    });
+    return normalText;
+};

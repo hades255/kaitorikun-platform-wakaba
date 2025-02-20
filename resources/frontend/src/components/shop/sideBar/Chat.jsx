@@ -22,6 +22,7 @@ import { getUserStatusColor } from "../../../feature/action";
 import { useAuth } from "../../../contexts/AuthContext";
 import { actionChat } from "../../../reduxStore/actions/chat_action";
 import { selectorChat } from "../../../reduxStore/selector/selectorChat";
+import { parseMixedTagsToText } from "../../helper/func";
 
 export const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -330,7 +331,7 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
                                 {auth?.id === user.id ? "(あなた)" : user.name}
                             </div>
                             <div className={classes.lastMessage}>
-                                {lastChat?.content}
+                                {parseMixedTagsToText(lastChat?.content || "")}
                             </div>
                         </Box>
                         <div className={classes.userTime}>

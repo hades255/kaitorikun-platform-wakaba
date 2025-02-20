@@ -31,6 +31,11 @@ class Chat extends Model
         return $this->hasMany(Chat::class, 'reply');
     }
 
+    public function reactions()
+    {
+        return $this->hasMany(ChatReaction::class);
+    }
+
     public static function getChatListWithReplies($userId)
     {
         return self::where(function ($query) use ($userId) {
@@ -39,7 +44,7 @@ class Chat extends Model
         })
             ->where('deleted', '!=', $userId)
             ->whereNull('group_id')
-            ->with('reply')
+            ->with(['reply', 'reactions'])
             // ->orderBy('created_at', 'desc')
             ->get();
     }

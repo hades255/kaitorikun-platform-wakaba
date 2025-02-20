@@ -1,4 +1,5 @@
 import {
+    ADD_REACTION_CHAT,
     ADD_USER,
     DELETE_CHATS,
     PIN_USER,
@@ -85,6 +86,31 @@ const chats = (state = initialState, actions) => {
             }
         case SET_CURRENT_USER:
             return { ...state, current: data };
+        case ADD_REACTION_CHAT:
+            return {
+                ...state,
+                chats: state.chats.map((chat) => ({
+                    ...chat,
+                    reactions:
+                        chat.id == data.chat_id
+                            ? data.reaction
+                                ? (chat.reactions || []).find(
+                                      (r) => r.user_id == data.user_id
+                                  )
+                                    ? (chat.reactions || []).map((r) => ({
+                                          ...r,
+                                          reaction:
+                                              r.user_id == data.user_id
+                                                  ? data.reaction
+                                                  : r.reaction,
+                                      }))
+                                    : [...(chat.reactions || []), data]
+                                : (chat.reactions || []).filter(
+                                      (r) => r.user_id != data.user_id
+                                  )
+                            : chat.reactions || [],
+                })),
+            };
         default:
             return state;
     }

@@ -168,6 +168,7 @@ export default ChatsPage;
 const ChatItem = ({ chat, selectedUser, setReply }) => {
     const { auth } = useAuth();
     const dispatch = useDispatch();
+    const currentUser = useSelector(selectorChat.handleGetCurrentUser);
 
     const position = chat.from === auth.id ? "right" : "left";
     const type = chat.type.startsWith("video/")
@@ -196,14 +197,53 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
           }
         : null;
 
-    const [selectedEmoji, setSelectedEmoji] = useState(null);
     const [showReactionButton, setShowReactionButton] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [emojis, setEmojis] = useState([]);
     const showEmojiPicker = Boolean(anchorEl);
+    const hasEmoji = emojis && Array.isArray(emojis) && emojis.length > 0;
 
-    const handleNewEmojiClick = (emoji) => {
-        setSelectedEmoji(emoji);
-        setAnchorEl(false);
+    useEffect(() => {
+        if (Array.isArray(chat.reactions) && chat.reactions.length > 0) {
+            let res = {};
+            chat.reactions?.forEach((item) => {
+                if (res[item.reaction]) {
+                    res[item.reaction] = {
+                        mine:
+                            res[item.reaction].mine || item.user_id == auth?.id,
+                        count: res[item.reaction].count + 1,
+                        users: [...res[item.reaction].users, item.user_id],
+                    };
+                } else {
+                    res[item.reaction] = {
+                        mine: item.user_id == auth?.id,
+                        count: 1,
+                        users: [item.user_id],
+                    };
+                }
+            });
+            let res_a = [];
+            for (let r in res) res_a.push({ reaction: r, ...res[r] });
+            setEmojis(res_a);
+        } else setEmojis([]);
+    }, [chat, auth]);
+
+    const handleNewEmojiClick = async (emojiData) => {
+        try {
+            const response = await api.post("chatreaction", {
+                reaction: emojiData.id,
+                chat_id: chat.id,
+            });
+            dispatch(actionChat.handleSetReaction(response.data));
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setAnchorEl(false);
+        }
+    };
+
+    const handleClickEmojiItem = (reaction) => {
+        handleNewEmojiClick({ id: reaction.reaction });
     };
 
     const handleClickRemove = useCallback(() => {
@@ -248,7 +288,7 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
             onMouseLeave={() => setShowReactionButton(false)}
             style={{
                 position: "relative",
-                marginBottom: selectedEmoji ? 20 : 0,
+                marginBottom: hasEmoji ? 20 : 0,
             }}
         >
             <MessageBox
@@ -339,7 +379,7 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
             <div
                 style={{
                     position: "absolute",
-                    bottom: selectedEmoji ? -20 : 0,
+                    bottom: hasEmoji ? -20 : 0,
                     [position]: 20,
                     display: "flex",
                     alignItems: "center",
@@ -347,23 +387,21 @@ const ChatItem = ({ chat, selectedUser, setReply }) => {
                         chat.from === auth.id ? "row" : "row-reverse",
                 }}
             >
-                {selectedEmoji && (
+                {hasEmoji && (
                     <div
                         style={{
                             display: "flex",
                             alignItems: "center",
                         }}
                     >
-                        <EmojiItem
-                            key={selectedEmoji.native}
-                            reaction={{
-                                reaction: selectedEmoji.id,
-                                count: 0,
-                                users: [],
-                            }}
-                            users={[]}
-                            onClick={() => {}}
-                        />
+                        {emojis.map((item) => (
+                            <EmojiItem
+                                key={item.reaction}
+                                reaction={item}
+                                users={currentUser.users}
+                                onClick={handleClickEmojiItem}
+                            />
+                        ))}
                     </div>
                 )}
                 <IconButton

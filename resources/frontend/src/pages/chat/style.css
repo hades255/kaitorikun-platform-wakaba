@@ -4,7 +4,12 @@
     overflow: hidden; */
 }
 
-.rce-mbox-body img, .rce-mbox-body video {
+.rce-mbox-body img,
+.rce-mbox-body video {
     max-width: 500px;
     max-height: 60vh;
+}
+
+.rce-mbox.rce-mbox--clear-notch {
+    max-width: 80%;
 }

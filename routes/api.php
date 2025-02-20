@@ -102,6 +102,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('chats', [ChatController::class, 'read'])->name('chats.read');
     Route::delete('chats/{chat}', [ChatController::class, 'destroy'])->name('chats.destroy');
     Route::post('chatgroups', [ChatgroupController::class, 'store'])->name('chatgroups.store');
+    Route::post('chatreaction', [ChatController::class, 'reaction'])->name('chatreaction.reaction');
 
     Route::get('users', [UserController::class, 'index']);
     Route::get('users/search', [UserController::class, 'search_users'])->name('users.search');

@@ -36,12 +36,15 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
     const tagifySettings = useMemo(
         () => ({
             enforceWhitelist: true,
-            whitelist: currentUser?.users.map(({ id, name, email }) => ({
-                value: name,
-                text: name,
-                title: email,
-                id,
-            })),
+            whitelist:
+                currentUser && currentUser.users
+                    ? currentUser.users.map(({ id, name, email }) => ({
+                          value: name,
+                          text: name,
+                          title: email,
+                          id,
+                      }))
+                    : [],
             addTagOnBlur: true,
             mode: "mix",
             pattern: /@|#/,
@@ -128,7 +131,15 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
                 if (uploadedFiles.length > 0) {
                     const _response = await api.post("chats/files", {
                         chats: uploadedFiles.map((item) => ({
-                            to: selectedUser.id,
+                            to:
+                                selectedUser.type == "chat"
+                                    ? selectedUser.id
+                                    : reply
+                                    ? reply.id
+                                    : 0,
+                            status: "unread",
+                            reply: reply ? reply.id : 0,
+                            group_id: selectedUser.type == "group" ? selectedUser.id : null,
                             ...item,
                         })),
                     });
@@ -142,7 +153,7 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
                 setSending(false);
             }
         },
-        [dispatch, setSending, selectedUser]
+        [dispatch, setSending, selectedUser, reply]
     );
 
     const handleClickFileInput = useCallback(() => {

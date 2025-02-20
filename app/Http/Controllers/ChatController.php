@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\NewChatJob;
+use App\Jobs\ReactionToChatJob;
 use App\Models\Chat;
 use App\Models\Chatgroup;
+use App\Models\ChatReaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +23,7 @@ class ChatController extends Controller
         $chats = Chat::getChatListWithReplies($userId);
         $groupIds = Auth::user()->chatgroups->pluck('id');
         $groupChats = Chat::whereIn('group_id', $groupIds)
-            ->with(['reply'])
+            ->with(['reply', 'reactions'])
             ->get();
         return response()->json([
             "chats" => $chats,
@@ -123,6 +125,8 @@ class ChatController extends Controller
                 "to" => $item['to'],
                 "content" => $item['content'],
                 "type" => $item['type'],
+                "reply" => $item['reply'],
+                "group_id" => $item['group_id'],
                 "other" => json_encode($item['other']),
                 "from" =>  Auth::id(),
             ]);
@@ -178,5 +182,40 @@ class ChatController extends Controller
             DB::table("chats")->where("group_id", $request->userId)->where("status", "unread")->update(["status" => "read"]);
 
         return response()->noContent();
+    }
+
+    public function reaction(Request $request)
+    {
+        $validatedData = $request->validate([
+            'reaction' => 'required|string|max:1000',
+            'chat_id' => 'required|integer',
+        ]);
+        $reaction = ChatReaction::where('chat_id', $validatedData['chat_id'])
+            ->where('user_id', Auth::id())
+            ->first();
+        if ($reaction) {
+            if ($reaction->reaction == $validatedData['reaction']) {
+                if ($reaction->delete()) {
+                    ReactionToChatJob::dispatch(["user_id" => Auth::id(), "chat_id" => $reaction->chat_id, "reaction" => ""], ["id" => Auth::id(), "name" => Auth::user()->name]);
+                    return response()->json(["user_id" => Auth::id(), "chat_id" => $reaction->chat_id, "reaction" => ""], 200);
+                }
+            } else {
+                $reaction->reaction = $validatedData['reaction'];
+                if ($reaction->save()) {
+                    ReactionToChatJob::dispatch($reaction, ["id" => Auth::id(), "name" => Auth::user()->name]);
+                    return response()->json($reaction, 200);
+                }
+            }
+        } else {
+            $reaction = new ChatReaction();
+            $reaction->reaction = $validatedData['reaction'];
+            $reaction->chat_id = $validatedData['chat_id'];
+            $reaction->user_id = Auth::id();
+            if ($reaction->save()) {
+                ReactionToChatJob::dispatch($reaction, ["id" => Auth::id(), "name" => Auth::user()->name]);
+                return response()->json($reaction, 201);
+            }
+        }
+        return response()->json(['message' => 'Reaction not found.'], 404);
     }
 }

@@ -9,6 +9,7 @@ export const ADD_USER = "ADD_USER";
 export const SET_USER_STATUS = "SER_USER_STATUS";
 export const PIN_USER = "PIN_USER";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
+export const ADD_REACTION_CHAT = "@CHATS/ADD_REACTION";
 
 const handleReceiveChat = (data) => handler(data, RECEIVE_CHAT);
 const handleSetChats = (data) => handler(data, SET_CHATS);
@@ -19,6 +20,7 @@ const handleAddUsers = (data) => handler(data, ADD_USER);
 const handleSetUserStatus = (data) => handler(data, SET_USER_STATUS);
 const handlePinUser = (data) => handler(data, PIN_USER);
 const handleSetCurrentUser = (data) => handler(data, SET_CURRENT_USER);
+const handleSetReaction = (data) => handler(data, ADD_REACTION_CHAT);
 
 const actionChat = {
     handleReceiveChat,
@@ -30,6 +32,7 @@ const actionChat = {
     handleSetUserStatus,
     handlePinUser,
     handleSetCurrentUser,
+    handleSetReaction,
 };
 
 export { actionChat };

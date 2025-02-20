@@ -118,23 +118,6 @@ const Notifications = () => {
                     dispatch(actionSChannel.handlePostRemoved(data.post.id));
             }
         };
-        const handleNewChat = (data) => {
-            if (
-                auth &&
-                data &&
-                data.chat &&
-                data.chat.from != auth?.id &&
-                (data.chat.to == auth?.id ||
-                    groups.includes(data.chat.group_id.toString()))
-            ) {
-                dispatch(actionChat.handleReceiveChat(data.chat));
-                updateUnreadTab("chat", true);
-                if (data.name)
-                    showNotification("新しいメッセージ", {
-                        message: `${data.name} さんが新しいメッセージを送信しました.`,
-                    });
-            }
-        };
         const handleDeleteCommunity = (data) => {
             if (
                 data &&
@@ -167,14 +150,51 @@ const Notifications = () => {
                 }
             }
         };
+        const handleNewChat = (data) => {
+            if (
+                auth &&
+                data &&
+                data.chat &&
+                data.chat.from != auth?.id &&
+                (data.chat.to == auth?.id ||
+                    (data.chat.group_id &&
+                        groups.includes(data.chat.group_id.toString())))
+            ) {
+                dispatch(actionChat.handleReceiveChat(data.chat));
+                updateUnreadTab("chat", true);
+                if (data.name)
+                    showNotification("新しいメッセージ", {
+                        message: `${data.name} さんが新しいメッセージを送信しました.`,
+                    });
+            }
+        };
+        const handleChatReaction = (data) => {
+            if (
+                auth &&
+                data &&
+                data.reaction &&
+                data.user &&
+                data.user.id != auth?.id
+            ) {
+                dispatch(actionChat.handleSetReaction(data.reaction));
+                if (data.reaction.reaction) {
+                    updateUnreadTab("chat", true);
+                    if (data.user.name)
+                        showNotification("チャットに反応する", {
+                            message: `${data.user.name} があなたのチャットに反応しました.`,
+                        });
+                }
+            }
+        };
 
         // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
         channel.listen(".channel.post.created", handlePostCreated);
         channel.listen(".channel.post.deleted", handleDeletePost);
-        channel.listen(".channel.chat.created", handleNewChat);
         channel.listen(".channel.community.removed", handleDeleteCommunity);
         channel.listen(".channel.removed", handleDeleteChannel);
+        channel.listen(".channel.chat.created", handleNewChat);
+        channel.listen(".channel.chat.reaction", handleChatReaction);
 
         return () => {
             if (channel) {
@@ -182,9 +202,10 @@ const Notifications = () => {
                 channel.stopListening(".channel.created");
                 channel.stopListening(".channel.post.created");
                 channel.stopListening(".channel.post.deleted");
-                channel.stopListening(".channel.chat.created");
                 channel.stopListening(".channel.community.removed");
                 channel.stopListening(".channel.removed");
+                channel.stopListening(".channel.chat.created");
+                channel.stopListening(".channel.chat.reaction");
             }
         };
     }, [

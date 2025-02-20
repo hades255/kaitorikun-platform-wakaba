@@ -4,7 +4,7 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 const HorizontalSeparator = ({ children, BottomComponent, divider }) => {
-    const [splitPosition, setSplitPosition] = useState(50);
+    const [splitPosition, setSplitPosition] = useState(70);
     const [isDragging, setIsDragging] = useState(false);
 
     const handleMouseDown = useCallback(() => {

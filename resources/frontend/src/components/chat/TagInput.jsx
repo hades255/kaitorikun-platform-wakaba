@@ -123,6 +123,7 @@ const TagInput = ({ setValues }) => {
                 variant="standard"
                 size="small"
                 fullWidth
+                className="new-groupcaht-input"
             />
             {showDropdown && (
                 <Box

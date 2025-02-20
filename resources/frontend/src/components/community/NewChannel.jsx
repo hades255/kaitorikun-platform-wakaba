@@ -44,66 +44,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const preChannelItems = [
-    { title: "一般", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "全体周知", color: "lightgray", icon: "far fa-circle nav-icon" },
-    {
-        title: "WAKAVAパスワード",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
-    { title: "ヤフオク", color: "lightgray", icon: "far fa-circle nav-icon" },
-    {
-        title: "幹部会議連絡",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
-    { title: "基準外", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "研修", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "店舗間連絡", color: "lightgray", icon: "far fa-circle nav-icon" },
-    {
-        title: "月毎のキャンペーン",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
-    {
-        title: "買取り実績ブログ",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
-    {
-        title: "生駒OOOOOOOO店",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
-    { title: "一般", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "業務連絡", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "1日の報告", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "一日の報告", color: "lightgray", icon: "far fa-circle nav-icon" },
     { title: "決裁", color: "lightgray", icon: "far fa-circle nav-icon" },
-    {
-        title: "業者の売却報告",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
     { title: "入出金", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "発注依頼", color: "lightgray", icon: "far fa-circle nav-icon" },
-    {
-        title: "購入依頼と送料支払報告",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
+    { title: "業者卸報告", color: "lightgray", icon: "far fa-circle nav-icon" },
     { title: "出張買取", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "廃棄処分", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "発注依頼", color: "lightgray", icon: "far fa-circle nav-icon" },
+    { title: "立替金", color: "lightgray", icon: "far fa-circle nav-icon" },
     { title: "業者来訪", color: "lightgray", icon: "far fa-circle nav-icon" },
-    { title: "シフト", color: "lightgray", icon: "far fa-circle nav-icon" },
-    {
-        title: "業務情報/引継ぎ",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
-    {
-        title: "スターフ会議",
-        color: "lightgray",
-        icon: "far fa-circle nav-icon",
-    },
 ];
 
 const CreateChannel = ({ page }) => {

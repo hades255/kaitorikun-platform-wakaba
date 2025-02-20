@@ -6,12 +6,9 @@ import { makeStyles } from "@mui/styles";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { Link, Route, React, getItem, useDispatch } from "../../../components";
 import menu1 from "./menu1";
-import menu2 from "./menu2";
-import menu3 from "./menu3";
 import ChatSidebar from "./Chat";
-import ChannelSidebar, { AddNewCommunityButton } from "./Channel";
+import ChannelSidebar from "./Channel";
 import SidebarNavList from "./SidebarNavList";
-import Menu4Sidebar from "./Menu4Sidebar";
 
 const tabs = [
     {
@@ -101,42 +98,7 @@ const Sidebar = (props) => {
                                 />
                             ))}
                         </ul>
-                        <ul
-                            className="nav nav-pills nav-sidebar flex-column"
-                            data-widget="treeview"
-                            role="menu"
-                            data-accordion="false"
-                        >
-                            {menu2.map((menu, i) => (
-                                <Route
-                                    path={menu.path}
-                                    exact={menu.exact}
-                                    key={i}
-                                    children={({ match }) => (
-                                        <SidebarNavList data={menu} key={i} />
-                                    )}
-                                />
-                            ))}
-                        </ul>
-                        <ul
-                            className="nav nav-pills nav-sidebar flex-column side-menu-separate"
-                            data-widget="treeview"
-                            role="menu"
-                            data-accordion="false"
-                        >
-                            {menu3.map((menu, i) => (
-                                <Route
-                                    path={menu.path}
-                                    exact={menu.exact}
-                                    key={i}
-                                    children={({ match }) => (
-                                        <SidebarNavList data={menu} key={i} />
-                                    )}
-                                />
-                            ))}
-                        </ul>
                         <ChannelSidebar page={false} />
-                        {/* <Menu4Sidebar /> */}
                     </nav>
                 )}
             </div>

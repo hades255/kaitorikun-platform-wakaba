@@ -181,6 +181,7 @@ export const AddNewCommunityButton = ({ page = true, search, setSearch }) => {
                     display="flex"
                     justifyContent="space-between"
                     alignItems={"center"}
+                    pl={page ? 0 : 2}
                 >
                     <Typography>コミュニティ</Typography>
                     <Box display={"flex"} alignItems={"center"}>

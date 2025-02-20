@@ -34,8 +34,8 @@ const PurchaseTable = (props) => {
     const [currentColumnName, setCurrentColumnName] = useState();
     const [dateFilterType, setDateFilterType] = useState(null);
     const [selectedYear, setSelectedYear] = useState(0);
-    const [selectedMonth, setSelectedMonth] = useState(0);
-    const [selectedDay, setSelectedDay] = useState(0);
+    const [selectedMonth, setSelectedMonth] = useState(moment().format('MM') - 1);
+    const [selectedDay, setSelectedDay] = useState(moment().format('DD') - 1);
     const [selectedStartDate, setSelectedStartDate] = useState(null);
     const [selectedEndDate, setSelectedEndDate] = useState(null);
     const [dateFilters, setDateFilters] = useState({});
@@ -132,7 +132,7 @@ const PurchaseTable = (props) => {
                 for (const column of Object.keys(filters)) {
                     if (column == _column) {
                         // if (item[_column]) {
-                            items.push(item[_column])
+                        items.push(item[_column])
                         // }
                     }
                 }
@@ -148,15 +148,45 @@ const PurchaseTable = (props) => {
         setSelectedEndDate(null);
     };
 
+    const handlePurchaseRegisterClick = () => {
+        props.onHandlePurchaseRegister();
+    }
+
     const columns = [
         { name: '買取計算書No', title: <Button type="link">買取計算書No</Button>, dataIndex: 'no' },
         { name: '店舗名', title: <Button type="link">店舗名</Button>, dataIndex: 'shop_name' },
-        { name: '氏名', title: <Button type="link">氏名</Button>, dataIndex: 'name' },
-        { name: 'カタカナ名', title: <Button type="link">カタカナ名</Button>, dataIndex: 'name_kana' },
+        {
+            name: '氏名', title: <Button type="link">氏名</Button>,
+            render: (cell, row) => {
+                return (
+                    <div>
+                        <Button
+                            type="link"
+                            onClick={() => handleClick(row)}
+                        >{cell}</Button>
+                    </div>
+                );
+            },
+            dataIndex: 'name'
+        },
+        {
+            name: 'カタカナ名', title: <Button type="link">カタカナ名</Button>,
+            render: (cell, row) => {
+                return (
+                    <div>
+                        <Button
+                            type="link"
+                            onClick={() => handleClick(row)}
+                        >{cell}</Button>
+                    </div>
+                );
+            },
+            dataIndex: 'name_kana', className: "customer-note"
+        },
         { name: '電話番号', title: <Button type="link">電話番号</Button>, dataIndex: 'phone_number' },
         { name: '生年月日', title: <Button type="link">生年月日</Button>, dataIndex: 'birthday' },
-        { name: '住所', title: <Button type="link">住所</Button>, dataIndex: 'address' },
-        { name: '職業', title: <Button type="link">職業</Button>, dataIndex: 'job' },
+        { name: '住所', title: <Button type="link">住所</Button>, dataIndex: 'address', className: "customer-note" },
+        { name: '職業', title: <Button type="link">職業</Button>, dataIndex: 'job', className: "customer-note" },
         { name: '本人確認書類', title: <Button type="link">本人確認書類</Button>, dataIndex: 'identification1', width: 100 },
         { name: '特記事項', title: <Button type="link">特記事項</Button>, dataIndex: 'note', className: "customer-note" },
         {
@@ -194,7 +224,7 @@ const PurchaseTable = (props) => {
                     }
                 }
                 const filterValue = filters[key];
-                
+
                 if (key === 'birthday' && filterValue) {
                     if (item[key]) {
                         const date = moment(item[key]);
@@ -202,9 +232,14 @@ const PurchaseTable = (props) => {
                             case '年':
                                 return date.format('YYYY') == years[selectedYear];
                             case '月':
-                                return date.format('MM') == months[selectedMonth];
+                                return date.format('YYYY-MM') == moment(years[selectedYear] + '-' + months[selectedMonth], 'YYYY-MM').format('YYYY-MM');
                             case '日':
-                                return date.format('DD') == dates[selectedDay];
+                                setSelectedYear(0)
+                                setSelectedMonth(moment().format('MM') - 1)
+                                setSelectedDay(moment().format('DD') - 1)
+                                return (
+                                    date.isBefore(moment(), "day")
+                                );
                             case '期間':
                                 return (
                                     (selectedStartDate && selectedEndDate) && date.isBetween(moment(selectedStartDate), moment(selectedEndDate))
@@ -223,7 +258,18 @@ const PurchaseTable = (props) => {
 
     return (
         <div>
-            <Button onClick={handleClearAllFilters}>フィルター全解除</Button>
+            <div className='flex-left'>
+                <Button
+                    type="button"
+                    onClick={handleClearAllFilters}
+                    style={{ backgroundColor: "#5A6268", color: 'white' }}
+                >フィルター全解除</Button>
+                <Button
+                    type="button"
+                    style={{ backgroundColor: "#0069D9", color: 'white' }}
+                    onClick={handlePurchaseRegisterClick}
+                >新規登録</Button>
+            </div>
             <TableMaster
                 columns={columns.map((col) => ({
                     ...col,
@@ -242,7 +288,7 @@ const PurchaseTable = (props) => {
             {/* Filter Modal */}
             {currentColumn == "birthday" ? (
                 <Dialog open={open} onClose={handleCloseDateFilterDialog}>
-                    <DialogTitle>birthday フィルタ</DialogTitle>
+                    <DialogTitle>生年月日 フィルター</DialogTitle>
                     <DialogContent>
                         <Button onClick={handleDateDeselectAll}>全選択解除</Button>
                         <div>
@@ -251,21 +297,21 @@ const PurchaseTable = (props) => {
                                 checked={dateFilterType === '年'}
                                 onChange={() => setDateFilterType('年')}
                             >
-                                年
+                                年指定
                             </Checkbox>
                             <Checkbox
                                 value="月"
                                 checked={dateFilterType === '月'}
                                 onChange={() => setDateFilterType('月')}
                             >
-                                月
+                                月指定
                             </Checkbox>
                             <Checkbox
                                 value="日"
                                 checked={dateFilterType === '日'}
                                 onChange={() => setDateFilterType('日')}
                             >
-                                日
+                                今日まで
                             </Checkbox>
                             <Checkbox
                                 value="期間"
@@ -296,7 +342,18 @@ const PurchaseTable = (props) => {
                             }
                             {
                                 dateFilterType === '月' && (
-                                    <div>
+                                    <div className='flex-center'>
+                                        <Select
+                                            onChange={(e) => setSelectedYear(e.target.value)}
+                                            displayEmpty
+                                            className="shop-select"
+                                            size='small'
+                                            value={selectedYear}
+                                        >
+                                            {years.map((item, key) => (
+                                                <MenuItem value={key} key={key}>{item}</MenuItem>
+                                            ))}
+                                        </Select>
                                         <Select
                                             onChange={(e) => setSelectedMonth(e.target.value)}
                                             displayEmpty
@@ -313,7 +370,29 @@ const PurchaseTable = (props) => {
                             }
                             {
                                 dateFilterType === '日' && (
-                                    <div>
+                                    <div className='flex-center'>
+                                        <Select
+                                            onChange={(e) => setSelectedYear(e.target.value)}
+                                            displayEmpty
+                                            className="shop-select"
+                                            size='small'
+                                            value={selectedYear}
+                                        >
+                                            {years.map((item, key) => (
+                                                <MenuItem value={key} key={key}>{item}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        <Select
+                                            onChange={(e) => setSelectedMonth(e.target.value)}
+                                            displayEmpty
+                                            className="shop-select"
+                                            value={selectedMonth}
+                                            size='small'
+                                        >
+                                            {months.map((item, key) => (
+                                                <MenuItem value={key} key={key}>{item}</MenuItem>
+                                            ))}
+                                        </Select>
                                         <Select
                                             onChange={(e) => setSelectedDay(e.target.value)}
                                             displayEmpty
@@ -355,7 +434,7 @@ const PurchaseTable = (props) => {
                 </Dialog>
             ) : (
                 <Dialog open={visible} onClose={handleCancel}>
-                    <DialogTitle>{currentColumnName} フィルタ</DialogTitle>
+                    <DialogTitle>{currentColumnName} フィルター</DialogTitle>
                     <DialogContent>
                         <Button onClick={handleSelectAll}>全選択</Button>
                         <Button onClick={handleDeselectAll}>全選択解除</Button>

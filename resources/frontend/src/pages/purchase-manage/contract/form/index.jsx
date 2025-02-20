@@ -18,6 +18,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import ImageIcon from '@mui/icons-material/Image';
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import { withRouter } from "react-router-dom";
@@ -322,14 +323,38 @@ let FormPurchaseContract = (props) => {
     }
 
     const handleFileChange = (e, index) => {
-        console.log(index);
         const file = e.target.files[0]
+        alert(file.name + "を取り込みました。")
         if (index == 1) {
             setIdentificationType1(file.type);
             setIdentificationFile1(file);
         } else if (index == 2) {
             setIdentificationType2(file.type);
             setIdentificationFile2(file);
+        }
+    }
+
+    const handleDeleteFile = (e, index) => {
+        if (index == 1) {
+            if (identificationFile1 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType1(undefined);
+                    setIdentificationFile1(undefined);
+                }
+            }
+        } else if (index == 2) {
+            if (identificationFile2 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType2(undefined);
+                    setIdentificationFile2(undefined);
+                }
+            }
         }
     }
 
@@ -368,8 +393,13 @@ let FormPurchaseContract = (props) => {
         setPreviewImage("")
     }
 
-    const handleCameraCaptureDialogOpen = (type) => {
-        setCameraCaptureType("passport")
+    const handleCameraCaptureDialogOpen1 = (type) => {
+        setCameraCaptureType("passport1")
+        setOpenCameraPreview(true)
+    }
+
+    const handleCameraCaptureDialogOpen2 = (type) => {
+        setCameraCaptureType("passport2")
         setOpenCameraPreview(true)
     }
 
@@ -382,9 +412,12 @@ let FormPurchaseContract = (props) => {
         const file = base64ToFile(image, moment().format('YYYYMMDDHHmmss'))
         console.log(file.type);
 
-        if (type == "passport") {
+        if (type == "passport1") {
             setIdentificationType1(file.type);
             setIdentificationFile1(file);
+        } else if (type == "passport2") {
+            setIdentificationType2(file.type);
+            setIdentificationFile2(file);
         } else if (type == "item") {
             setItems(prevData =>
                 prevData.map((obj) =>
@@ -456,9 +489,7 @@ let FormPurchaseContract = (props) => {
     const handleSignClear = () => signCanvas.current.clear();
 
     const handleCalcPrice = (price) => {
-        console.log(price);
-
-        setPurchasePrice(price)
+        setPurchasePrice(price - coupon)
     }
 
     const handleContractCloseClick = async () => {
@@ -542,10 +573,6 @@ let FormPurchaseContract = (props) => {
             ToastNotification("error", "利用規約のチェックは必須です。");
             return;
         }
-        if (signFile === undefined) {
-            ToastNotification("error", "お客様サインは必須です。");
-            return;
-        }
         if (window.confirm("本当に買取を了承してもよろしいですか？")) {
             dispatch(utilityAction.setLoading("content"));
             try {
@@ -565,21 +592,25 @@ let FormPurchaseContract = (props) => {
                 formData.append("address2", address2);
                 formData.append("address3", address3);
                 if (identificationId1 !== undefined && identificationType1 !== undefined) {
-                    formData.append("identification_id1", identificationId1);
-                    formData.append("identification_type1", identificationType1);
-                    formData.append("files[]", identificationFile1);
+                    if (typeof identificationFile1 !== "string") {
+                        formData.append("identification_id1", identificationId1);
+                        formData.append("identification_type1", identificationType1);
+                        formData.append("files[]", identificationFile1);
+                    }
                 }
                 if (identificationId2 !== undefined && identificationType2 !== undefined) {
-                    formData.append("identification_id2", identificationId2);
-                    formData.append("identification_type2", identificationType2);
-                    formData.append("files[]", identificationFile2);
+                    if (typeof identificationFile1 !== "string") {
+                        formData.append("identification_id2", identificationId2);
+                        formData.append("identification_type2", identificationType2);
+                        formData.append("files[]", identificationFile2);
+                    }
                 }
                 formData.append("note", note);
 
                 formData.append("purchase_id", purchaseId);
                 formData.append("service_officer_id", getItem("userdata").id);
                 formData.append("purchase_date", moment().format('YYYY-MM-DD HH:ss'));
-                formData.append("files[]", signFile);
+                formData.append("files[]", file);
                 formData.append("purchase_price", purchasePrice);
                 formData.append("status", 3);
 
@@ -703,7 +734,7 @@ let FormPurchaseContract = (props) => {
                     <div className='screen-div2 purchase-register-container'>
                         <div className='screen-div2'>
                             <div>
-                                <div className="input-label">店舗名</div>
+                                <div className="input-label">店舗名<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <Select
                                         onChange={(e) => handleShopChange(e.target.value)}
@@ -734,7 +765,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">名前</div>
+                                <div className="input-label">名前<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <TextInput
                                         id="name"
@@ -749,7 +780,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">カタカナ名</div>
+                                <div className="input-label">カタカナ名<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <TextInput
                                         id="name_kana"
@@ -767,7 +798,7 @@ let FormPurchaseContract = (props) => {
                         <div className='screen-div2'>
                             <div className='flex-left'>
                                 <div className="mt-5" style={{ width: '100%' }}>
-                                    <div className="input-label">生年月日</div>
+                                    <div className="input-label">生年月日<span className='require-label'>*</span></div>
                                     <div className="input-value">
                                         <DateInput
                                             className="shop-select"
@@ -777,7 +808,7 @@ let FormPurchaseContract = (props) => {
                                     </div>
                                 </div>
                                 <div className="mt-5" style={{ width: '80px' }}>
-                                    <div className="input-label">性別</div>
+                                    <div className="input-label">性別<span className='require-label'>*</span></div>
                                     <div className="input-value">
                                         <Select
                                             onChange={(e) => setGender(e.target.value)}
@@ -792,7 +823,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">電話番号(自宅)</div>
+                                <div className="input-label">電話番号(自宅)<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <PhoneInput
                                         id="phone"
@@ -805,7 +836,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">電話番号(携帯)</div>
+                                <div className="input-label">電話番号(携帯)<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <PhoneInput
                                         id="phone"
@@ -818,7 +849,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">職業</div>
+                                <div className="input-label">職業<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <Select
                                         onChange={(e) => setJob(e.target.value)}
@@ -838,7 +869,7 @@ let FormPurchaseContract = (props) => {
                     <div className='screen-div2 purchase-register-container'>
                         <div className='screen-div2'>
                             <div>
-                                <div className="input-label">郵便番号</div>
+                                <div className="input-label">郵便番号<span className='require-label'>*</span></div>
                                 <div className="input-value flex-left">
                                     <ZipcodeInput
                                         className='w-200'
@@ -857,7 +888,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">都道府県</div>
+                                <div className="input-label">都道府県<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <Select
                                         onChange={handleChangeAddress1}
@@ -875,7 +906,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">市町村</div>
+                                <div className="input-label">市町村<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <Select
                                         onChange={handleChangeAddress2}
@@ -890,7 +921,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">住所詳細</div>
+                                <div className="input-label">住所詳細<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <TextInput
                                         id="address3"
@@ -907,7 +938,7 @@ let FormPurchaseContract = (props) => {
                         </div>
                         <div className='screen-div2'>
                             <div>
-                                <div className="input-label">本人確認書類</div>
+                                <div className="input-label">本人確認書類<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <div className='flex-left' style={{ height: '35px' }}>
                                         {/* <div>
@@ -927,10 +958,11 @@ let FormPurchaseContract = (props) => {
                                                     <MenuItem value={4}>パスポート</MenuItem>
                                                 </Select>
                                                 <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                    <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
+                                                    <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='.jpg,.jpeg,.png,.pdf' />
                                                     <ImageIcon className='file-icon' />
                                                 </label>
-                                                <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen} />
+                                                <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen1} />
+                                                <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 1)} />
                                                 <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                             </div>
                                             {isVisible && (
@@ -947,9 +979,11 @@ let FormPurchaseContract = (props) => {
                                                         <MenuItem value={4}>パスポート</MenuItem>
                                                     </Select>
                                                     <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                        <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                        <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='.jpg,.jpeg,.png,.pdf' />
                                                         <ImageIcon className='file-icon' />
                                                     </label>
+                                                    <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen2} />
+                                                    <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 2)} />
                                                     <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                                 </div>
                                             )}
@@ -958,7 +992,7 @@ let FormPurchaseContract = (props) => {
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <div className="input-label">特記事項</div>
+                                <div className="input-label">特記事項<span className='require-label'>*</span></div>
                                 <div className="input-value">
                                     <textarea
                                         rows={10}
@@ -1136,8 +1170,8 @@ let FormPurchaseContract = (props) => {
                         className='image-preview'
                         onClose={() => handleSignDialogClose()}
                     >
-                        <div style={{height: '500px', padding: '10px'}}>
-                            <div className='flex-center' style={{height: '440px'}}>
+                        <div style={{ height: '500px', padding: '10px' }}>
+                            <div className='flex-center' style={{ height: '440px' }}>
                                 <SignatureCanvas
                                     ref={signCanvas}
                                     penColor="black"

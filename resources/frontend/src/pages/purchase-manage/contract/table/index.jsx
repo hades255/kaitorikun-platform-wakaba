@@ -44,10 +44,11 @@ let TablePurchaseContract = (props) => {
             } else if (props.coupon == 3) {
                 setCoupon(10000)
             }
+
             setSummaryItems(newItems)
             setTotal(totalAmount)
-            setTotalPrice(totalPrice - coupon)
-            props.onHandleCalcPrice(totalPrice - coupon)
+            setTotalPrice(totalPrice)
+            props.onHandleCalcPrice(totalPrice)
         }
     }, [props.items, props.categories1, props.coupon]);
 
@@ -103,7 +104,7 @@ let TablePurchaseContract = (props) => {
             <div style={{ textAlign: "center", display: "flex", justifyContent: "center", marginTop: '20px' }}>
                 <table border="1">
                     <thead>
-                        <tr style={{backgroundColor: '#e6e6e6'}}>
+                        <tr style={{ backgroundColor: '#e6e6e6' }}>
                             <th style={{ width: "200px", padding: "10px" }}>カテゴリー1</th>
                             <th style={{ width: "600px", padding: "10px" }}>商品名</th>
                             <th style={{ width: "100px", padding: "10px" }}>個数</th>
@@ -125,7 +126,7 @@ let TablePurchaseContract = (props) => {
             <div style={{ textAlign: "center", display: "flex", justifyContent: "right", gap: '10px', marginTop: '10px' }}>
                 <label>買取点数 {total ? total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}点</label>
                 {coupon > 0 && <label>{coupon ? coupon.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}円のクーポンを利用</label>}
-                <label>買取合計 {totalPrice ? totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}円</label>
+                <label>買取合計 {totalPrice ? (totalPrice - coupon).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0}円</label>
             </div>
         </div>
     );

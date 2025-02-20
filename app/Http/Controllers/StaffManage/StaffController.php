@@ -285,7 +285,7 @@ class StaffController extends Controller
                 'staff_id' => $staff['staff_id'],
                 'password' => $staff['password']
             );
-            Mail::send('email.staff_register_end', compact('data'), function ($message) use ($data) {
+            Mail::send('email.staff_register_send', compact('data'), function ($message) use ($data) {
                 $message->to($data['email'])->subject($data['name'] . '樣スタッフ登録が完了しました。');
             });
         } catch (\Throwable $error) {

@@ -20,6 +20,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import { withRouter } from "react-router-dom";
@@ -98,6 +99,7 @@ let FormPurchaseCustomer = (props) => {
     const dispatch = useDispatch();
 
     const [purchaseId, setPurchaseId] = useState(0)
+    const [coupon, setCoupon] = useState()
 
     const [items, setItems] = useState([]);
     const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
@@ -109,12 +111,14 @@ let FormPurchaseCustomer = (props) => {
     const [openLeaveItemDialog, setOpenLeaveItemDialog] = useState(false);
     const [openHearingDialog, setOpenHearingDialog] = useState(false)
     const [openStatusDialog, setOpenStatusDialog] = useState(false)
+    const [openCouponDialog, setOpenCouponDialog] = useState(false)
     const [selectedItemHearingValue1, setSelectedItemHearingValue1] = useState()
     const [selectedItemHearingValue2, setSelectedItemHearingValue2] = useState()
     const [selectedItemHearingValue3, setSelectedItemHearingValue3] = useState()
     const [selectedItemHearingValue4, setSelectedItemHearingValue4] = useState()
     const [openSummaryItemDialog, setOpenSummaryItemDialog] = useState(false);
     const [selectedItemImages, setSelectedItemImages] = useState([]);
+    const [selectedItemImage, setSelectedItemImage] = useState();
 
     const hearingNews = [
         'さきがけ',
@@ -153,8 +157,9 @@ let FormPurchaseCustomer = (props) => {
         '学生',
         '無職',
     ];
-    const results = ["買取", "不正約", "預り", "返品"];
+    const results = ["お預かり", "買取済", "出品中", "不正約", "クーリングオフ期間", "卸発送中", "入金確認済"];
     const coupons = ["利用なし", "クーポン1", "クーポン2", "現金還元"];
+    const purchase_coupons = ["3,000円", "5,000円", "10,000円"];
     const gifts = ["なし", "テイッシュボックス", "その他"];
 
     //For OCR
@@ -434,14 +439,38 @@ let FormPurchaseCustomer = (props) => {
     }
 
     const handleFileChange = (e, index) => {
-        console.log(index);
         const file = e.target.files[0]
+        alert(file.name + "を取り込みました。")
         if (index == 1) {
             setIdentificationType1(file.type);
             setIdentificationFile1(file);
         } else if (index == 2) {
             setIdentificationType2(file.type);
             setIdentificationFile2(file);
+        }
+    }
+
+    const handleDeleteFile = (e, index) => {
+        if (index == 1) {
+            if (identificationFile1 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType1(undefined);
+                    setIdentificationFile1(undefined);
+                }
+            }
+        } else if (index == 2) {
+            if (identificationFile2 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType2(undefined);
+                    setIdentificationFile2(undefined);
+                }
+            }
         }
     }
 
@@ -494,10 +523,52 @@ let FormPurchaseCustomer = (props) => {
         setOpenCameraPreview(true)
     }
 
+    const setCurrentImage = (id) => {
+        console.log(id);
+
+        setSelectedItemImage(id);
+    }
+
     const handleCapturedItemImageDialog = () => {
         setCameraCaptureType("item")
         setOpenImageSlider(false)
         setOpenCameraPreview(true)
+    }
+
+    useEffect(() => {
+        if (selectedIndex !== undefined) {
+            let selectedItem = items?.filter(item => item.id === selectedIndex)
+            setSelectedItemImages([])
+            let images = []
+            selectedItem?.forEach(item => {
+                if (item.image_files.length > 0) {
+                    item.image_files?.forEach(image => { // base64
+                        images.push(image)
+                    });
+                }
+            });
+            
+            setSelectedItemImages(images)
+        }
+    }, [items]);
+    
+    const handleDeleteItemImage = () => {
+        if (selectedItemImages.length > 0) {
+            if (window.confirm("本当に削除してもよろしいでしょうか？")) {
+                setItems(items.map(item =>
+                    item.id === selectedIndex
+                        ? { ...item, images: item.images - 1 }
+                        : item
+                ));
+                setItems((prevGroups) =>
+                    prevGroups.map((group) =>
+                        group.id === selectedIndex
+                            ? { ...group, image_files: group.image_files.filter((_, i) => i !== selectedItemImage) } 
+                            : group
+                    )
+                );
+            }
+        }
     }
 
     const handleCameraPreviewClose = () => {
@@ -552,6 +623,10 @@ let FormPurchaseCustomer = (props) => {
 
     const handleStatusDialogClose = () => {
         setOpenStatusDialog(false)
+    }
+
+    const handleCouponDialogClose = () => {
+        setOpenCouponDialog(false)
     }
 
     const handleAddItemsClose = () => {
@@ -700,6 +775,14 @@ let FormPurchaseCustomer = (props) => {
         }
     }
 
+    const handleCouponItemsClick = () => {
+        if (items.length <= 0) {
+            alert("まず、商品を追加していただけますでしょうか？");
+            return;
+        }
+        setOpenCouponDialog(true)
+    }
+
     const handleStampSheetClick = () => {
         const selectedItems = items.filter(item => item.category1 === '切手')
         if (selectedItems.length <= 0) {
@@ -713,6 +796,10 @@ let FormPurchaseCustomer = (props) => {
 
     const handleResultSelectChange = (value) => {
         setItems(items.map(item => ({ ...item, result: value })));
+    };
+
+    const handleCouponSelectChange = (value) => {
+        setCoupon(value)
     };
 
     const handleToCustomerPageClick = async () => {
@@ -798,16 +885,16 @@ let FormPurchaseCustomer = (props) => {
                 formData.append("address3", address3);
             }
             if (identificationId1 !== undefined && identificationType1 !== undefined) {
-                formData.append("identification_id1", identificationId1);
-                formData.append("identification_type1", identificationType1);
                 if (typeof identificationFile1 !== "string") {
+                    formData.append("identification_id1", identificationId1);
+                    formData.append("identification_type1", identificationType1);
                     formData.append("files[]", identificationFile1);
                 }
             }
             if (identificationId2 !== undefined && identificationType2 !== undefined) {
-                formData.append("identification_id2", identificationId2);
-                formData.append("identification_type2", identificationType2);
                 if (typeof identificationFile1 !== "string") {
+                    formData.append("identification_id2", identificationId2);
+                    formData.append("identification_type2", identificationType2);
                     formData.append("files[]", identificationFile2);
                 }
             }
@@ -823,6 +910,7 @@ let FormPurchaseCustomer = (props) => {
                 formData.append("document_type", documentType);
                 formData.append("files[]", documentFile);
             }
+            formData.append("coupon", coupon);
             formData.append("status", 2);
             setItems(items.map(item => ({ ...item, image_files: JSON.stringify(item.image_files) })));
             items.forEach(item => formData.append("items[]", JSON.stringify(item)));
@@ -1146,7 +1234,7 @@ let FormPurchaseCustomer = (props) => {
                             </div>
                         </div>
                         <div className="mt-5">
-                            <div className="input-label">名前</div>
+                            <div className="input-label">名前<span className='require-label'>*</span></div>
                             <div className="input-value">
                                 <TextInput
                                     id="name"
@@ -1204,7 +1292,7 @@ let FormPurchaseCustomer = (props) => {
                     </div>
                     <div className='screen-div2'>
                         <div className="mt-5">
-                            <div className="input-label">電話番号(自宅)</div>
+                            <div className="input-label">電話番号(自宅)<span className='require-label'>*</span></div>
                             <div className="input-value">
                                 <PhoneInput
                                     id="phone"
@@ -1217,7 +1305,7 @@ let FormPurchaseCustomer = (props) => {
                             </div>
                         </div>
                         <div className="mt-5">
-                            <div className="input-label">電話番号(携帯)</div>
+                            <div className="input-label">電話番号(携帯)<span className='require-label'>*</span></div>
                             <div className="input-value">
                                 <PhoneInput
                                     id="phone"
@@ -1246,7 +1334,7 @@ let FormPurchaseCustomer = (props) => {
                             </div>
                         </div>
                         <div className="mt-5">
-                            <div className="input-label">査定完了予定日時</div>
+                            <div className="input-label">査定完了予定日時<span className='require-label'>*</span></div>
                             <div className="input-value">
                                 <DateTimeInput
                                     value={checkPlanDate ? checkPlanDate : 0}
@@ -1276,10 +1364,11 @@ let FormPurchaseCustomer = (props) => {
                                                 <MenuItem value={4}>パスポート</MenuItem>
                                             </Select>
                                             <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
+                                                <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='.jpg,.jpeg,.png,.pdf' />
                                                 <ImageIcon className='file-icon' />
                                             </label>
                                             <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen1} />
+                                            <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 1)} />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                         </div>
                                         {isVisible && (
@@ -1296,10 +1385,11 @@ let FormPurchaseCustomer = (props) => {
                                                     <MenuItem value={4}>パスポート</MenuItem>
                                                 </Select>
                                                 <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                    <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                    <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='.jpg,.jpeg,.png,.pdf' />
                                                     <ImageIcon className='file-icon' />
                                                 </label>
                                                 <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen2} />
+                                                <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 2)} />
                                                 <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                             </div>
                                         )}
@@ -1553,6 +1643,14 @@ let FormPurchaseCustomer = (props) => {
                     loading
                     textLoading="Waiting"
                     type="submit"
+                    color="outline-info"
+                    title="クーポン利用"
+                    onClick={handleCouponItemsClick}
+                />
+                <Button
+                    loading
+                    textLoading="Waiting"
+                    type="submit"
                     color="success"
                     title="切手査定シート"
                     onClick={handleStampSheetClick}
@@ -1578,6 +1676,12 @@ let FormPurchaseCustomer = (props) => {
                     onHandleItemImagesClick={handleItemImagesClick}
                 />
             </DataContext.Provider>
+            {
+                coupon &&
+                <div className='flex-right'>
+                    <label>{purchase_coupons[coupon - 1]}のクーポンを利用</label>
+                </div>
+            }
             <div>
                 <Dialog
                     open={openImagePreview}
@@ -1769,6 +1873,36 @@ let FormPurchaseCustomer = (props) => {
                     </div>
                 </div>
             </Dialog>
+            <Dialog
+                open={openCouponDialog}
+                onClose={() => handleCouponDialogClose()}
+            >
+                <div className='item-status-container'>
+                    <label className='mt-20'>クーポンを設定してください。</label>
+                    <div>
+                        <Select
+                            onChange={(e) => handleCouponSelectChange(e.target.value)}
+                            displayEmpty
+                            className="shop-select"
+                        >
+                            {purchase_coupons.map((item, key) => (
+                                <MenuItem key={key} value={key + 1}>{item}</MenuItem>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className="mt-5">
+                        <Button
+                            loading
+                            textLoading="Waiting"
+                            type="submit"
+                            color="outline-secondary"
+                            title="閉じる"
+                            className="w-100-pro"
+                            onClick={handleCouponDialogClose}
+                        />
+                    </div>
+                </div>
+            </Dialog>
             <div>
                 <Dialog
                     open={openSummaryItemDialog}
@@ -1789,15 +1923,15 @@ let FormPurchaseCustomer = (props) => {
                     onClose={() => handleImageSliderClose()}
                     className='image-preview'
                 >
-                    <div className=''>
-                        <Swiper spaceBetween={0} slidesPerView={1} autoplay={{ delay: 300 }} loop={true} style={{ textAlign: 'center', minHeight: '400px' }}>
+                    <div style={{ position: 'relative' }}>
+                        <Swiper onSlideChange={(swiper) => setCurrentImage(swiper.realIndex)} spaceBetween={0} slidesPerView={1} autoplay={{ delay: 300 }} loop={true} style={{ textAlign: 'center', minHeight: '400px' }}>
                             {selectedItemImages.map((image_file, key) => (
                                 <SwiperSlide key={key}><img src={image_file} alt="1" /></SwiperSlide>
                             ))}
                         </Swiper>
                         {
                             selectedIndex && (
-                                <div className='flex-base mt-10' style={{ marginBottom: '10px' }}>
+                                <div className='flex-base' style={{ padding: '10px', backgroundColor: 'white', position: 'absolute', top: '0', width: '100%', zIndex: '10' }}>
                                     <Button
                                         loading
                                         textLoading="Waiting"
@@ -1806,6 +1940,15 @@ let FormPurchaseCustomer = (props) => {
                                         className="w-100"
                                         title="追加"
                                         onClick={handleCapturedItemImageDialog}
+                                    />
+                                    <Button
+                                        loading
+                                        textLoading="Waiting"
+                                        type="submit"
+                                        color="danger"
+                                        className="w-100"
+                                        title="削除"
+                                        onClick={handleDeleteItemImage}
                                     />
                                 </div>
                             )

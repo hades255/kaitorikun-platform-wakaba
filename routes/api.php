@@ -62,6 +62,7 @@ Route::post('/purchase/contract', [PurchaseController::class, 'contract']);
 
 Route::post('/purchase/search/items', [ItemsController::class, 'search']);
 Route::post('/purchase/item/init-register', [ItemsController::class, 'initRegister']);
+Route::post('/items/list', [ItemsController::class, 'itemsList']);
 
 Route::post('/invitations/{id}/view', [InvitationController::class, 'view'])->name('invitations.view');
 Route::post('/invitations/{id}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');

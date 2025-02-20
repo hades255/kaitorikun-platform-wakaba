@@ -222,7 +222,7 @@ let LeaveItemsDialog = (props) => {
                     <label>以上</label>
                 </div>
                 <div style={{ textAlign: "right", marginTop: "20px", fontSize: "14px" }}>
-                    <label>買取WAKABA　{customer_shop}</label>
+                    <label>業務システム買取くん{customer_shop}</label>
                 </div>
                 <div style={{ textAlign: "right", marginTop: "20px", fontSize: "14px" }}>
                     <label>TEL：0867-88-0582</label>

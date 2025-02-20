@@ -19,7 +19,9 @@ import {
 } from "./components/index.jsx";
 import Notifications from "./components/Notifications/index.jsx";
 import "./index.css";
-//Tes
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+
 const App = () => {
     const windowSize = useWindowSize();
     const screenSize = useSelector(selectorUtility.screenSize);
@@ -44,6 +46,14 @@ const App = () => {
             addWindowClass("sidebar-closed");
             addWindowClass("sidebar-collapse");
         }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+
         // checkSidebarClass("sidebar-header");
     }, [windowSize, menuSidebarCollapsed, dispatch, screenSize]);
 

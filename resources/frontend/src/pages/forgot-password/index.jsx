@@ -31,12 +31,8 @@ const ForgotPassword = (props) => {
     return (
         <div className="login-box container" style={{ marginTop: "10%" }}>
             <div className="card card-outline card-primary">
-                <div className="card-header text-center">
-                    <img
-                        src="img/logo.png"
-                        width={"200px"}
-                        alt="logo"
-                    />
+                <div className="card-header login-logo">
+                    業務システム買取くん
                 </div>
                 <div className="card-body">
                     <FormForgotPassword onSubmit={(data) => handleSubmit(data)} />

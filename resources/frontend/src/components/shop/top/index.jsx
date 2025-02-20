@@ -7,11 +7,15 @@ import Scrap from "../../ui/scrap";
 import SearchBar from "../../ui/searchbar";
 import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SearchIcon from '@mui/icons-material/Search';
+import OutlinedInput from "@mui/material/OutlinedInput"
+import InputAdornment from "@mui/material/InputAdornment"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Button from "@mui/material/Button";
 
 const Top = (props) => {
+    const [showSearchBar, setShowSearchBar] = useState(false)
     const dispatch = useDispatch();
 
     const logout = () => {
@@ -22,6 +26,15 @@ const Top = (props) => {
             props.history.location.pathname = "/";
         }, 500);
     };
+
+    const handleSearch = () => {
+        setShowSearchBar(true)
+    }
+
+    const handleSearchClick = () => {
+        setShowSearchBar(false)
+    }
+
     return (
         <div className="staff-top-items">
             <div className="left">
@@ -48,9 +61,39 @@ const Top = (props) => {
                 <div className="cost-field">
                     <Scrap />
                 </div>
-                <div>
-                    <SearchBar />
-                </div>
+                {
+                    !showSearchBar &&
+                    <div>
+                        <IconButton color="primary" onClick={handleSearch}>
+                            <SearchIcon />
+                        </IconButton>
+                    </div>
+                }
+                {
+                    showSearchBar &&
+                    <div style={{ position: 'absolute', left: '0', backgroundColor: 'white', width: '100%', zIndex: '10' }}>
+                        <React.Fragment>
+                            <OutlinedInput
+                                id="search-bar"
+                                type="text"
+                                size="small"
+                                placeholder="検索"
+                                className="filter-field"
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="search-bar"
+                                            edge="end"
+                                            onClick={handleSearchClick}
+                                        >
+                                            <SearchIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                            />
+                        </React.Fragment>
+                    </div>
+                }
             </div>
             <div className="right">
                 <div className="user-name">{getItem("userdata").name}</div>

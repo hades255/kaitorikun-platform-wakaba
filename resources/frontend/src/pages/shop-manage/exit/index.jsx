@@ -45,7 +45,7 @@ const StaffExit = (props) => {
     };
     return (
         <PanelContent title="">
-            <div className="page-title">新規スタッフ登録 <br />(本登録入力フォーム)</div>
+            <div className="page-title">退会</div>
             <FormStaffExit onSubmit={(data) => handleSubmit(data)} />
         </PanelContent>
     );

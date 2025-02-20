@@ -168,7 +168,7 @@ const ChatSidebar = () => {
             <List>
                 {pinnedChats?.map((user) => (
                     <ChatItem
-                        key={user.id}
+                        key={user.type + user.id}
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}
@@ -195,7 +195,7 @@ const ChatSidebar = () => {
                 )}
                 {recentChats?.map((user) => (
                     <ChatItem
-                        key={user.id}
+                        key={user.type + user.id}
                         user={user}
                         selected={selectedUser}
                         onClick={handleSetSelectedUser}

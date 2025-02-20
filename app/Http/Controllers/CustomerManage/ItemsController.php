@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Index\CustomerRequest;
 use App\Http\Requests\Index\ItemInitRegisterRequest;
 use App\Http\Requests\Index\ItemMasterRequest;
+use App\Http\Requests\Index\ItemsListRequest;
 use App\Http\Requests\Store\CustomerRequest as StoreCustomerRequest;
 use App\Models\Customer;
 use App\Models\City;
@@ -14,6 +15,8 @@ use App\Models\Items;
 use App\Models\Prefectures;
 use App\Models\Purchase;
 use App\Models\Shop;
+use App\Models\Staff;
+use App\Models\User;
 use Carbon\Carbon;
 
 class ItemsController extends Controller
@@ -171,11 +174,11 @@ class ItemsController extends Controller
     }
 
     /**
-     * 商品お預かり証更新API
+     * 在庫一覧
      *
-     * @param StoreCustomerRequest $request
+     * @param ItemsListRequest $request
      */
-    public function leaveItemsRegister(StoreCustomerRequest $request)
+    public function itemsList(ItemsListRequest $request)
     {
         //check validate
         $errors = $this->checkForm($request);
@@ -189,8 +192,65 @@ class ItemsController extends Controller
 
         // バリデーションされたデータを取得
         $validatedData = $request->validated();
+        $user = User::find($validatedData["user_id"]);
+        $shop_id = "";
+        if ($user->role > 4) {
+            $staff = Staff::where("system_user_id", $user->id)->first();
+            $shop_id = $staff->shop_id;
+            $validatedData["shop_id"] = $shop_id;
+        }
+        $items = Items::getItemsList($validatedData);
+        $itemsList = array();
+        foreach ($items as $key => $item) {
+            $newItem = array();
+            $newItem["id"] = str_pad($item->id, 4, '0', STR_PAD_LEFT);
+            $newItem["purchase_id"] = str_pad($item->purchase_id, 4, '0', STR_PAD_LEFT);
+            $newItem["customer_id"] = $item->customer_id;
+            $newItem["result"] = $item->result;
+            $newItem["purchase_date"] = $item->purchase_date;
+            $newItem["officer_name"] = $item->officer_name;
+            $newItem["shop_name"] = $item->shop_name;
+            // customer
+            $newItem["name"] = $item->name;
+            $newItem["name_kana"] = $item->name_kana;
+            $newItem["phone_number"] = $item->phone_number1 ? $item->phone_number1 : $item->phone_number2;
+            $newItem["address"] = $item->address1 . $item->address2 . $item->address3;
+            $newItem["type"] = $item->type;
 
-        return response()->json(['message' => 'OK'], 200);
+            $newItem["category1"] = $item->category1;
+            $newItem["category2"] = $item->category2;
+            $newItem["category3"] = $item->category3;
+            $newItem["category4"] = $item->category4;
+            $newItem["category5"] = $item->category5;
+            $newItem["category6"] = $item->category6;
+            $newItem["images"] = $item->images;
+            $newItem["image_files"] = $item->image_files;
+            $newItem["item_name"] = $item->item_name;
+            $newItem["amount"] = $item->amount;
+            $newItem["gold_seeds"] = $item->gold_seeds;
+            $newItem["g_face_value"] = $item->g_face_value;
+            $newItem["purchase_price"] = $item->request_price;
+            $newItem["highest_check_price"] = $item->highest_check_price;
+            $newItem["sales_forecast"] = $item->sales_forecast;
+            $newItem["sales_price"] = $item->sales_price;
+
+            $newItem["tentative_appraisal_date"] = $item->tentative_appraisal_date;
+            $newItem["tentative_appraisal_price"] = $item->tentative_appraisal_price;
+            $newItem["actual_appraisal_date"] = $item->actual_appraisal_date;
+            $newItem["actual_appraisal_price"] = $item->actual_appraisal_price;
+            
+            $newItem["postage"] = $item->postage;
+            $newItem["profit_forecast"] = $item->profit_forecast;
+            $newItem["profit_price"] = $item->profit_price;
+            $newItem["wholesale_destination"] = $item->wholesale_destination;
+            $newItem["payment_date"] = $item->payment_date;
+            $newItem["wholesale_date"] = $item->wholesale_date;
+            $newItem["note1"] = $item->note1;
+            $newItem["note2"] = $item->note2;
+            $newItem["selected"] = false;
+            $itemsList[] = $newItem;
+        }
+        return response()->json(['items' => $itemsList, 'shop_id' => $shop_id], 200);
     }
 
     /**

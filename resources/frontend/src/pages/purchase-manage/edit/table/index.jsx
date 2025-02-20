@@ -23,7 +23,7 @@ let TablePurchase = (props) => {
     const category5 = props.categories5;
     const category6 = props.categories6;
     const agrees = ["申請", "許可", "変更", "基準外", "不可", "預り"];
-    const results = ["買取", "不正約", "預り", "返品"];
+    const results = ["お預かり", "買取済", "出品中", "不正約", "クーリングオフ期間", "卸発送中", "入金確認済"];
     const { items, setItems } = useContext(DataContext);
 
     const [categoryColumnsVisibility, setCategoryColumnsVisibility] = useState({
@@ -108,9 +108,9 @@ let TablePurchase = (props) => {
                     カテゴリー1
                     {
                         categoryVisibility ?
-                            <ArrowBackIosIcon size="small" onClick={toggleCategoryColumn} />
+                            <ArrowBackIosIcon size="small" style={{cursor: "pointer"}} onClick={toggleCategoryColumn} />
                             :
-                            <ArrowForwardIosIcon size="small" onClick={toggleCategoryColumn} />
+                            <ArrowForwardIosIcon size="small" style={{cursor: "pointer"}} onClick={toggleCategoryColumn} />
                     }
                 </div>
             ),
@@ -244,9 +244,9 @@ let TablePurchase = (props) => {
                     業社
                     {
                         companyVisibility ?
-                            <ArrowBackIosIcon size="small" onClick={toggleCompanyColumn} />
+                            <ArrowBackIosIcon size="small" style={{cursor: "pointer"}} onClick={toggleCompanyColumn} />
                             :
-                            <ArrowForwardIosIcon size="small" onClick={toggleCompanyColumn} />
+                            <ArrowForwardIosIcon size="small" style={{cursor: "pointer"}} onClick={toggleCompanyColumn} />
                     }
                 </div>
             ),

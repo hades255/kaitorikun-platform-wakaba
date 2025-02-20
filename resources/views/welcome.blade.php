@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <meta http-equiv="Cache-control" content="public"> --}}
     <link href={{ mix('css/app.css') }} rel="stylesheet">
-    <title>WAKABA</title>
+    <title>業務システム買取くん</title>
 </head>
 
 <body id="body" class="sidebar-mini" style="overflow: hidden;">

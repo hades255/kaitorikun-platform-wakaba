@@ -43,8 +43,7 @@ const Menu = (props) => {
                 来店
             </div>
             <Link to="/purchase/list" className="menu-item">買取計算書一覧</Link>
-            <Link to="#" className="menu-item">商品一覧</Link>
-            <Link to="#" className="menu-item">業者査定シート</Link>
+            <Link to="/items" className="menu-item">在庫一覧</Link>
             <Link to="#" className="menu-item">業者卸発送一覧</Link>
             <Link to="#" className="menu-item">月次収支報告書</Link>
             <Link to="#" className="menu-item">金庫入出金履歴</Link>

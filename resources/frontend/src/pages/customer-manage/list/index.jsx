@@ -11,7 +11,6 @@ import {
 } from "../../../components";
 import { withRouter } from "react-router-dom";
 import CustomerTable from "./table";
-import FilterableTable from "./filterable-table"
 
 const CustomerList = (props) => {
     const dispatch = useDispatch();
@@ -41,6 +40,10 @@ const CustomerList = (props) => {
         props.history.push("/customer/edit", { pathname: "/customer/edit", id: data.id });
     };
 
+    const handleCustomerRegister = () => {
+        props.history.push("/customer/register");
+    };
+
     return (
         <PanelContent title="">
             <div className="page-title">顧客一覧</div>
@@ -49,6 +52,7 @@ const CustomerList = (props) => {
                 <CustomerTable
                     dataSource={customers}
                     onHandleEdit={handleCustomerEdit}
+                    onHandleCustomerRegister={handleCustomerRegister}
                 />
             </div>
         </PanelContent>

@@ -5,7 +5,7 @@ const NotificationContext = createContext();
 export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
-    const [permission, setPermission] = useState(Notification.permission);
+    const [permission, setPermission] = useState();
     const [unreadTab, setUnreadTab] = useState({ todo: false, com: false, chat: false, scom: [] });
 
     const requestNotificationPermission = () => {

@@ -16,6 +16,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import ZipcodeInput from "../../../../components/ZipcodeInput";
@@ -64,6 +65,7 @@ let FormStaffRegister = (props) => {
     const [guarantors, setGuarantors] = useState([])
     const [openImagePreview, setOpenImagePreview] = useState(false)
     const [openCameraPreview, setOpenCameraPreview] = useState(false)
+    const [openRegisterPreview, setOpenRegisterPreview] = useState(false)
     const [cameraCaptureType, setCameraCaptureType] = useState()
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
@@ -71,6 +73,21 @@ let FormStaffRegister = (props) => {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
+
+    const types = [
+        { "id": 3, "name": "マネージャー" },
+        { "id": 4, "name": "本部社員" },
+        { "id": 5, "name": "店長" },
+        { "id": 6, "name": "社員" },
+        { "id": 7, "name": "アルバイト" },
+    ]
+
+    const identifications = [
+        { "id": 1, "name": "マイナンバー" },
+        { "id": 2, "name": "運転免許証" },
+        { "id": 3, "name": "健康保険証" },
+        { "id": 4, "name": "パスポート" },
+    ]
 
     useEffect(() => {
         // API Call
@@ -143,12 +160,55 @@ let FormStaffRegister = (props) => {
 
     }
 
-    const handleShowIdentification = () => {
+    const handleDeleteFile = (e, index) => {
+        if (index == 1) {
+            console.log(identificationFile1);
+
+            if (identificationFile1 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType1(undefined);
+                    setIdentificationFile1(undefined);
+                }
+            }
+        } else if (index == 2) {
+            if (identificationFile2 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType2(undefined);
+                    setIdentificationFile2(undefined);
+                }
+            }
+        } else if (index == 3) {
+            if (historyFile === undefined) {
+                ToastNotification("error", "履歴書ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setHistoryType(undefined);
+                    setHistoryFile(undefined);
+                }
+            }
+        } else if (index == 4) {
+            if (workingHistoryFile === undefined) {
+                ToastNotification("error", "職務経歴書ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setWorkingHistoryType(undefined);
+                    setWorkingHistoryFile(undefined);
+                }
+            }
+        }
     }
 
     const handleFileChange = (e, index) => {
-        console.log(index);
         const file = e.target.files[0]
+        alert(file.name + "を取り込みました。")
         if (index == 1) {
             setIdentificationType1(file.type);
             setIdentificationFile1(file);
@@ -283,112 +343,8 @@ let FormStaffRegister = (props) => {
         setPreviewImage("")
     }
 
-    const handlePdfPreview = async (file) => {
-        setOpenPdfPreview(true)
-        const previewPdf = await file
-        console.log(URL.createObjectURL(previewPdf));
-
-        setPreviewPdf(previewPdf)
-    }
-
-    const handlePdfPreviewClose = () => {
-        setOpenPdfPreview(false)
-        setPreviewPdf("")
-    }
-
-    const onDocumentLoadSuccess = ({ numPages }) => {
-        setNumPages(numPages);
-    };
-
-    const handleZipCode = async (e) => {
-        setZipCode(e);
-    }
-
-    const handleRegisterClick = async () => {
-        // check validate
-        if (staffId === undefined) {
-            ToastNotification("error", "スタッフIDは必須です。");
-            return;
-        }
-        if (email === undefined) {
-            ToastNotification("error", "メールアドレスは必須です。");
-            return;
-        }
-        if (email !== undefined && !email.includes("@")) {
-            ToastNotification("error", "メールアドレスの形式が無効です。");
-            return;
-        }
-        if (password === undefined) {
-            ToastNotification("error", "パスワードは必須です。");
-            return;
-        } else if (password.length < 8) {
-            ToastNotification("error", "パスワードは8文字以上入力してください。");
-            return;
-        }
-        if (shop === undefined) {
-            ToastNotification("error", "店舗名は必須です。");
-            return;
-        }
-        if (type === undefined) {
-            ToastNotification("error", "種別は必須です。");
-            return;
-        }
-        if (name === undefined) {
-            ToastNotification("error", "名前は必須です。");
-            return;
-        }
-        if (nameKana === undefined) {
-            ToastNotification("error", "カタカナ名は必須です。");
-            return;
-        }
-        if (phoneNumber === undefined) {
-            ToastNotification("error", "電話番号は必須です。");
-            return;
-        }
-        if (birthday === undefined) {
-            ToastNotification("error", "生年月日は必須です。");
-            return;
-        }
-        if (gender === undefined) {
-            ToastNotification("error", "性別は必須です。");
-            return;
-        }
-        if (zipCode === undefined) {
-            ToastNotification("error", "郵便番号は必須です。");
-            return;
-        }
-        if (address1 === undefined) {
-            ToastNotification("error", "都道府県は必須です。");
-            return;
-        }
-        if (address2 === undefined) {
-            ToastNotification("error", "市町村は必須です。");
-            return;
-        }
-        if (address3 === undefined) {
-            ToastNotification("error", "住所詳細は必須です。");
-            return;
-        }
-        let exist = false
-        if (identificationId1 !== undefined && identificationType1 !== undefined) {
-            exist = true;
-        }
-        if (identificationId2 !== undefined && identificationType2 !== undefined) {
-            exist = true;
-        }
-        if (!exist) {
-            ToastNotification("error", "本人確認書類は必須です。");
-            return;
-        }
-        if (historyType === undefined) {
-            ToastNotification("error", "履歴書は必須です。");
-            return;
-        }
-        if (guarantorId === undefined) {
-            ToastNotification("error", "連帯保証人は必須です。");
-            return;
-        }
-
+    const handleRegisterPreviewClose = async () => {
+        setOpenRegisterPreview(false)
         dispatch(utilityAction.setLoading("content"));
         if (window.confirm("この操作でスタッフが登録されます。本当に登録しますか？")) {
             try {
@@ -447,6 +403,115 @@ let FormStaffRegister = (props) => {
         } else {
             props.history.push("/");
         }
+    }
+
+    const handlePdfPreview = async (file) => {
+        setOpenPdfPreview(true)
+        const previewPdf = await file
+        console.log(URL.createObjectURL(previewPdf));
+
+        setPreviewPdf(previewPdf)
+    }
+
+    const handlePdfPreviewClose = () => {
+        setOpenPdfPreview(false)
+        setPreviewPdf("")
+    }
+
+    const onDocumentLoadSuccess = ({ numPages }) => {
+        setNumPages(numPages);
+    };
+
+    const handleZipCode = async (e) => {
+        setZipCode(e);
+    }
+
+    const handleRegisterClick = async () => {
+        // check validate
+        // if (staffId === undefined) {
+        //     ToastNotification("error", "スタッフIDは必須です。");
+        //     return;
+        // }
+        // if (email === undefined) {
+        //     ToastNotification("error", "メールアドレスは必須です。");
+        //     return;
+        // }
+        // if (email !== undefined && !email.includes("@")) {
+        //     ToastNotification("error", "メールアドレスの形式が無効です。");
+        //     return;
+        // }
+        // if (password === undefined) {
+        //     ToastNotification("error", "パスワードは必須です。");
+        //     return;
+        // } else if (!/^[a-zA-Z0-9]*$/.test(password) || password.length < 8) {
+        //     ToastNotification("error", "半角英数字を含む8文字以上入力してください。");
+        //     return;
+        // }
+        // if (shop === undefined) {
+        //     ToastNotification("error", "店舗名は必須です。");
+        //     return;
+        // }
+        // if (type === undefined) {
+        //     ToastNotification("error", "種別は必須です。");
+        //     return;
+        // }
+        // if (name === undefined) {
+        //     ToastNotification("error", "名前は必須です。");
+        //     return;
+        // }
+        // if (nameKana === undefined) {
+        //     ToastNotification("error", "カタカナ名は必須です。");
+        //     return;
+        // }
+        // if (phoneNumber === undefined) {
+        //     ToastNotification("error", "電話番号は必須です。");
+        //     return;
+        // }
+        // if (birthday === undefined) {
+        //     ToastNotification("error", "生年月日は必須です。");
+        //     return;
+        // }
+        // if (gender === undefined) {
+        //     ToastNotification("error", "性別は必須です。");
+        //     return;
+        // }
+        // if (zipCode === undefined) {
+        //     ToastNotification("error", "郵便番号は必須です。");
+        //     return;
+        // }
+        // if (address1 === undefined) {
+        //     ToastNotification("error", "都道府県は必須です。");
+        //     return;
+        // }
+        // if (address2 === undefined) {
+        //     ToastNotification("error", "市町村は必須です。");
+        //     return;
+        // }
+        // if (address3 === undefined) {
+        //     ToastNotification("error", "住所詳細は必須です。");
+        //     return;
+        // }
+        // let exist = false
+        // if (identificationId1 !== undefined && identificationType1 !== undefined) {
+        //     exist = true;
+        // }
+        // if (identificationId2 !== undefined && identificationType2 !== undefined) {
+        //     exist = true;
+        // }
+        // if (!exist) {
+        //     ToastNotification("error", "本人確認書類は必須です。");
+        //     return;
+        // }
+        // if (historyType === undefined) {
+        //     ToastNotification("error", "履歴書は必須です。");
+        //     return;
+        // }
+        // if (guarantorId === undefined) {
+        //     ToastNotification("error", "連帯保証人は必須です。");
+        //     return;
+        // }
+
+        setOpenRegisterPreview(true)
     };
 
     const handleCancelClick = () => {
@@ -488,8 +553,8 @@ let FormStaffRegister = (props) => {
         <div>
             <div className='staff-register-container'>
                 <div className='screen-div2'>
-                    <div className="mt-10">
-                        <div className="input-label">スタッフID</div>
+                    <div className="mt-5">
+                        <div className="input-label">スタッフID<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="staff_id"
@@ -503,8 +568,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">名前</div>
+                    <div className="mt-5">
+                        <div className="input-label">名前<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="name"
@@ -517,8 +582,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">カタカナ名</div>
+                    <div className="mt-5">
+                        <div className="input-label">カタカナ名<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="name_kana"
@@ -531,8 +596,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">生年月日</div>
+                    <div className="mt-5">
+                        <div className="input-label">生年月日<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <DateInput
                                 className="shop-select w-100"
@@ -540,8 +605,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">性別</div>
+                    <div className="mt-5">
+                        <div className="input-label">性別<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => setGender(e.target.value)}
@@ -553,8 +618,8 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">郵便番号</div>
+                    <div className="mt-5">
+                        <div className="input-label">郵便番号<span className='require-label'>*</span></div>
                         <div className="input-value flex-left">
                             <ZipcodeInput
                                 className='w-100-pro'
@@ -571,8 +636,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">都道府県</div>
+                    <div className="mt-5">
+                        <div className="input-label">都道府県<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress1}
@@ -589,8 +654,8 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">市町村</div>
+                    <div className="mt-5">
+                        <div className="input-label">市町村<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress2}
@@ -604,8 +669,8 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">住所詳細</div>
+                    <div className="mt-5">
+                        <div className="input-label">住所詳細<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="address3"
@@ -621,8 +686,8 @@ let FormStaffRegister = (props) => {
                     </div>
                 </div>
                 <div className='screen-div2'>
-                    <div className="mt-10">
-                        <div className="input-label">店舗名</div>
+                    <div className="mt-5">
+                        <div className="input-label">店舗名<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => setShop(e.target.value)}
@@ -639,8 +704,8 @@ let FormStaffRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">種別</div>
+                    <div className="mt-5">
+                        <div className="input-label">種別<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => setType(e.target.value)}
@@ -651,16 +716,14 @@ let FormStaffRegister = (props) => {
                                 <MenuItem disabled value="">
                                     <span className="text-gray-500">種別</span>
                                 </MenuItem>
-                                <MenuItem value={3}>マネージャー</MenuItem>
-                                <MenuItem value={4}>本部社員</MenuItem>
-                                <MenuItem value={5}>店長</MenuItem>
-                                <MenuItem value={6}>社員</MenuItem>
-                                <MenuItem value={7}>アルバイト</MenuItem>
+                                {types.map(item => (
+                                    <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                                ))}
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">メールアドレス</div>
+                    <div className="mt-5">
+                        <div className="input-label">メールアドレス<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="email"
@@ -673,8 +736,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">電話番号</div>
+                    <div className="mt-5">
+                        <div className="input-label">電話番号<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
@@ -685,8 +748,8 @@ let FormStaffRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">パスワード</div>
+                    <div className="mt-5">
+                        <div className="input-label">パスワード<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="password"
@@ -696,12 +759,12 @@ let FormStaffRegister = (props) => {
                                 autoComplete="new-password"
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                placeholder="パスワードは8文字以上"
+                                placeholder="半角英数字を含む8文字以上"
                             />
                         </div>
                     </div>
                     <div className="flex-left mt-20">
-                        <div className="input-label">本人確認書類</div>
+                        <div className="input-label">本人確認書類<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <div className='flex-left'>
                                 <div>
@@ -714,16 +777,16 @@ let FormStaffRegister = (props) => {
                                             className="shop-select w-150"
                                             size='small'
                                         >
-                                            <MenuItem value={1}>マイナンバー</MenuItem>
-                                            <MenuItem value={2}>運転免許証</MenuItem>
-                                            <MenuItem value={3}>健康保険証</MenuItem>
-                                            <MenuItem value={4}>パスポート</MenuItem>
+                                            {identifications.map(item => (
+                                                <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                                            ))}
                                         </Select>
                                         <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                            <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
+                                            <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='.jpg,.jpeg,.png,.pdf' />
                                             <ImageIcon className='file-icon' />
                                         </label>
                                         <CameraAltIcon className='file-icon camera-icon' onClick={handleIdentificationCameraDialogOpen1} />
+                                        <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 1)} />
                                         <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                     </div>
                                     {isVisible && (
@@ -733,16 +796,16 @@ let FormStaffRegister = (props) => {
                                                 className="shop-select w-150"
                                                 size='small'
                                             >
-                                                <MenuItem value={1}>マイナンバー</MenuItem>
-                                                <MenuItem value={2}>運転免許証</MenuItem>
-                                                <MenuItem value={3}>健康保険証</MenuItem>
-                                                <MenuItem value={4}>パスポート</MenuItem>
+                                                {identifications.map(item => (
+                                                    <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                                                ))}
                                             </Select>
                                             <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='.jpg,.jpeg,.png,.pdf' />
                                                 <ImageIcon className='file-icon' />
                                             </label>
                                             <CameraAltIcon className='file-icon camera-icon' onClick={handleIdentificationCameraDialogOpen2} />
+                                            <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 2)} />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                         </div>
                                     )}
@@ -750,31 +813,33 @@ let FormStaffRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">書類</div>
+                    <div className="mt-5">
+                        <div className="input-label">書類<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <div className='flex-left'>
                                 <div className='flex-center'>
                                     <label htmlFor={`doc_3`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                        <input type="file" id={`doc_3`} className='hidden' onChange={(e) => handleFileChange(e, 3)} accept='image/*, .pdf' />
+                                        <input type="file" id={`doc_3`} className='hidden' onChange={(e) => handleFileChange(e, 3)} accept='.jpg,.jpeg,.png,.pdf' />
                                         <ImageIcon className='file-icon' />
                                     </label>
                                     <CameraAltIcon className='file-icon camera-icon' onClick={handleHistoryCameraDialogOpen} />
+                                    <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 3)} />
                                     <div className="flex-center image-show-btn" onClick={handleHistoryPreview}>履歴書</div>
                                 </div>
                                 <div className='flex-center'>
                                     <label htmlFor={`doc_4`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                        <input type="file" id={`doc_4`} className='hidden' onChange={(e) => handleFileChange(e, 4)} accept='image/*, .pdf' />
+                                        <input type="file" id={`doc_4`} className='hidden' onChange={(e) => handleFileChange(e, 4)} accept='.jpg,.jpeg,.png,.pdf' />
                                         <ImageIcon className='file-icon' />
                                     </label>
                                     <CameraAltIcon className='file-icon camera-icon' onClick={handleWorkingHistoryCameraDialogOpen} />
+                                    <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 4)} />
                                     <div className="flex-center image-show-btn" onClick={handleWorkingHistoryPreview}>職務経歴書</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="mt-10">
-                        <div className="input-label">連帯保証人</div>
+                    <div className="mt-5">
+                        <div className="input-label">連帯保証人<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <div className='flex-left'>
                                 <div className='flex-center'>
@@ -800,7 +865,7 @@ let FormStaffRegister = (props) => {
 
             <div className='flex-center'
                 style={{
-                    marginTop: '50px',
+                    marginTop: '20px',
                     gap: '100px'
                 }}>
                 <div
@@ -864,6 +929,96 @@ let FormStaffRegister = (props) => {
                     )}
                 </DialogContent>
             </Dialog>
+            <div>
+                <Dialog
+                    open={openRegisterPreview}
+                    className='register-preview'
+                >
+                    <div className='flex-center'>
+                        <div className='screen-div2'>
+                            <div className='flex-center'>
+                                <label>スタッフID:</label>
+                                <label>{staffId}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>名前:</label>
+                                <label>{name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>カタカナ名:</label>
+                                <label>{nameKana}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>生年月日:</label>
+                                <label>{birthday}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>郵便番号:</label>
+                                <label>{zipCode}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>都道府県:</label>
+                                <label>{prefectures[address1 - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>市町村:</label>
+                                <label>{cities[address2 - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>住所詳細:</label>
+                                <label>{address3}</label>
+                            </div>
+                        </div>
+                        <div className='screen-div2'>
+                            <div className='flex-center'>
+                                <label>店舗名:</label>
+                                <label>{shops[shop - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>種別:</label>
+                                <label>{types[type - 3]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>メールアドレス:</label>
+                                <label>{email}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>性別:</label>
+                                <label>{gender == 1 ? "男" : "女"}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>電話番号:</label>
+                                <label>{phoneNumber}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>パスワード:</label>
+                                <label>{password}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>本人確認書類1:</label>
+                                <label>{identifications[identificationId1 - 1]?.name}</label>
+                            </div>
+                            {
+                                isVisible &&
+                                <div className='flex-center'>
+                                    <label>本人確認書類2:</label>
+                                    <label>{identifications[identificationId2 - 1]?.name}</label>
+                                </div>
+                            }
+                            <div className='flex-center'>
+                                <label>連帯保証人:</label>
+                                <label>{guarantors[guarantorId - 1]?.name}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex-center mt-20'>
+                        <div
+                            className="register-btn"
+                            onClick={handleRegisterPreviewClose}
+                        >登録する</div>
+                    </div>
+                </Dialog>
+            </div>
         </div>
     );
 };

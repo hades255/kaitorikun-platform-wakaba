@@ -287,9 +287,15 @@ class PurchaseController extends Controller
         if (isset($validatedData['note'])) {
             $customer->note = $validatedData['note'];
         }
-        $customer->hearing_item1_id = $validatedData['hearing_item1_id'];
-        $customer->hearing_item1_value = $validatedData['hearing_item1_value'];
-        $customer->hearing_item2_value = $validatedData['hearing_item2_value'];
+        if (isset($validatedData['hearing_item1_id'])) {
+            $customer->hearing_item1_id = $validatedData['hearing_item1_id'];
+        }
+        if (isset($validatedData['hearing_item1_value'])) {
+            $customer->hearing_item1_value = $validatedData['hearing_item1_value'];
+        }
+        if (isset($validatedData['hearing_item2_value'])) {
+            $customer->hearing_item2_value = $validatedData['hearing_item2_value'];
+        }
         if (isset($validatedData['hearing_line'])) {
             $customer->hearing_line = $validatedData['hearing_line'];
         }
@@ -335,7 +341,7 @@ class PurchaseController extends Controller
             $item->images = $data['images'];
             $item->image_files = $data['image_files'];
             $item->agree = $data['agree'];
-            $item->result = 3;
+            $item->result = $data['result'];
             $item->save();
         }
 
@@ -372,22 +378,30 @@ class PurchaseController extends Controller
             }
         }
         foreach ($uploadedFilePaths as $key => $value) {
-            if (isset($validatedData['identification_id1']) && isset($validatedData['identification_id2'])) {
-                if ($key == 0) {
-                    $validatedData['identification_path1'] = $value;
-                } elseif ($key == 1) {
-                    $validatedData['identification_path2'] = $value;
-                } elseif ($key == 2) {
-                    $validatedData['sign_path'] = $value;
+            if (isset($validatedData['identification_id1'])) {
+                if (isset($validatedData['identification_id2'])) {
+                    if ($key == 0) {
+                        $validatedData['identification_path1'] = $value;
+                    } elseif ($key == 1) {
+                        $validatedData['identification_path2'] = $value;
+                    } elseif ($key == 2) {
+                        $validatedData['sign_path'] = $value;
+                    }
+                } else {
+                    if ($key == 0) {
+                        $validatedData['identification_path1'] = $value;
+                    } elseif ($key == 1) {
+                        $validatedData['sign_path'] = $value;
+                    }
                 }
             } else {
-                if ($key == 0) {
-                    if (isset($validatedData['identification_id1'])) {
-                        $validatedData['identification_path1'] = $value;
-                    } elseif (isset($validatedData['identification_id2'])) {
+                if (isset($validatedData['identification_id2'])) {
+                    if ($key == 0) {
                         $validatedData['identification_path2'] = $value;
+                    } elseif ($key == 1) {
+                        $validatedData['sign_path'] = $value;
                     }
-                } elseif ($key == 1) {
+                } else {
                     $validatedData['sign_path'] = $value;
                 }
             }
@@ -429,7 +443,9 @@ class PurchaseController extends Controller
         $purchase->customer_id = $customer->id;
         $purchase->service_officer_id = $validatedData['service_officer_id'];
         $purchase->purchase_date = $validatedData['purchase_date'];
-        $purchase->signature_img_path = $validatedData['sign_path'];
+        if (isset($validatedData['sign_path'])) {
+            $purchase->signature_img_path = $validatedData['sign_path'];
+        }
         $purchase->purchase_price = $validatedData['purchase_price'];
         $purchase->status = 3;
         $purchase->save();
@@ -439,7 +455,7 @@ class PurchaseController extends Controller
             $data = json_decode($json, true);
             $item = Items::find($data['id']);
             $item->customer_id = $customer->id;
-            $item->result = 1;
+            $item->result = 2;
             $item->save();
         }
 

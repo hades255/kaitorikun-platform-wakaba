@@ -9,10 +9,10 @@ const setTitle = (path, routeArray) => {
     var pageTitle;
     for (var i = 0; i < routeArray.length; i++) {
         if (routeArray[i].path === path) {
-            pageTitle = "WAKABA | " + routeArray[i].title;
+            pageTitle = "業務システム買取くん | " + routeArray[i].title;
         }
     }
-    document.title = pageTitle ? pageTitle : "WAKABA | React App";
+    document.title = pageTitle ? pageTitle : "業務システム買取くん | React App";
 };
 
 const Content = (props) => {

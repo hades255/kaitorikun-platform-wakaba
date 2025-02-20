@@ -18,6 +18,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import { withRouter } from "react-router-dom";
@@ -57,6 +58,7 @@ let FormCustomerRegister = (props) => {
     const [hearingItem1Id, setHearingItem1Id] = useState()
     const [hearingItem1Value, setHearingItem1Value] = useState()
     const [hearingItem2Value, setHearingItem2Value] = useState()
+    const [hearingItem1, setHearingItem1] = useState()
     const [hearingLine, setHearingLine] = useState()
     const [hearingGoogle, setHearingGoogle] = useState()
     const [hearingCoupon, setHearingCoupon] = useState()
@@ -69,12 +71,20 @@ let FormCustomerRegister = (props) => {
     const [filteredCities, setFilteredCities] = useState([])
     const [openImagePreview, setOpenImagePreview] = useState(false)
     const [openCameraPreview, setOpenCameraPreview] = useState(false)
+    const [openRegisterPreview, setOpenRegisterPreview] = useState(false)
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
+
+    const identifications = [
+        { "id": 1, "name": "マイナンバー" },
+        { "id": 2, "name": "運転免許証" },
+        { "id": 3, "name": "健康保険証" },
+        { "id": 4, "name": "パスポート" },
+    ]
 
     const hearingNews = [
         'さきがけ',
@@ -283,14 +293,38 @@ let FormCustomerRegister = (props) => {
     }
 
     const handleFileChange = (e, index) => {
-        console.log(index);
         const file = e.target.files[0]
+        alert(file.name + "を取り込みました。")
         if (index == 1) {
             setIdentificationType1(file.type);
             setIdentificationFile1(file);
         } else if (index == 2) {
             setIdentificationType2(file.type);
             setIdentificationFile2(file);
+        }
+    }
+
+    const handleDeleteFile = (e, index) => {
+        if (index == 1) {
+            if (identificationFile1 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType1(undefined);
+                    setIdentificationFile1(undefined);
+                }
+            }
+        } else if (index == 2) {
+            if (identificationFile2 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType2(undefined);
+                    setIdentificationFile2(undefined);
+                }
+            }
         }
     }
 
@@ -459,14 +493,46 @@ let FormCustomerRegister = (props) => {
             ToastNotification("error", "本人確認書類は必須です。");
             return;
         }
-        if (hearingItem1Id === undefined || (hearingItem2Value === undefined || hearingItem2Value === "")) {
-            ToastNotification("error", "全体ヒアリングは必須です。");
-            return;
+        // if (hearingItem1Id === undefined || (hearingItem2Value === undefined || hearingItem2Value === "")) {
+        //     ToastNotification("error", "全体ヒアリングは必須です。");
+        //     return;
+        // }
+        // if (hearingItem1Id > 2 && (hearingItem1Value === undefined || hearingItem1Value === "")) {
+        //     ToastNotification("error", "全体ヒアリングは必須です。");
+        //     return;
+        // }
+        switch (hearingItem1Id) {
+            case 1:
+                setHearingItem1('以前も利用したことがある')
+                break;
+            case 2:
+                setHearingItem1('店舗を見て')
+                break;
+            case 3:
+                setHearingItem1('店舗以外の看板・広告を見て ' + hearingItem1Value + 'の場所で見ました')
+                break;
+            case 4:
+                setHearingItem1('折込チラシを見て ' + hearingNews[hearingItem1Value])
+                break;
+            case 5:
+                setHearingItem1('インターネットを見て ' + hearingInternet[hearingItem1Value])
+                break;
+            case 6:
+                setHearingItem1('紹介されて ' + hearingItem1Value)
+                break;
+            case 7:
+                setHearingItem1('その他 ' + hearingItem1Value)
+                break;
+
+            default:
+                break;
         }
-        if (hearingItem1Id > 2 && (hearingItem1Value === undefined || hearingItem1Value === "")) {
-            ToastNotification("error", "全体ヒアリングは必須です。");
-            return;
-        }
+
+        setOpenRegisterPreview(true)
+    };
+
+    const handleRegisterPreviewClose = async () => {
+        setOpenRegisterPreview(false)
         if (window.confirm("お客様の情報を本当に登録してもよろしいですか？")) {
             dispatch(utilityAction.setLoading("content"));
             try {
@@ -510,7 +576,7 @@ let FormCustomerRegister = (props) => {
                 if (hearingGift !== undefined) {
                     formData.append("hearing_gift", hearingGift);
                 }
-    
+
                 let feedback = await multiPostData("customer/register", formData)
                 if (feedback.status === 200) {
                     window.history.back();
@@ -523,7 +589,7 @@ let FormCustomerRegister = (props) => {
             }
         } else {
         }
-    };
+    }
 
     const handleCancelClick = () => {
         if (window.confirm("保存しますか？")) {
@@ -628,8 +694,8 @@ let FormCustomerRegister = (props) => {
         <div>
             <div className='customer-register-container'>
                 <div className='screen-div3'>
-                    <div className="mt-20">
-                        <div className="input-label">店舗名</div>
+                    <div className="mt-10">
+                        <div className="input-label">店舗名<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => handleShopChange(e.target.value)}
@@ -646,7 +712,7 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-20">
+                    {/* <div className="mt-10">
                         <div className="input-label">来店経緯</div>
                         <div className="input-value">
                             <TextInput
@@ -657,9 +723,9 @@ let FormCustomerRegister = (props) => {
                                 disabled
                             />
                         </div>
-                    </div>
-                    <div className="mt-20">
-                        <div className="input-label">名前</div>
+                    </div> */}
+                    <div className="mt-10">
+                        <div className="input-label">名前<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="name"
@@ -672,8 +738,8 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">カタカナ名</div>
+                    <div className="mt-10">
+                        <div className="input-label">カタカナ名<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="name_kana"
@@ -687,8 +753,8 @@ let FormCustomerRegister = (props) => {
                         </div>
                     </div>
                     <div className='flex-left'>
-                        <div className="mt-20">
-                            <div className="input-label">生年月日</div>
+                        <div className="mt-10">
+                            <div className="input-label">生年月日<span className='require-label'>*</span></div>
                             <div className="input-value">
                                 <DateInput
                                     className="shop-select"
@@ -696,8 +762,8 @@ let FormCustomerRegister = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="mt-20" style={{ width: '33%' }}>
-                            <div className="input-label">性別</div>
+                        <div className="mt-10" style={{ width: '33%' }}>
+                            <div className="input-label">性別<span className='require-label'>*</span></div>
                             <div className="input-value">
                                 <Select
                                     onChange={(e) => setGender(e.target.value)}
@@ -710,8 +776,8 @@ let FormCustomerRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">電話番号(自宅)</div>
+                    <div className="mt-10">
+                        <div className="input-label">電話番号(自宅)<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
@@ -722,8 +788,8 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">電話番号(携帯)</div>
+                    <div className="mt-10">
+                        <div className="input-label">電話番号(携帯)<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <PhoneInput
                                 id="phone"
@@ -734,8 +800,8 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">職業</div>
+                    <div className="mt-10">
+                        <div className="input-label">職業<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={(e) => setJob(e.target.value)}
@@ -751,8 +817,8 @@ let FormCustomerRegister = (props) => {
                     </div>
                 </div>
                 <div className='screen-div3'>
-                    <div className="mt-20">
-                        <div className="input-label">郵便番号</div>
+                    <div className="mt-10">
+                        <div className="input-label">郵便番号<span className='require-label'>*</span></div>
                         <div className="input-value flex-left">
                             <ZipcodeInput
                                 onChange={(e) => handleZipCode(e)}
@@ -767,8 +833,8 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">都道府県</div>
+                    <div className="mt-10">
+                        <div className="input-label">都道府県<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress1}
@@ -785,8 +851,8 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">市町村</div>
+                    <div className="mt-10">
+                        <div className="input-label">市町村<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <Select
                                 onChange={handleChangeAddress2}
@@ -800,8 +866,8 @@ let FormCustomerRegister = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">住所詳細</div>
+                    <div className="mt-10">
+                        <div className="input-label">住所詳細<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <TextInput
                                 id="address3"
@@ -815,8 +881,8 @@ let FormCustomerRegister = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">本人確認書類</div>
+                    <div className="mt-10">
+                        <div className="input-label">本人確認書類<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <div className='flex-left'>
                                 <div>
@@ -835,10 +901,11 @@ let FormCustomerRegister = (props) => {
                                             <MenuItem value={4}>パスポート</MenuItem>
                                         </Select>
                                         <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                            <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
+                                            <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='.jpg,.jpeg,.png,.pdf' />
                                             <ImageIcon className='file-icon' />
                                         </label>
                                         <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen1} />
+                                        <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 1)} />
                                         <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
                                     </div>
                                     {isVisible && (
@@ -854,10 +921,11 @@ let FormCustomerRegister = (props) => {
                                                 <MenuItem value={4}>パスポート</MenuItem>
                                             </Select>
                                             <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='.jpg,.jpeg,.png,.pdf' />
                                                 <ImageIcon className='file-icon' />
                                             </label>
                                             <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen2} />
+                                            <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 2)} />
                                             <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                         </div>
                                     )}
@@ -865,8 +933,8 @@ let FormCustomerRegister = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-20">
-                        <div className="input-label">特記事項</div>
+                    <div className="mt-10">
+                        <div className="input-label">特記事項<span className='require-label'>*</span></div>
                         <div className="input-value">
                             <textarea
                                 rows={10}
@@ -878,11 +946,11 @@ let FormCustomerRegister = (props) => {
                     </div>
                 </div>
                 <div className='screen-div3'>
-                    <div className="mt-20">
-                        <div className="input-label">全体ヒアリング</div>
-                        <div className="hearing-container" style={{ height: '650px' }}>
+                    <div className="mt-10">
+                        <div className="input-label">全体ヒアリング<span className='require-label'>*</span></div>
+                        <div className="hearing-container" style={{ height: '550px' }}>
                             <div>
-                                <div className="input-label">来店経緯</div>
+                                <div className="input-label">来店経緯<span className='require-label'>*</span></div>
                                 <div className='ml-10'>
                                     <label className='flex-left custom-radio-label'>
                                         <input
@@ -925,7 +993,7 @@ let FormCustomerRegister = (props) => {
                                         <label className='mt-1 custom-radio-label'>)の場所で見ました</label>
                                     </div>
                                 </div>
-                                <div className='ml-10 mt-20'>
+                                <div className='ml-10 mt-10'>
                                     <label className='flex-left custom-radio-label'>
                                         <input
                                             type="radio"
@@ -1007,8 +1075,8 @@ let FormCustomerRegister = (props) => {
                                         />
                                     </label>
                                 </div>
-                                <div className="mt-20">
-                                    <div className="input-label">よく買取店に行かれるんですか？</div>
+                                <div className="mt-10">
+                                    <div className="input-label">よく買取店に行かれるんですか？<span className='require-label'>*</span></div>
                                     <div className="input-value">
                                         <TextInput
                                             type="text"
@@ -1018,7 +1086,7 @@ let FormCustomerRegister = (props) => {
                                         />
                                     </div>
                                 </div>
-                                <div className='mt-20 ml-10'>
+                                <div className='mt-10 ml-10'>
                                     <label className='flex-left custom-radio-label'>
                                         <input
                                             type="checkbox"
@@ -1028,7 +1096,7 @@ let FormCustomerRegister = (props) => {
                                         LINEお友達登録したか？
                                     </label>
                                 </div>
-                                <div className='mt-20 ml-10'>
+                                <div className='mt-10 ml-10'>
                                     <label className='flex-left custom-radio-label'>
                                         <input
                                             type="checkbox"
@@ -1038,7 +1106,7 @@ let FormCustomerRegister = (props) => {
                                         Googleロコミしたか？
                                     </label>
                                 </div>
-                                <div className="mt-20 ml-10">
+                                <div className="mt-10 ml-10">
                                     <div className="input-label">ノベルティーを何を渡したか？</div>
                                     <div className="input-value">
                                         <Select
@@ -1052,7 +1120,7 @@ let FormCustomerRegister = (props) => {
                                         </Select>
                                     </div>
                                 </div>
-                                <div className="mt-20 ml-10">
+                                <div className="mt-10 ml-10">
                                     <div className="input-label">クーポンのご利用はあったか？</div>
                                     <div className="input-value">
                                         <Select
@@ -1186,6 +1254,169 @@ let FormCustomerRegister = (props) => {
                         <p>{ocrResult}</p>
                     </div>
                 )}
+            </div>
+            <div>
+                <Dialog
+                    open={openRegisterPreview}
+                    className='register-preview'
+                >
+                    <div className='flex-center'>
+                        <div className='screen-div2'>
+                            <div className='flex-center'>
+                                <label>店舗名:</label>
+                                <label>{shops[shop - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>来店経緯:</label>
+                                <label>{type}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>名前:</label>
+                                <label>{name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>カタカナ名:</label>
+                                <label>{nameKana}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>生年月日:</label>
+                                <label>{birthday}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>電話番号(自宅):</label>
+                                <label>{phoneNumber1}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>電話番号(携帯):</label>
+                                <label>{phoneNumber2}</label>
+                            </div>
+                        </div>
+                        <div className='screen-div2'>
+                            <div className='flex-center'>
+                                <label>職業:</label>
+                                <label>{jobList[job]}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>郵便番号:</label>
+                                <label>{zipCode}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>都道府県:</label>
+                                <label>{prefectures[address1 - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>市町村:</label>
+                                <label>{cities[address2 - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>住所詳細:</label>
+                                <label>{address3}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>性別:</label>
+                                <label>{gender == 1 ? "男" : "女"}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>本人確認書類1:</label>
+                                <label>{identifications[identificationId1 - 1]?.name}</label>
+                            </div>
+                            {
+                                isVisible &&
+                                <div className='flex-center'>
+                                    <label>本人確認書類2:</label>
+                                    <label>{identifications[identificationId2 - 1]?.name}</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div className="mt-10">
+                        <div className="input-label">特記事項</div>
+                        <div className="input-value">
+                            <textarea
+                                rows={10}
+                                variant="outlined"
+                                value={note ? note : ""}
+                                className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
+                                disabled
+                            />
+                        </div>
+                    </div>
+                    <div className="input-label mt-10">全体ヒアリング</div>
+                    <div className="hearing-container" style={{ height: '200px' }}>
+                        <div>
+                            <div className="input-label">来店経緯</div>
+                            <div className='ml-10'>
+                                <label className='flex-left custom-radio-label'>
+                                    {hearingItem1}
+                                </label>
+                            </div>
+                            <div className="mt-10">
+                                <div className="input-label">よく買取店に行かれるんですか？</div>
+                                <div className="input-value">
+                                    <label className='flex-left custom-radio-label ml-10'>
+                                        {hearingItem2Value}
+                                    </label>
+                                </div>
+                            </div>
+                            {
+                                hearingLine &&
+                                <div className='mt-10 ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="checkbox"
+                                            name="hearing_line"
+                                            checked={hearingLine}
+                                            disabled
+                                        />
+                                        LINEお友達登録したか？
+                                    </label>
+                                </div>
+                            }
+                            {
+                                hearingGoogle == 1 &&
+                                <div className='mt-10 ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="checkbox"
+                                            name="hearing_google"
+                                            checked={hearingGoogle}
+                                            disabled
+                                        />
+                                        Googleロコミしたか？
+                                    </label>
+                                </div>
+                            }
+                            {
+                                hearingGift >= 0 &&
+                                <div className="mt-10 ml-10">
+                                    <div className="input-label">ノベルティーを何を渡したか？</div>
+                                    <div className="input-value">
+                                        <label className='flex-left custom-radio-label'>
+                                            {gifts[hearingGift]}
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                            {
+                                hearingCoupon >= 0 &&
+                                <div className="mt-10 ml-10">
+                                    <div className="input-label">クーポンのご利用はあったか？</div>
+                                    <div className="input-value">
+                                        <label className='flex-left custom-radio-label'>
+                                            {coupons[hearingCoupon]}
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div className='flex-center mt-10'>
+                        <div
+                            className="register-btn"
+                            onClick={handleRegisterPreviewClose}
+                        >登録する</div>
+                    </div>
+                </Dialog>
             </div>
         </div>
     );

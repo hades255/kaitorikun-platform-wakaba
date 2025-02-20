@@ -19,6 +19,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { pdfjs, Document, Page } from "react-pdf";
 import { withRouter } from "react-router-dom";
@@ -75,11 +76,19 @@ let FormCustomerEdit = (props) => {
     const [openImagePreview, setOpenImagePreview] = useState(false)
     const [openCameraPreview, setOpenCameraPreview] = useState(false)
     const [openPdfPreview, setOpenPdfPreview] = useState(false)
+    const [openRegisterPreview, setOpenRegisterPreview] = useState(false)
     const [previewImage, setPreviewImage] = useState("")
     const [previewPdf, setPreviewPdf] = useState("")
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const dispatch = useDispatch();
+
+    const identifications = [
+        { "id": 1, "name": "マイナンバー" },
+        { "id": 2, "name": "運転免許証" },
+        { "id": 3, "name": "健康保険証" },
+        { "id": 4, "name": "パスポート" },
+    ]
 
     const hearingNews = [
         'さきがけ',
@@ -201,8 +210,8 @@ let FormCustomerEdit = (props) => {
                 setHearingItem2(data.customer.hearing_item2_value)
                 setHearingLine(data.customer.hearing_line)
                 setHearingGoogle(data.customer.hearing_google)
-                setHearingCoupon(data.customer.hearing_coupon)
-                setHearingGift(data.customer.hearing_gift)
+                setHearingCoupon(coupons[data.customer.hearing_coupon])
+                setHearingGift(gifts[data.customer.hearing_gift])
 
                 setPurchases(data.purchases);
                 setItems(data.items);
@@ -346,14 +355,38 @@ let FormCustomerEdit = (props) => {
     }
 
     const handleFileChange = (e, index) => {
-        console.log(index);
         const file = e.target.files[0]
+        alert(file.name + "を取り込みました。")
         if (index == 1) {
             setIdentificationType1(file.type);
             setIdentificationFile1(file);
         } else if (index == 2) {
             setIdentificationType2(file.type);
             setIdentificationFile2(file);
+        }
+    }
+
+    const handleDeleteFile = (e, index) => {
+        if (index == 1) {
+            if (identificationFile1 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType1(undefined);
+                    setIdentificationFile1(undefined);
+                }
+            }
+        } else if (index == 2) {
+            if (identificationFile2 === undefined) {
+                ToastNotification("error", "本人確認書類ファイルをインポートしてください。");
+                return;
+            } else {
+                if (window.confirm("このファイルを本当に削除してもよろしいですか？")) {
+                    setIdentificationType2(undefined);
+                    setIdentificationFile2(undefined);
+                }
+            }
         }
     }
 
@@ -526,6 +559,11 @@ let FormCustomerEdit = (props) => {
             ToastNotification("error", "本人確認書類は必須です。");
             return;
         }
+        setOpenRegisterPreview(true)
+    };
+
+    const handleRegisterPreviewClose = async () => {
+        setOpenRegisterPreview(false)
         if (window.confirm("お客様の情報を本当に登録してもよろしいですか？")) {
             dispatch(utilityAction.setLoading("content"));
             try {
@@ -545,17 +583,17 @@ let FormCustomerEdit = (props) => {
                 formData.append("address2", address2);
                 formData.append("address3", address3);
                 if (identificationId1 !== undefined && identificationType1 !== undefined) {
-                    formData.append("identification_id1", identificationId1);
-                    formData.append("identification_type1", identificationType1);
                     if (typeof identificationFile1 !== "string") {
+                        formData.append("identification_id1", identificationId1);
+                        formData.append("identification_type1", identificationType1);
                         formData.append("files[]", identificationFile1);
                     }
                 }
 
                 if (identificationId2 !== undefined && identificationType2 !== undefined) {
-                    formData.append("identification_id2", identificationId2);
-                    formData.append("identification_type2", identificationType2);
                     if (typeof identificationFile1 !== "string") {
+                        formData.append("identification_id2", identificationId2);
+                        formData.append("identification_type2", identificationType2);
                         formData.append("files[]", identificationFile2);
                     }
                 }
@@ -573,7 +611,7 @@ let FormCustomerEdit = (props) => {
             }
         } else {
         }
-    };
+    }
 
     const handleCancelClick = () => {
         if (window.confirm("保存しますか？")) {
@@ -641,13 +679,13 @@ let FormCustomerEdit = (props) => {
             <div className='customer-register-container'>
                 <div className='screen-div2 customer-register-container'>
                     <div className='screen-div2'>
-                        <div className="flex-left mt-20">
+                        <div className="flex-left mt-5">
                             <div className="input-label">顧客番号</div>
                             <div className="input-value">
                                 {customer ? customer.id.toString().padStart(8, '0') : ''}
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">店舗名</div>
                             <div className="input-value">
                                 <Select
@@ -666,7 +704,7 @@ let FormCustomerEdit = (props) => {
                                 </Select>
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">来店経緯</div>
                             <div className="input-value">
                                 <TextInput
@@ -678,7 +716,7 @@ let FormCustomerEdit = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">名前</div>
                             <div className="input-value">
                                 <TextInput
@@ -693,7 +731,7 @@ let FormCustomerEdit = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">カタカナ名</div>
                             <div className="input-value">
                                 <TextInput
@@ -709,7 +747,7 @@ let FormCustomerEdit = (props) => {
                             </div>
                         </div>
                         <div className='flex-left'>
-                            <div className="mt-20">
+                            <div className="mt-5">
                                 <div className="input-label">生年月日</div>
                                 <div className="input-value">
                                     <DateInput
@@ -719,7 +757,7 @@ let FormCustomerEdit = (props) => {
                                     />
                                 </div>
                             </div>
-                            <div className="mt-20" style={{ width: '33%' }}>
+                            <div className="mt-5" style={{ width: '33%' }}>
                                 <div className="input-label">性別</div>
                                 <div className="input-value">
                                     <Select
@@ -734,7 +772,7 @@ let FormCustomerEdit = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">電話番号(自宅)</div>
                             <div className="input-value">
                                 <PhoneInput
@@ -747,7 +785,7 @@ let FormCustomerEdit = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">電話番号(携帯)</div>
                             <div className="input-value">
                                 <PhoneInput
@@ -760,9 +798,21 @@ let FormCustomerEdit = (props) => {
                                 />
                             </div>
                         </div>
+                        <div className="mt-5">
+                            <div className="input-label">特記事項</div>
+                            <div className="input-value">
+                                <textarea
+                                    rows={10}
+                                    variant="outlined"
+                                    value={note ? note : ""}
+                                    className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
+                                    onChange={(e) => setNote(e.target.value)}
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div className='screen-div2'>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">職業</div>
                             <div className="input-value">
                                 <Select
@@ -778,7 +828,7 @@ let FormCustomerEdit = (props) => {
                                 </Select>
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">郵便番号</div>
                             <div className="input-value flex-left">
                                 <ZipcodeInput
@@ -795,7 +845,7 @@ let FormCustomerEdit = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">都道府県</div>
                             <div className="input-value">
                                 <Select
@@ -813,7 +863,7 @@ let FormCustomerEdit = (props) => {
                                 </Select>
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">市町村</div>
                             <div className="input-value">
                                 <Select
@@ -828,7 +878,7 @@ let FormCustomerEdit = (props) => {
                                 </Select>
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">住所詳細</div>
                             <div className="input-value">
                                 <TextInput
@@ -843,7 +893,7 @@ let FormCustomerEdit = (props) => {
                                 />
                             </div>
                         </div>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">本人確認書類</div>
                             <div className="input-value">
                                 <div className='flex-left'>
@@ -851,30 +901,11 @@ let FormCustomerEdit = (props) => {
                                         <div><AddIcon className='add-icon' onClick={handleAddIdentification} /></div>
                                     </div>
                                     <div>
-                                        <div className='flex-left'>
-                                            <Select
-                                                value={identificationId1 ? identificationId1 : 0}
-                                                onChange={(e) => setIdentificationId1(e.target.value)}
-                                                className="shop-select w-150"
-                                                size='small'
-                                            >
-                                                <MenuItem value={1}>マイナンバー</MenuItem>
-                                                <MenuItem value={2}>運転免許証</MenuItem>
-                                                <MenuItem value={3}>健康保険証</MenuItem>
-                                                <MenuItem value={4}>パスポート</MenuItem>
-                                            </Select>
-                                            <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='image/*, .pdf' />
-                                                <ImageIcon className='file-icon' />
-                                            </label>
-                                            <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen1} />
-                                            <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
-                                        </div>
-                                        {isVisible && (
+                                        <div>
                                             <div className='flex-left'>
                                                 <Select
-                                                    value={identificationId2 ? identificationId2 : 0}
-                                                    onChange={(e) => setIdentificationId2(e.target.value)}
+                                                    value={identificationId1 ? identificationId1 : 0}
+                                                    onChange={(e) => setIdentificationId1(e.target.value)}
                                                     className="shop-select w-150"
                                                     size='small'
                                                 >
@@ -883,11 +914,36 @@ let FormCustomerEdit = (props) => {
                                                     <MenuItem value={3}>健康保険証</MenuItem>
                                                     <MenuItem value={4}>パスポート</MenuItem>
                                                 </Select>
-                                                <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
-                                                    <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='image/*, .pdf' />
+                                                <label htmlFor={`doc_1`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
+                                                    <input type="file" id={`doc_1`} className='hidden' onChange={(e) => handleFileChange(e, 1)} accept='.jpg,.jpeg,.png,.pdf' />
                                                     <ImageIcon className='file-icon' />
                                                 </label>
-                                                <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen2} />
+                                                <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen1} />
+                                                <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 1)} />
+                                            </div>
+                                            <div className="flex-center image-show-btn" onClick={handleIdentificationPreview1}>画像と情報表示</div>
+                                        </div>
+                                        {isVisible && (
+                                            <div>
+                                                <div className='flex-left'>
+                                                    <Select
+                                                        value={identificationId2 ? identificationId2 : 0}
+                                                        onChange={(e) => setIdentificationId2(e.target.value)}
+                                                        className="shop-select w-150"
+                                                        size='small'
+                                                    >
+                                                        <MenuItem value={1}>マイナンバー</MenuItem>
+                                                        <MenuItem value={2}>運転免許証</MenuItem>
+                                                        <MenuItem value={3}>健康保険証</MenuItem>
+                                                        <MenuItem value={4}>パスポート</MenuItem>
+                                                    </Select>
+                                                    <label htmlFor={`doc_2`} className='flex w-44 shrink-0 bg-sky-600 p-2 rounded flex gap-2 justify-center items-center text-white text-md cursor-pointer hover:opacity-75'>
+                                                        <input type="file" id={`doc_2`} className='hidden' onChange={(e) => handleFileChange(e, 2)} accept='.jpg,.jpeg,.png,.pdf' />
+                                                        <ImageIcon className='file-icon' />
+                                                    </label>
+                                                    <CameraAltIcon className='file-icon camera-icon' onClick={handleCameraCaptureDialogOpen2} />
+                                                    <DeleteIcon className='file-icon camera-icon' onClick={(e) => handleDeleteFile(e, 2)} />
+                                                </div>
                                                 <div className="flex-center image-show-btn" onClick={handleIdentificationPreview2}>画像と情報表示</div>
                                             </div>
                                         )}
@@ -895,25 +951,13 @@ let FormCustomerEdit = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-20">
-                            <div className="input-label">特記事項</div>
-                            <div className="input-value">
-                                <textarea
-                                    rows={10}
-                                    variant="outlined"
-                                    value={note ? note : ""}
-                                    className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
-                                    onChange={(e) => setNote(e.target.value)}
-                                />
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div className='screen-div2 customer-register-container'>
                     <div className='w-100-pro'>
-                        <div className="mt-20">
+                        <div className="mt-5">
                             <div className="input-label">過去の来店履歴</div>
-                            <div className="hearing-container" style={{ height: '300px' }}>
+                            <div className="hearing-container" style={{ height: '250px' }}>
                                 <TableVisitShopHistory
                                     categories1={categories1}
                                     items={items}
@@ -922,8 +966,8 @@ let FormCustomerEdit = (props) => {
                                 />
 
                             </div>
-                            <div className="input-label mt-20">全体ヒアリング</div>
-                            <div className="hearing-container" style={{ height: '300px' }}>
+                            <div className="input-label mt-5">全体ヒアリング</div>
+                            <div className="hearing-container" style={{ height: '250px' }}>
                                 <div>
                                     <div className="input-label">来店経緯</div>
                                     <div className='ml-10'>
@@ -931,7 +975,7 @@ let FormCustomerEdit = (props) => {
                                             {hearingItem1}
                                         </label>
                                     </div>
-                                    <div className="mt-20">
+                                    <div className="mt-5">
                                         <div className="input-label">よく買取店に行かれるんですか？</div>
                                         <div className="input-value">
                                             <label className='flex-left custom-radio-label ml-10'>
@@ -940,8 +984,8 @@ let FormCustomerEdit = (props) => {
                                         </div>
                                     </div>
                                     {
-                                        hearingLine &&
-                                        <div className='mt-20 ml-10'>
+                                        hearingLine == 1 &&
+                                        <div className='mt-5 ml-10'>
                                             <label className='flex-left custom-radio-label'>
                                                 <input
                                                     type="checkbox"
@@ -955,7 +999,7 @@ let FormCustomerEdit = (props) => {
                                     }
                                     {
                                         hearingGoogle == 1 &&
-                                        <div className='mt-20 ml-10'>
+                                        <div className='mt-5 ml-10'>
                                             <label className='flex-left custom-radio-label'>
                                                 <input
                                                     type="checkbox"
@@ -968,23 +1012,23 @@ let FormCustomerEdit = (props) => {
                                         </div>
                                     }
                                     {
-                                        hearingGift == 1 &&
-                                        <div className="mt-20 ml-10">
+                                        hearingGift &&
+                                        <div className="mt-5 ml-10">
                                             <div className="input-label">ノベルティーを何を渡したか？</div>
                                             <div className="input-value">
                                                 <label className='flex-left custom-radio-label'>
-                                                    {gifts[hearingGift]}
+                                                    {hearingGift}
                                                 </label>
                                             </div>
                                         </div>
                                     }
                                     {
                                         hearingCoupon &&
-                                        <div className="mt-20 ml-10">
+                                        <div className="mt-5 ml-10">
                                             <div className="input-label">クーポンのご利用はあったか？</div>
                                             <div className="input-value">
                                                 <label className='flex-left custom-radio-label'>
-                                                    {coupons[hearingCoupon]}
+                                                    {hearingCoupon}
                                                 </label>
                                             </div>
                                         </div>
@@ -997,7 +1041,7 @@ let FormCustomerEdit = (props) => {
             </div>
             <div className='flex-center'
                 style={{
-                    marginTop: '50px',
+                    marginTop: '20px',
                     gap: '100px'
                 }}>
                 <div
@@ -1114,6 +1158,169 @@ let FormCustomerEdit = (props) => {
                         <p>{ocrResult}</p>
                     </div>
                 )}
+            </div>
+            <div>
+                <Dialog
+                    open={openRegisterPreview}
+                    className='register-preview'
+                >
+                    <div className='flex-center'>
+                        <div className='screen-div2'>
+                            <div className='flex-center'>
+                                <label>店舗名:</label>
+                                <label>{shops[shop - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>来店経緯:</label>
+                                <label>{type}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>名前:</label>
+                                <label>{name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>カタカナ名:</label>
+                                <label>{nameKana}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>生年月日:</label>
+                                <label>{birthday}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>電話番号(自宅):</label>
+                                <label>{phoneNumber1}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>電話番号(携帯):</label>
+                                <label>{phoneNumber2}</label>
+                            </div>
+                        </div>
+                        <div className='screen-div2'>
+                            <div className='flex-center'>
+                                <label>職業:</label>
+                                <label>{jobList[job]}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>郵便番号:</label>
+                                <label>{zipCode}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>都道府県:</label>
+                                <label>{prefectures[address1 - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>市町村:</label>
+                                <label>{cities[address2 - 1]?.name}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>住所詳細:</label>
+                                <label>{address3}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>性別:</label>
+                                <label>{gender == 1 ? "男" : "女"}</label>
+                            </div>
+                            <div className='flex-center'>
+                                <label>本人確認書類1:</label>
+                                <label>{identifications[identificationId1 - 1]?.name}</label>
+                            </div>
+                            {
+                                isVisible &&
+                                <div className='flex-center'>
+                                    <label>本人確認書類2:</label>
+                                    <label>{identifications[identificationId2 - 1]?.name}</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div className="mt-10">
+                        <div className="input-label">特記事項</div>
+                        <div className="input-value">
+                            <textarea
+                                rows={10}
+                                variant="outlined"
+                                value={note ? note : ""}
+                                className='customer-business rounded w-full border-gray-300 hover:border-sky-600'
+                                disabled
+                            />
+                        </div>
+                    </div>
+                    <div className="input-label mt-10">全体ヒアリング</div>
+                    <div className="hearing-container" style={{ height: '200px' }}>
+                        <div>
+                            <div className="input-label">来店経緯</div>
+                            <div className='ml-10'>
+                                <label className='flex-left custom-radio-label'>
+                                    {hearingItem1}
+                                </label>
+                            </div>
+                            <div className="mt-10">
+                                <div className="input-label">よく買取店に行かれるんですか？</div>
+                                <div className="input-value">
+                                    <label className='flex-left custom-radio-label ml-10'>
+                                        {hearingItem2}
+                                    </label>
+                                </div>
+                            </div>
+                            {
+                                hearingLine &&
+                                <div className='mt-10 ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="checkbox"
+                                            name="hearing_line"
+                                            checked={hearingLine}
+                                            disabled
+                                        />
+                                        LINEお友達登録したか？
+                                    </label>
+                                </div>
+                            }
+                            {
+                                hearingGoogle == 1 &&
+                                <div className='mt-10 ml-10'>
+                                    <label className='flex-left custom-radio-label'>
+                                        <input
+                                            type="checkbox"
+                                            name="hearing_google"
+                                            checked={hearingGoogle}
+                                            disabled
+                                        />
+                                        Googleロコミしたか？
+                                    </label>
+                                </div>
+                            }
+                            {
+                                hearingGift &&
+                                <div className="mt-10 ml-10">
+                                    <div className="input-label">ノベルティーを何を渡したか？</div>
+                                    <div className="input-value">
+                                        <label className='flex-left custom-radio-label'>
+                                            {hearingGift}
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                            {
+                                hearingCoupon &&
+                                <div className="mt-10 ml-10">
+                                    <div className="input-label">クーポンのご利用はあったか？</div>
+                                    <div className="input-value">
+                                        <label className='flex-left custom-radio-label'>
+                                            {hearingCoupon}
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div className='flex-center mt-10'>
+                        <div
+                            className="register-btn"
+                            onClick={handleRegisterPreviewClose}
+                        >更新する</div>
+                    </div>
+                </Dialog>
             </div>
         </div>
     );

@@ -16,6 +16,7 @@ import PurchaseList from "../../pages/purchase-manage/list";
 import PurchaseContract from "../../pages/purchase-manage/contract";
 import PurchaseEdit from "../../pages/purchase-manage/edit";
 import PurchaseCustomer from "../../pages/purchase-manage/customer";
+import ItemsList from "../../pages/items-manage";
 import SChannel from "../../pages/schannel";
 import SchannelWithSeparatorBar from "../../pages/schannel/SchannelWithSeparatorBar";
 import Schannel from "../../pages/schannel";
@@ -105,6 +106,12 @@ const MenuRoutes = [
         exact: true,
         title: "買取計算書",
         component: () => <PurchaseEdit />,
+    },
+    {
+        path: "/items",
+        exact: true,
+        title: "在庫一覧",
+        component: () => <ItemsList />,
     },
     {
         path: "/form-control",

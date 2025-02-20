@@ -35,6 +35,11 @@ const Login = (props) => {
 
     const handleSubmit = async (data) => {
         dispatch(utilityAction.setLoading("content"));
+        if (!/^[a-zA-Z0-9]*$/.test(data.password)) {
+            ToastNotification("error", "半角英数字のみ入力してください");
+            return;
+        }
+
         try {
             let feedback = await postData("login", {
                 email: data.email,
@@ -61,8 +66,8 @@ const Login = (props) => {
     return (
         <div className="login-box container" style={{ marginTop: "10%" }}>
             <div className="card card-outline card-primary">
-                <div className="card-header text-center">
-                    <img src="img/logo.png" width={"200px"} alt="logo" />
+                <div className="card-header login-logo">
+                    業務システム買取くん
                 </div>
                 <div className="card-body">
                     <p className="login-box-msg">ログイン</p>

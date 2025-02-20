@@ -28,6 +28,10 @@ const ResetPassword = (props) => {
 
     let search = window.location.search
     const handleSubmit = async (data) => {
+        if (!/^[a-zA-Z0-9]*$/.test(data.newPassword) || !/^[a-zA-Z0-9]*$/.test(data.confirmPassword)) {
+            ToastNotification("error", "半角英数字のみ入力してください");
+            return;
+        }
         if (data.newPassword !== data.confirmPassword) {
             ToastNotification("error", "パスワードが一致しません。");
             return;
@@ -49,12 +53,8 @@ const ResetPassword = (props) => {
     return (
         <div className="login-box container" style={{ marginTop: "10%" }}>
             <div className="card card-outline card-primary">
-                <div className="card-header text-center">
-                    <img
-                        src="img/logo.png"
-                        width={"200px"}
-                        alt="logo"
-                    />
+                <div className="card-header login-logo">
+                    業務システム買取くん
                 </div>
                 <div className="card-body">
                     <FormResetPassword onSubmit={(data) => handleSubmit(data)} />

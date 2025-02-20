@@ -328,7 +328,9 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
                     <div className={classes.detailsHeader}>
                         <Box display={"flex"} flexDirection={"column"}>
                             <div className={classes.userName}>
-                                {auth?.id === user.id ? "(あなた)" : user.name}
+                                {user.type == "chat" && auth?.id === user.id
+                                    ? "(あなた)"
+                                    : user.name}
                             </div>
                             <div className={classes.lastMessage}>
                                 {parseMixedTagsToText(lastChat?.content || "")}

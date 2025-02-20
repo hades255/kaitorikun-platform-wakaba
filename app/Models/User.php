@@ -48,6 +48,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Community::class, 'community_users');
     }
 
+    public function communitiesWithUsers()
+    {
+        return $this->belongsToMany(Community::class, 'community_users')->with("users");
+    }
+
     public function schannelUsers()
     {
         return $this->hasMany('App\Models\SchannelUser', 'user_id');

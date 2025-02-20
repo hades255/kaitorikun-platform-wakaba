@@ -34,25 +34,22 @@ class ChatController extends Controller
 
     public function users()
     {
-        $userId = Auth::id();
-        $userIds = Chat::where('from', $userId)
-            ->orWhere('to', $userId)
-            ->select('from', 'to')
-            ->get()
-            ->pluck('from', 'to')
-            ->flatten()
-            ->unique()
-            ->filter(function ($value) use ($userId) {
-                return $value != $userId;
-            })
-            ->values();
-
-        $users = User::whereIn('id', $userIds)->get();
+        $communities = Auth::user()->communitiesWithUsers;
+        $communityUsers = collect();
+        foreach ($communities as $community) {
+            $communityUsers = $communityUsers->merge($community->users);
+        }
+        $chats = Auth::user()->chatgroups;
+        $chatGroupUsers = collect();
+        foreach ($chats as $chat) {
+            $chatGroupUsers = $chatGroupUsers->merge($chat->users);
+        }
+        $allUsers = $communityUsers->merge($chatGroupUsers)->unique('id');
 
         $groups = Auth::user()->chatgroupsAccepted;
 
         $response = [
-            'users' => $users->map(function ($user) {
+            'users' => $allUsers->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,

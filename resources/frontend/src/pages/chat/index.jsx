@@ -52,21 +52,23 @@ const ChatsPage = () => {
     const handleReadChat = useCallback(
         async (selectedUser) => {
             try {
-                await api.patch("chats", {
-                    userId: selectedUser.id,
-                    type: selectedUser.type,
-                });
                 dispatch(
                     actionChat.handleReadChats({
-                        id: selectedUser.id,
+                        from: selectedUser.id,
+                        to: auth.id,
                         type: selectedUser.type,
                     })
                 );
+                await api.patch("chats", {
+                    from: selectedUser.id,
+                    to: auth.id,
+                    type: selectedUser.type,
+                });
             } catch (error) {
                 console.log(error);
             }
         },
-        [dispatch]
+        [dispatch, auth]
     );
 
     useEffect(() => {
@@ -84,11 +86,16 @@ const ChatsPage = () => {
                                 item.status === "unread")
                     )
                 ) {
-                    handleReadChat(selectedUser);
+                    const timer = setTimeout(() => {
+                        handleReadChat(selectedUser);
+                    }, 300);
+                    return () => {
+                        if (timer) clearTimeout(timer);
+                    };
                 }
             }
         }
-    }, [handleReadChat, chats, selectedUser, sending]);
+    }, [handleReadChat, chats, selectedUser]);
 
     useEffect(() => {
         dispatch(actionChat.handleSetCurrentUser(null));

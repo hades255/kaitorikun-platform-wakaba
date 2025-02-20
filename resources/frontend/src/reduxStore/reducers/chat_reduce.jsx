@@ -49,8 +49,10 @@ const chats = (state = initialState, actions) => {
                 chats: state.chats?.map((item) => ({
                     ...item,
                     status:
-                        (data.type == "chat" && item.from == data.id) ||
-                        (data.type === "group" && item.group_id == data.id)
+                        (data.type == "chat" &&
+                            item.to == data.to &&
+                            item.from == data.from) ||
+                        (data.type === "group" && item.group_id == data.from)
                             ? "read"
                             : item.status,
                 })),

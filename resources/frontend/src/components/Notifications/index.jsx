@@ -186,6 +186,11 @@ const Notifications = () => {
                 }
             }
         };
+        const handleChatRead = (data) => {
+            if (data && data.chat) {
+                dispatch(actionChat.handleReadChats(data.chat));
+            }
+        };
 
         // channel.listen(".channel.community.created", handleCommunityCreated);
         channel.listen(".channel.created", handleChannelCreated);
@@ -195,6 +200,7 @@ const Notifications = () => {
         channel.listen(".channel.removed", handleDeleteChannel);
         channel.listen(".channel.chat.created", handleNewChat);
         channel.listen(".channel.chat.reaction", handleChatReaction);
+        channel.listen(".channel.chat.read", handleChatRead);
 
         return () => {
             if (channel) {
@@ -206,6 +212,7 @@ const Notifications = () => {
                 channel.stopListening(".channel.removed");
                 channel.stopListening(".channel.chat.created");
                 channel.stopListening(".channel.chat.reaction");
+                channel.stopListening(".channel.chat.read");
             }
         };
     }, [

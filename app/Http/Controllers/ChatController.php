@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\NewChatJob;
 use App\Jobs\ReactionToChatJob;
+use App\Jobs\ReadChatJob;
 use App\Models\Chat;
 use App\Models\Chatgroup;
 use App\Models\ChatReaction;
@@ -177,10 +178,10 @@ class ChatController extends Controller
     public function read(Request $request)
     {
         if ($request->type == "chat")
-            DB::table("chats")->where("from", $request->userId)->where("to", Auth::id())->where("status", "unread")->update(["status" => "read"]);
+            DB::table("chats")->where("from", $request->from)->where("to", Auth::id())->where("status", "unread")->update(["status" => "read"]);
         if ($request->type == "group")
-            DB::table("chats")->where("group_id", $request->userId)->where("status", "unread")->update(["status" => "read"]);
-
+            DB::table("chats")->where("group_id", $request->from)->where("status", "unread")->update(["status" => "read"]);
+        ReadChatJob::dispatch(["from" => $request->from, "to" => $request->to, "type" => $request->type,]);
         return response()->noContent();
     }
 

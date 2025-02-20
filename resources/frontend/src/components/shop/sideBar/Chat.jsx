@@ -241,7 +241,7 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
                 }
                 if (!item.group_id && user.type == "chat") {
                     return (
-                        item.from !== auth?.id &&
+                        item.from == user?.id &&
                         item.to == auth?.id &&
                         item.status == "unread"
                     );
@@ -259,7 +259,9 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
                         return item.group_id == user.id;
                     }
                     if (!item.group_id && user.type == "chat") {
-                        return item.from == auth?.id || item.to == auth?.id;
+                        if (auth?.id == user?.id)
+                            return item.from == user?.id && item.to == user?.id;
+                        return item.from == user?.id || item.to == user?.id;
                     }
                     return false;
                 })
@@ -287,7 +289,9 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
     return (
         <Box
             className={`${classes.boxContainer} ${
-                selected?.id === user.id ? classes.selected : ""
+                selected?.id === user.id && selected?.type === user?.type
+                    ? classes.selected
+                    : ""
             }`}
             onClick={handleClick}
         >

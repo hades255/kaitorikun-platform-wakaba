@@ -44,7 +44,7 @@ class ChatController extends Controller
         foreach ($chats as $chat) {
             $chatGroupUsers = $chatGroupUsers->merge($chat->users);
         }
-        $allUsers = $communityUsers->merge($chatGroupUsers)->unique('id');
+        $allUsers = $communityUsers->merge($chatGroupUsers)->unique('id')->values();
 
         $groups = Auth::user()->chatgroupsAccepted;
 

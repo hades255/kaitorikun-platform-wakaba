@@ -6,7 +6,12 @@ export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
     const [permission, setPermission] = useState();
-    const [unreadTab, setUnreadTab] = useState({ todo: false, com: false, chat: false, scom: [] });
+    const [unreadTab, setUnreadTab] = useState({
+        todo: false,
+        com: false,
+        chat: false,
+        scom: [],
+    });
 
     const requestNotificationPermission = () => {
         if ("Notification" in window) {
@@ -17,7 +22,10 @@ export const NotificationProvider = ({ children }) => {
     };
 
     const showNotification = (title, options) => {
-        if ("Notification" in window && permission === "default") {
+        if (
+            ("Notification" in window && permission === "default") ||
+            !permission
+        ) {
             requestNotificationPermission();
         }
         if ("Notification" in window && permission === "granted") {
@@ -33,13 +41,15 @@ export const NotificationProvider = ({ children }) => {
     const updateUnreadTab = (key, value) => {
         if (key == "scom")
             setUnreadTab({ ...unreadTab, scom: [...unreadTab.scom, value] });
-        else
-            setUnreadTab({ ...unreadTab, [key]: value });
+        else setUnreadTab({ ...unreadTab, [key]: value });
     };
 
     const clearScomUnreadTab = (key, value) => {
-        setUnreadTab({ ...unreadTab, scom: unreadTab.scom.filter((item) => item[key] != value) });
-    }
+        setUnreadTab({
+            ...unreadTab,
+            scom: unreadTab.scom.filter((item) => item[key] != value),
+        });
+    };
 
     return (
         <NotificationContext.Provider
@@ -48,7 +58,7 @@ export const NotificationProvider = ({ children }) => {
                 showNotification,
                 unreadTab,
                 updateUnreadTab,
-                clearScomUnreadTab
+                clearScomUnreadTab,
             }}
         >
             {children}

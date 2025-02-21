@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "../../../components";
 import CreateCommunity from "../../community/New";
 import CreateChannel from "../../community/NewChannel";
 import CSidebarNavList from "./CSidebarNavList";
+import { InvitationDialog } from "../../../pages/communities";
 
 const ChannelSidebar = ({ page = true }) => {
     const dispatch = useDispatch();
@@ -112,6 +113,8 @@ export const AddNewCommunityButton = ({ page = true, search, setSearch }) => {
         setShowChannelEditor,
         showCommunityEditor,
         showChannelEditor,
+        showInviteDialog,
+        setShowInviteDialog,
     } = useCommunity();
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -238,6 +241,14 @@ export const AddNewCommunityButton = ({ page = true, search, setSearch }) => {
                     fullWidth={true}
                 >
                     <CreateChannel page={page} />
+                </Dialog>
+            )}
+            {showInviteDialog && (
+                <Dialog
+                    open={showInviteDialog}
+                    onClose={() => setShowInviteDialog(false)}
+                >
+                    <InvitationDialog onClose={setShowInviteDialog} />
                 </Dialog>
             )}
         </>

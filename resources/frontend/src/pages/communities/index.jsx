@@ -8,13 +8,18 @@ import {
     Card,
     CardContent,
     Chip,
-    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     TextField,
     Typography,
 } from "@mui/material";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import api from "../../api";
+import { useAuth } from "../../contexts/AuthContext";
+import { useCommunity } from "../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../reduxStore";
 import {
     PanelContent,
@@ -22,13 +27,12 @@ import {
     useDispatch,
     useSelector,
 } from "../../components";
+import { UserItem } from "../../components/chat/TagInput";
 import Creator from "../../components/community/Creator";
 import { stringAvatar } from "../../components/helper/func";
-import Post from "./Post";
-import PostEditor from "./PostEditor";
 import HorizontalSeparator from "../../components/community/HorizontalSeparator";
-import { UserItem } from "../../components/chat/TagInput";
-import { useAuth } from "../../contexts/AuthContext";
+import PostEditor from "./PostEditor";
+import Post from "./Post";
 
 const sepItems = [
     { type: "posts", title: "投稿" },
@@ -44,11 +48,10 @@ const Communities = ({ match }) => {
     const community = useSelector(selectorChannel.handleGetCommunity);
     const posts = useSelector(selectorChannel.handleGetPosts);
     const users = useSelector(selectorChannel.handleGetUsers);
+
     const [comSepType, setComSepType] = useState("posts");
     const [post, setPost] = useState(null);
-
     const [showPostEditor, setShowPostEditor] = useState(false);
-    const [showInviteDialog, setShowInviteDialog] = useState(false);
 
     const divider = useMemo(
         () => community?.type == 1 && channel?.type == 0,
@@ -165,7 +168,6 @@ const Communities = ({ match }) => {
                         channel={channel}
                         handleClickSepCom={handleClickSepCom}
                         sepCom={comSepType}
-                        setShowInviteDialog={setShowInviteDialog}
                     />
                     <Box display={"flex"} justifyContent={"center"}>
                         <Box
@@ -242,18 +244,6 @@ const Communities = ({ match }) => {
                             )}
                         </Box>
                     </Box>
-                    {showInviteDialog && (
-                        <Dialog
-                            open={showInviteDialog}
-                            onClose={() => setShowInviteDialog(false)}
-                        >
-                            <Invitation
-                                onClose={setShowInviteDialog}
-                                community={community}
-                                channel={channel}
-                            />
-                        </Dialog>
-                    )}
                 </>
             </HorizontalSeparator>
         </PanelContent>
@@ -262,13 +252,8 @@ const Communities = ({ match }) => {
 
 export default withRouter(Communities);
 
-const ComHeader = ({
-    community,
-    channel,
-    handleClickSepCom,
-    sepCom,
-    setShowInviteDialog,
-}) => {
+const ComHeader = ({ community, channel, handleClickSepCom, sepCom }) => {
+    const { setShowInviteDialog } = useCommunity();
     const { auth } = useAuth();
     const mainContent = channel
         ? channel.type == 0
@@ -362,11 +347,18 @@ const SepItems = ({ children, type, onClick, active }) => {
     );
 };
 
-const Invitation = ({ community, channel, onClose }) => {
+export const InvitationDialog = ({ onClose, data = null }) => {
+    const _community = useSelector(selectorChannel.handleGetCommunity);
+
+    const [community, setCommunity] = useState(null);
     const [inviteEmail, setInviteEmail] = useState("");
     const [selected, setSelected] = useState([]);
     const [timer, setTimer] = useState(null);
     const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        setCommunity(data || _community);
+    }, [data, _community]);
 
     const dropdownUsers = useMemo(
         () =>
@@ -385,7 +377,7 @@ const Invitation = ({ community, channel, onClose }) => {
             await api.post("invitations", {
                 users: selected,
                 community_id: community.id,
-                channel_id: channel.id,
+                channel_id: 0,
             });
             ToastNotification("success", "招待が正常に送信されました");
             setInviteEmail("");
@@ -398,20 +390,20 @@ const Invitation = ({ community, channel, onClose }) => {
                     "登録ユーザーに招待を送信できます"
                 );
         }
-    }, [community, channel, onClose, selected]);
+    }, [community, onClose, selected]);
 
     const getUsers = useCallback(
         async (input) => {
             try {
                 const response = await api(
-                    `invitations/users/search?search=${input}&channel_id=${channel.id}`
+                    `invitations/users/search?search=${input}&community_id=${community.id}`
                 );
                 setUsers(response.data);
             } catch (error) {
                 console.log(error);
             }
         },
-        [channel]
+        [community]
     );
 
     const handleInputChange = useCallback(
@@ -433,79 +425,85 @@ const Invitation = ({ community, channel, onClose }) => {
     );
 
     return (
-        <Box p={4}>
-            <Typography variant="body1">
-                {/* Invite People */}メンバーを「コミュニティ ガイド」に招待
-            </Typography>
-            <Typography variant="subtitle2">
-                このコミュニティに追加する個人の名前、メール
-                アドレスを入力します。
-            </Typography>
-            <Box minHeight={200} my={2}>
-                {selected.length > 0 && (
-                    <Box
-                        display={"flex"}
-                        alignItems={"center"}
-                        flexWrap={"wrap"}
-                        gap={1}
-                        mb={2}
-                    >
-                        {selected.map((user) => (
-                            <Chip
-                                key={user.id}
-                                id={user.id}
-                                label={user.name}
-                                variant="outlined"
-                                color="info"
-                                onDelete={() =>
-                                    setSelected(
-                                        selected.filter(
-                                            ({ id }) => id != user.id
-                                        )
-                                    )
-                                }
-                                avatar={<Avatar>{user.name[0]}</Avatar>}
-                            />
-                        ))}
+        community && (
+            <>
+                <DialogTitle variant="body1">
+                    メンバーを「{community.name}」に招待
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText variant="subtitle2">
+                        このコミュニティに追加する個人の名前、メール
+                        アドレスを入力します。
+                    </DialogContentText>
+                    <Box minHeight={200} my={2}>
+                        {selected.length > 0 && (
+                            <Box
+                                display={"flex"}
+                                alignItems={"center"}
+                                flexWrap={"wrap"}
+                                gap={1}
+                                mb={2}
+                            >
+                                {selected.map((user) => (
+                                    <Chip
+                                        key={user.id}
+                                        id={user.id}
+                                        label={user.name}
+                                        variant="outlined"
+                                        color="info"
+                                        onDelete={() =>
+                                            setSelected(
+                                                selected.filter(
+                                                    ({ id }) => id != user.id
+                                                )
+                                            )
+                                        }
+                                        avatar={<Avatar>{user.name[0]}</Avatar>}
+                                    />
+                                ))}
+                            </Box>
+                        )}
+                        <TextField
+                            fullWidth
+                            label="名前、メールを検索"
+                            type="email"
+                            placeholder="名前、メールを入力"
+                            required
+                            value={inviteEmail}
+                            onChange={handleInputChange}
+                        />
+                        {dropdownUsers.length > 0 && (
+                            <Box
+                                display={"flex"}
+                                flexDirection={"column"}
+                                maxHeight={400}
+                                borderRadius={2}
+                                border={"1px solid lightgray"}
+                                boxShadow={"2px 3px 4px #0004"}
+                                sx={{ overflowY: "scroll", cursor: "pointer" }}
+                                className="non-scrollbar"
+                            >
+                                {dropdownUsers.map((user) => (
+                                    <UserItem
+                                        key={user.id}
+                                        user={user}
+                                        onClick={handleClickInviteUserItem}
+                                    />
+                                ))}
+                            </Box>
+                        )}
                     </Box>
-                )}
-                <TextField
-                    fullWidth
-                    label="名前、メールを検索"
-                    type="email"
-                    placeholder="名前、メールを入力"
-                    required
-                    value={inviteEmail}
-                    onChange={handleInputChange}
-                />
-                {dropdownUsers.length > 0 && (
-                    <Box
-                        display={"flex"}
-                        flexDirection={"column"}
-                        maxHeight={400}
-                        borderRadius={2}
-                        border={"1px solid lightgray"}
-                        boxShadow={"2px 3px 4px #0004"}
-                        sx={{ overflowY: "scroll", cursor: "pointer" }}
-                        className="non-scrollbar"
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        variant="contained"
+                        disabled={selected.length == 0}
+                        onClick={handleSubmitInvitation}
                     >
-                        {dropdownUsers.map((user) => (
-                            <UserItem
-                                key={user.id}
-                                user={user}
-                                onClick={handleClickInviteUserItem}
-                            />
-                        ))}
-                    </Box>
-                )}
-            </Box>
-            <Button
-                variant="contained"
-                disabled={selected.length == 0}
-                onClick={handleSubmitInvitation}
-            >
-                {/* Send Invite */}招待を送信
-            </Button>
-        </Box>
+                        {/* Send Invite */}招待
+                    </Button>
+                </DialogActions>
+            </>
+        )
     );
 };

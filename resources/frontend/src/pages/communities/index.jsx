@@ -28,6 +28,7 @@ import Post from "./Post";
 import PostEditor from "./PostEditor";
 import HorizontalSeparator from "../../components/community/HorizontalSeparator";
 import { UserItem } from "../../components/chat/TagInput";
+import { useAuth } from "../../contexts/AuthContext";
 
 const sepItems = [
     { type: "posts", title: "投稿" },
@@ -268,6 +269,7 @@ const ComHeader = ({
     sepCom,
     setShowInviteDialog,
 }) => {
+    const { auth } = useAuth();
     const mainContent = channel
         ? channel.type == 0
             ? community
@@ -329,9 +331,11 @@ const ComHeader = ({
                             variant="text"
                             aria-label="mainContent settings"
                         >
-                            <Button onClick={handleClickInvite}>
-                                <GroupAddIcon />
-                            </Button>
+                            {community?.user_id == auth?.id && (
+                                <Button onClick={handleClickInvite}>
+                                    <GroupAddIcon />
+                                </Button>
+                            )}
                             {/* <Button>
                                 <LinkIcon />
                             </Button>

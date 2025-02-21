@@ -16,6 +16,8 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { ToastNotification } from "../../helper";
 import { stringAvatar } from "../../helper/func";
@@ -261,6 +263,7 @@ const MoreButton = ({ data }) => {
                     "aria-labelledby": "basic-button",
                 }}
             >
+                {data.mood=="com"&&<MenuItem></MenuItem>}
                 <MenuItem
                     disabled={
                         (auth ? auth.id != data.user_id : true) ||
@@ -272,27 +275,13 @@ const MoreButton = ({ data }) => {
                     チャネルの削除
                 </MenuItem>
             </Menu>
-            <Dialog
+            <ConfirmDialog
                 open={openDeleteModal}
                 onClose={handleCloseDeleteModal}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    これを削除してもよろしいですか?
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        {data.title}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDeleteModal}>反対</Button>
-                    <Button onClick={handleAcceptDeleteModal} autoFocus>
-                        賛成
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                onOk={handleAcceptDeleteModal}
+                title={"これを削除してもよろしいですか?"}
+                innerTitle={data.title}
+            />
         </div>
     );
 };
@@ -330,3 +319,36 @@ export const useStyles = makeStyles((theme) => ({
         },
     },
 }));
+
+export const ConfirmDialog = ({
+    open = false,
+    onClose = () => {},
+    onOk = () => {},
+    title = "",
+    innerTitle = "",
+}) => {
+    const stopPropagation = useCallback((e) => e.stopPropagation(), []);
+
+    return (
+        <Dialog
+            open={open}
+            onClose={onClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            onClick={stopPropagation}
+        >
+            <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    {innerTitle}
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>反対</Button>
+                <Button onClick={onOk} autoFocus>
+                    賛成
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};

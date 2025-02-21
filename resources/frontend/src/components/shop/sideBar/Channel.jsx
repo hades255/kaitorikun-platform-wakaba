@@ -131,7 +131,8 @@ export const AddNewCommunityButton = ({ page = true, search, setSearch }) => {
     };
 
     const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+        // setAnchorEl(event.currentTarget);
+        handleNewCommunity();
     };
 
     const handleClose = () => {

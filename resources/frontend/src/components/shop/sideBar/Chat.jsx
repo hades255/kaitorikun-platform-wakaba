@@ -237,7 +237,7 @@ const ChatItem = ({ user, selected, onClick, pinned, setPin }) => {
         () =>
             chats.filter((item) => {
                 if (item.group_id && user.type == "group") {
-                    return item.group_id == user.id && item.status == "unread";
+                    return item.group_id == user.id && item.from != auth?.id && item.status == "unread";
                 }
                 if (!item.group_id && user.type == "chat") {
                     return (

@@ -72,34 +72,52 @@ const ChatsPage = () => {
     );
 
     useEffect(() => {
-        if (selectedUser && lastmessage.current) {
-            {
-                lastmessage.current.scrollIntoView({ behavior: "smooth" });
-                if (
-                    chats.find(
-                        (item) =>
-                            (selectedUser.type == "chat" &&
-                                item.from == selectedUser.id &&
-                                item.status === "unread") ||
-                            (selectedUser.type == "group" &&
-                                item.group_id == selectedUser.id &&
-                                item.status === "unread")
-                    )
-                ) {
-                    const timer = setTimeout(() => {
-                        handleReadChat(selectedUser);
-                    }, 300);
-                    return () => {
-                        if (timer) clearTimeout(timer);
-                    };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    if (
+                        chats.find(
+                            (item) =>
+                                (selectedUser.type == "chat" &&
+                                    item.from == selectedUser.id &&
+                                    item.status === "unread") ||
+                                (selectedUser.type == "group" &&
+                                    item.group_id == selectedUser.id &&
+                                    item.from != auth.id &&
+                                    item.status === "unread")
+                        )
+                    ) {
+                        const timer = setTimeout(() => {
+                            handleReadChat(selectedUser);
+                        }, 300);
+                        return () => {
+                            if (timer) clearTimeout(timer);
+                        };
+                    }
                 }
-            }
+            });
+        });
+
+        if (lastmessage.current) {
+            observer.observe(lastmessage.current);
         }
-    }, [handleReadChat, chats, selectedUser]);
+
+        return () => {
+            if (lastmessage.current) {
+                observer.unobserve(lastmessage.current);
+            }
+        };
+    }, [handleReadChat, chats, selectedUser, auth]);
 
     useEffect(() => {
         dispatch(actionChat.handleSetCurrentUser(null));
     }, [dispatch]);
+
+    useEffect(() => {
+        if (selectedUser && lastmessage.current) {
+            lastmessage.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [selectedUser]);
 
     return (
         <PanelContent title="メッセージ">
@@ -143,7 +161,10 @@ const ChatsPage = () => {
                                         <AnimTypingIcon />
                                     </Box>
                                 )}
-                                <Box ref={lastmessage}></Box>
+                                <Box
+                                    ref={lastmessage}
+                                    className={classes.lastmessage}
+                                ></Box>
                             </Box>
                             <ChatInput
                                 sending={sending}
@@ -436,8 +457,11 @@ const useStyles = makeStyles((theme) => ({
         marginRight: "auto",
     },
     chatWrapper: {
-        height: "calc(100% - 44px)",
-        maxHeight: "calc(100% - 44px)",
+        height: "calc(100% - 66px)",
+        maxHeight: "calc(100% - 66px)",
         overflowY: "scroll",
+    },
+    lastmessage: {
+        padding: 16,
     },
 }));

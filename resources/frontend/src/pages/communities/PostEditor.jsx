@@ -126,7 +126,7 @@ export default function PostEditor({ onPost, onClose, initPost }) {
                             onChange={handleFileSelect}
                         />
                     </IconButton>
-                    <FormControlLabel
+                    {/* <FormControlLabel
                         control={
                             <Checkbox
                                 checked={notifyEmail}
@@ -137,7 +137,7 @@ export default function PostEditor({ onPost, onClose, initPost }) {
                         }
                         // label="Also notify via email"
                         label="メールでも通知"
-                    />
+                    /> */}
                 </Box>
                 {attachment && (
                     <Box

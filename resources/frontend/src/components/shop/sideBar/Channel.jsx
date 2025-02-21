@@ -93,10 +93,10 @@ const ChannelSidebar = ({ page = true }) => {
             >
                 {communityItems.map((menu, i) => (
                     <CSidebarNavList
+                        key={menu.mood + menu.id}
                         data={menu}
                         page={page}
                         path={page ? "communities" : "channels"}
-                        key={menu.id}
                     />
                 ))}
             </ul>

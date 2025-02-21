@@ -1,7 +1,7 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
-import { makeStyles } from "@mui/styles";
 import {
     Avatar,
     Button,
@@ -14,32 +14,53 @@ import {
     Menu,
     MenuItem,
 } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { ToastNotification } from "../../helper";
 import { stringAvatar } from "../../helper/func";
+import api from "../../../api";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { useNotification } from "../../../contexts/NotificationContext";
+import { actionChannel, selectorChannel } from "../../../reduxStore";
 import "./CSidebarNavList.css";
-import { ToastNotification } from "../../helper";
-import api from "../../../api";
-import { useDispatch } from "react-redux";
-import { actionChannel } from "../../../reduxStore";
-import { useAuth } from "../../../contexts/AuthContext";
 
-const CSidebarNavList = (props) => {
-    const dataId = props.data.id;
-    const { auth } = useAuth();
+const CSidebarNavList = ({ data, page, path }) => {
+    const dataId = data.id;
     const classes = useStyles();
+    const channel = useSelector(selectorChannel.handleGetChannel);
+    const community = useSelector(selectorChannel.handleGetCommunity);
+
+    const { auth } = useAuth();
     const { unreadTab, clearScomUnreadTab } = useNotification();
     const { setShowChannelEditor, setPreSetCommunityId } = useCommunity();
 
-    const count = Array.isArray(unreadTab.scom)
-        ? props.data.mood == "com"
-            ? unreadTab.scom.filter(({ com }) => com == dataId).length
-            : unreadTab.scom.filter(({ cha }) => cha == dataId).length
-        : 0;
+    const count = useMemo(
+        () =>
+            Array.isArray(unreadTab.scom)
+                ? data.mood == "com"
+                    ? unreadTab.scom.filter(({ com }) => com == dataId).length
+                    : unreadTab.scom.filter(({ cha }) => cha == dataId).length
+                : 0,
+        [data, unreadTab]
+    );
+    const channelSelected = useMemo(
+        () =>
+            channel && community && data.mood == "cha" && data.id == channel.id,
+        [channel, community, data]
+    );
 
     const [isMenuExtended, setIsMenuExtended] = useState(false);
+
+    useEffect(() => {
+        setIsMenuExtended(
+            channel &&
+                community &&
+                data.mood == "com" &&
+                data.id == community.id
+        );
+    }, [channel, community, data]);
 
     const handleMainMenuAction = useCallback(() => {
         setIsMenuExtended(!isMenuExtended);
@@ -61,9 +82,10 @@ const CSidebarNavList = (props) => {
                 "menu-open": isMenuExtended,
             })}
         >
-            {props.data.mood == "com" ? (
+            {data.mood == "com" ? (
                 <div
                     className={clsx(
+                        { [classes.comMenuOpen]: isMenuExtended },
                         "CSidebarNavListItem nav-link nav-link-font",
                         classes.menuItem
                     )}
@@ -72,56 +94,63 @@ const CSidebarNavList = (props) => {
                     <Avatar
                         variant="rounded"
                         {...stringAvatar({
-                            name: props.data.title,
-                            src: props.data.icon,
+                            name: data.title,
+                            src: data.icon,
                             sx: {
                                 color: "black",
-                                width: props.page ? 28 : 24,
-                                height: props.page ? 28 : 24,
+                                width: page ? 28 : 24,
+                                height: page ? 28 : 24,
                             },
                         })}
                     />
                     <p>
-                        {props.data.title}
+                        {data.title}
                         <i className="right fas fa-angle-left extend-angle-left-icon" />
                     </p>
-                    {auth && auth.id == props.data.user_id && (
-                        <MoreButton data={props.data} />
+                    {auth && auth.id == data.user_id && (
+                        <MoreButton data={data} />
                     )}
                 </div>
             ) : (
                 <Link
-                    to={`/${props.path}/${dataId}`}
+                    to={`/${path}/${dataId}`}
                     className={clsx(
                         "CSidebarNavListItem nav-link nav-link-font",
                         classes.menuItem
                     )}
                     onClick={handleMainSubMenuAction}
                 >
-                    <i
-                        className="far fa-circle nav-icon"
-                        style={{ minWidth: 24, width: 24 }}
-                    />
-                    <p>{props.data.title}</p>
-                    {auth && auth.id == props.data.user_id && (
-                        <MoreButton data={props.data} />
+                    {channelSelected ? (
+                        <i
+                            className="far fa-circle-dot nav-icon"
+                            style={{ minWidth: 24, width: 24 }}
+                        />
+                    ) : (
+                        <i
+                            className="far fa-circle nav-icon"
+                            style={{ minWidth: 24, width: 24 }}
+                        />
+                    )}
+                    <p>{data.title}</p>
+                    {auth && auth.id == data.user_id && (
+                        <MoreButton data={data} />
                     )}
                 </Link>
             )}
             {isMenuExtended && (
                 <ul className="nav nav-treeview">
-                    {props.data.mood == "com" &&
-                        props.data.children &&
-                        props.data.children.map((submenu, i) => (
+                    {data.mood == "com" &&
+                        data.children &&
+                        data.children.map((submenu, i) => (
                             <CSidebarNavList
                                 data={submenu}
-                                page={props.page}
-                                path={props.page ? "communities" : "channels"}
+                                page={page}
+                                path={page ? "communities" : "channels"}
                                 key={i}
                                 submenu="active"
                             />
                         ))}
-                    {auth && auth.id == props.data.user_id && (
+                    {auth && auth.id == data.user_id && (
                         <div
                             className={clsx(
                                 "nav-link nav-link-font",
@@ -291,5 +320,12 @@ export const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         gap: 4,
         cursor: "pointer",
+    },
+    comMenuOpen: {
+        backgroundColor: "transparent !important",
+        borderBottom: "1px solid grey",
+        "&:hover": {
+            backgroundColor: "#FFF1 !important",
+        },
     },
 }));

@@ -27,7 +27,7 @@ import { stringAvatar } from "../../components/helper/func";
 import Post from "./Post";
 import PostEditor from "./PostEditor";
 import HorizontalSeparator from "../../components/community/HorizontalSeparator";
-import { preChannelItems } from "../../components/community/NewChannel";
+import { UserItem } from "../../components/chat/TagInput";
 
 const sepItems = [
     { type: "posts", title: "投稿" },
@@ -82,7 +82,17 @@ const Communities = ({ match }) => {
 
     useEffect(() => {
         if (channelId) getChannel(channelId);
-    }, [getChannel, channelId]);
+        return () => {
+            dispatch(
+                actionChannel.handleSelectChannel({
+                    posts: [],
+                    community: null,
+                    channel: null,
+                    users: [],
+                })
+            );
+        };
+    }, [getChannel, dispatch, channelId]);
 
     const handleCreatePost = useCallback(
         (post, init) => {
@@ -296,7 +306,7 @@ const ComHeader = ({
                         <Typography variant="h5" color="black">
                             {mainContent.name}
                         </Typography>
-                        <ButtonGroup
+                        {/* <ButtonGroup
                             size="small"
                             variant="text"
                             aria-label="sep mainContent settings"
@@ -311,7 +321,7 @@ const ComHeader = ({
                                     {item.title}
                                 </SepItems>
                             ))}
-                        </ButtonGroup>
+                        </ButtonGroup> */}
                     </Box>
                     <Box>
                         <ButtonGroup
@@ -353,6 +363,18 @@ const Invitation = ({ community, channel, onClose }) => {
     const [selected, setSelected] = useState([]);
     const [timer, setTimer] = useState(null);
     const [users, setUsers] = useState([]);
+
+    const dropdownUsers = useMemo(
+        () =>
+            users
+                ? users.filter(
+                      (user) =>
+                          !selected?.find(({ id }) => id == user.id) &&
+                          !community?.users?.find(({ id }) => id == user.id)
+                  )
+                : [],
+        [users, selected, community]
+    );
 
     const handleSubmitInvitation = useCallback(async () => {
         try {
@@ -399,6 +421,13 @@ const Invitation = ({ community, channel, onClose }) => {
         [timer, getUsers]
     );
 
+    const handleClickInviteUserItem = useCallback(
+        (user) => {
+            setSelected([...selected, user]);
+        },
+        [selected]
+    );
+
     return (
         <Box p={4}>
             <Typography variant="body1">
@@ -415,6 +444,7 @@ const Invitation = ({ community, channel, onClose }) => {
                         alignItems={"center"}
                         flexWrap={"wrap"}
                         gap={1}
+                        mb={2}
                     >
                         {selected.map((user) => (
                             <Chip
@@ -437,51 +467,33 @@ const Invitation = ({ community, channel, onClose }) => {
                 )}
                 <TextField
                     fullWidth
-                    // label="Email"
                     label="名前、メールを検索"
                     type="email"
                     placeholder="名前、メールを入力"
                     required
                     value={inviteEmail}
                     onChange={handleInputChange}
-                    sx={{ my: 2 }}
                 />
-                <Box
-                    display={"flex"}
-                    flexDirection={"column"}
-                    gap={1}
-                    maxHeight={400}
-                    sx={{ overflowY: "scroll", cursor: "pointer" }}
-                >
-                    {users.map(
-                        (user) =>
-                            !selected.find(({ id }) => id == user.id) && (
-                                <Box
-                                    key={user.id}
-                                    id={user.id}
-                                    display={"flex"}
-                                    alignItems={"center"}
-                                    gap={2}
-                                    onClick={() =>
-                                        setSelected([...selected, user])
-                                    }
-                                >
-                                    <Avatar>{user.name[0]}</Avatar>
-                                    <Box
-                                        display={"flex"}
-                                        flexDirection={"column"}
-                                    >
-                                        <Typography variant="caption">
-                                            {user.name}
-                                        </Typography>
-                                        <Typography variant="caption">
-                                            {user.email}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            )
-                    )}
-                </Box>
+                {dropdownUsers.length > 0 && (
+                    <Box
+                        display={"flex"}
+                        flexDirection={"column"}
+                        maxHeight={400}
+                        borderRadius={2}
+                        border={"1px solid lightgray"}
+                        boxShadow={"2px 3px 4px #0004"}
+                        sx={{ overflowY: "scroll", cursor: "pointer" }}
+                        className="non-scrollbar"
+                    >
+                        {dropdownUsers.map((user) => (
+                            <UserItem
+                                key={user.id}
+                                user={user}
+                                onClick={handleClickInviteUserItem}
+                            />
+                        ))}
+                    </Box>
+                )}
             </Box>
             <Button
                 variant="contained"

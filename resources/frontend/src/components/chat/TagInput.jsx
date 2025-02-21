@@ -134,6 +134,9 @@ const TagInput = ({ setValues }) => {
                     border={"1px solid lightgray"}
                     borderRadius={2}
                     boxShadow={"2px 3px 4px #0004"}
+                    maxHeight={400}
+                    sx={{ overflowY: "scroll", cursor: "pointer" }}
+                    className="non-scrollbar"
                 >
                     {whitelist.map((user) => (
                         <UserItem
@@ -150,7 +153,7 @@ const TagInput = ({ setValues }) => {
 
 export default TagInput;
 
-const UserItem = ({ user, onClick }) => {
+export const UserItem = ({ user, onClick }) => {
     const handleClick = () => {
         onClick(user);
     };

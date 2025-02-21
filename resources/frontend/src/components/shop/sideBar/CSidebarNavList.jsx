@@ -54,12 +54,13 @@ const CSidebarNavList = ({ data, page, path }) => {
     const [isMenuExtended, setIsMenuExtended] = useState(false);
 
     useEffect(() => {
-        setIsMenuExtended(
+        if (
             channel &&
-                community &&
-                data.mood == "com" &&
-                data.id == community.id
-        );
+            community &&
+            data.mood == "com" &&
+            data.id == community.id
+        )
+            setIsMenuExtended(true);
     }, [channel, community, data]);
 
     const handleMainMenuAction = useCallback(() => {

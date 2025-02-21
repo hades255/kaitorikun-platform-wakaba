@@ -73,6 +73,7 @@ const HorizontalSeparator = ({ children, BottomComponent, divider }) => {
                     transition: isDragging ? "none" : "height 0.1s ease",
                     borderRadius: 0,
                 }}
+                className="non-scrollbar"
             >
                 {children}
             </Box>
@@ -143,6 +144,7 @@ const HorizontalSeparator = ({ children, BottomComponent, divider }) => {
                     transition: isDragging ? "none" : "height 0.1s ease",
                     borderRadius: 0,
                 }}
+                className="non-scrollbar"
             >
                 {BottomComponent}
             </Box>

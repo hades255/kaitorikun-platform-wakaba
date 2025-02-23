@@ -2,10 +2,7 @@ import { useCallback, useState } from "react";
 import {
     Box,
     TextField,
-    Switch,
-    FormControlLabel,
     Button,
-    Typography,
     DialogTitle,
     DialogContent,
 } from "@mui/material";
@@ -16,17 +13,22 @@ import { ToastNotification, useDispatch } from "..";
 import CommunityGuideline from "./CommunityGuideline";
 import CommunityIconUrl from "./CommunityIconUrl";
 
-const CreateCommunity = ({ page = true }) => {
+const CreateCommunity = ({
+    page = true,
+    initData = null,
+    onClose = () => {},
+}) => {
     const dispatch = useDispatch();
 
     const { preSetCommunityName, setShowCommunityEditor } = useCommunity();
 
     const [comData, setComData] = useState({
-        name: preSetCommunityName,
-        description: "",
-        icon: "",
-        guideline:
-            "コミュニティのメンバーに対して親切で敬意を持って接してください。失礼な態度や残酷な態度はとらないでください。自分らしく参加し、違反する投稿はしないでください",
+        name: initData ? initData.title : preSetCommunityName,
+        description: initData ? initData.description : "",
+        icon: initData ? initData.icon : "",
+        guideline: initData
+            ? initData.guideline
+            : "コミュニティのメンバーに対して親切で敬意を持って接してください。失礼な態度や残酷な態度はとらないでください。自分らしく参加し、違反する投稿はしないでください",
         requireApproval: false,
         isPublic: true,
     });
@@ -35,23 +37,41 @@ const CreateCommunity = ({ page = true }) => {
         e.preventDefault();
         const saveChannel = async () => {
             try {
-                const response = await api.post("communities", {
-                    ...comData,
-                    type: page ? false : true,
-                });
-                ToastNotification(
-                    "success",
-                    "コミュニティが正常に作成されました"
-                );
-                dispatch(
-                    actionChannel.handleAddCommunity({
-                        ...response.data.community,
-                        channels: response.data.channel
-                            ? [response.data.channel]
-                            : [],
-                    })
-                );
-                setShowCommunityEditor(false);
+                if (initData) {
+                    const response = await api.put(
+                        "communities/" + initData.id,
+                        {
+                            ...comData,
+                            type: page ? false : true,
+                        }
+                    );
+                    ToastNotification(
+                        "success",
+                        "コミュニティが正常に更新されました"
+                    );
+                    dispatch(
+                        actionChannel.handleUpdateCommunity(response.data)
+                    );
+                    onClose();
+                } else {
+                    const response = await api.post("communities", {
+                        ...comData,
+                        type: page ? false : true,
+                    });
+                    ToastNotification(
+                        "success",
+                        "コミュニティが正常に作成されました"
+                    );
+                    dispatch(
+                        actionChannel.handleAddCommunity({
+                            ...response.data.community,
+                            channels: response.data.channel
+                                ? [response.data.channel]
+                                : [],
+                        })
+                    );
+                    setShowCommunityEditor(false);
+                }
             } catch (error) {
                 console.log(error);
                 ToastNotification(
@@ -65,10 +85,10 @@ const CreateCommunity = ({ page = true }) => {
         saveChannel();
     };
 
-    const handleClose = useCallback(
-        () => setShowCommunityEditor(false),
-        [setShowCommunityEditor]
-    );
+    const handleClose = useCallback(() => {
+        if (onClose) onClose();
+        setShowCommunityEditor(false);
+    }, [setShowCommunityEditor, onClose]);
 
     return (
         <>

@@ -1,11 +1,17 @@
-import React, { createContext, useContext, useState } from "react";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 const NotificationContext = createContext();
 
 export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
-    const [permission, setPermission] = useState();
+    const [permission, setPermission] = useState(null);
     const [unreadTab, setUnreadTab] = useState({
         todo: false,
         com: false,
@@ -13,13 +19,13 @@ export const NotificationProvider = ({ children }) => {
         scom: [],
     });
 
-    const requestNotificationPermission = () => {
+    const requestNotificationPermission = useCallback(() => {
         if ("Notification" in window) {
             Notification.requestPermission().then((permission) => {
                 setPermission(permission);
             });
         }
-    };
+    }, []);
 
     const showNotification = (title, options) => {
         if (
@@ -50,6 +56,10 @@ export const NotificationProvider = ({ children }) => {
             scom: unreadTab.scom.filter((item) => item[key] != value),
         });
     };
+
+    useEffect(() => {
+        requestNotificationPermission();
+    }, [requestNotificationPermission]);
 
     return (
         <NotificationContext.Provider

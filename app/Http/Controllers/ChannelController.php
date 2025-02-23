@@ -67,7 +67,17 @@ class ChannelController extends Controller
 
     public function update(Request $request, Channel $channel)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+        $channel->name = $validatedData['name'];
+        $channel->description = $validatedData['description'];
+        if ($channel->save()) {
+            // NewChannelJob::dispatch($channel, Auth::user()->name);
+            return response()->json($channel);
+        }
+        return response()->json(['error' => 'Failed to update channel'], 500);
     }
 
     public function destroy(Channel $channel)

@@ -55,7 +55,11 @@ export const preChannelItems = [
     { title: "業者来訪", color: "lightgray", icon: "far fa-circle nav-icon" },
 ];
 
-const CreateChannel = ({ page }) => {
+const CreateChannel = ({
+    page = true,
+    initData = null,
+    onClose = () => {},
+}) => {
     const { auth } = useAuth();
     const classes = useStyles();
     const { preSetCommunityId, setShowChannelEditor } = useCommunity();
@@ -65,9 +69,11 @@ const CreateChannel = ({ page }) => {
     const [editName, setEditName] = useState(true);
 
     const [comData, setComData] = useState({
-        name: "",
-        description: "",
-        community_id: preSetCommunityId || undefined,
+        name: initData ? initData.title : "",
+        description: initData ? initData.description : "",
+        community_id: initData
+            ? initData.description
+            : preSetCommunityId || undefined,
         icon: "",
         requireApproval: false,
         isPublic: true,
@@ -77,16 +83,32 @@ const CreateChannel = ({ page }) => {
         e.preventDefault();
         const saveChannel = async () => {
             try {
-                const response = await api.post("channels", {
-                    ...comData,
-                    type: editName,
-                });
-                ToastNotification(
-                    "success",
-                    "チャンネルが正常に作成されました"
-                );
-                dispatch(actionChannel.handleAddChannel(response.data.channel));
-                setShowChannelEditor(false);
+                if (initData) {
+                    const response = await api.put("channels/" + initData.id, {
+                        ...comData,
+                    });
+                    ToastNotification(
+                        "success",
+                        "チャンネルが正常に更新されました"
+                    );
+                    dispatch(
+                        actionChannel.handleUpdateChannel(response.data)
+                    );
+                    onClose(false);
+                } else {
+                    const response = await api.post("channels", {
+                        ...comData,
+                        type: editName,
+                    });
+                    ToastNotification(
+                        "success",
+                        "チャンネルが正常に作成されました"
+                    );
+                    dispatch(
+                        actionChannel.handleAddChannel(response.data.channel)
+                    );
+                    setShowChannelEditor(false);
+                }
             } catch (error) {
                 console.log(error);
                 ToastNotification(
@@ -101,10 +123,10 @@ const CreateChannel = ({ page }) => {
     };
 
     const handleClickShowPre = useCallback(() => sethidePre(false), []);
-    const handleClose = useCallback(
-        () => setShowChannelEditor(false),
-        [setShowChannelEditor]
-    );
+    const handleClose = useCallback(() => {
+        if (onClose) onClose();
+        setShowChannelEditor(false);
+    }, [setShowChannelEditor, onClose]);
     const handleClickPreItem = useCallback(
         (param) => {
             setComData({ ...comData, name: param });
@@ -130,7 +152,6 @@ const CreateChannel = ({ page }) => {
             <Typography variant="h5" sx={{ mb: 3 }}>
                 チャネルの作成
             </Typography>
-
             {!hidePre && (
                 <Box
                     sx={{ maxHeight: 400, overflowY: "scroll" }}
@@ -158,7 +179,6 @@ const CreateChannel = ({ page }) => {
                     </Box>
                 </Box>
             )}
-
             {hidePre && (
                 <form onSubmit={handleSubmit} className={classes.formContainer}>
                     <div className={classes.formGroup}>
@@ -176,7 +196,7 @@ const CreateChannel = ({ page }) => {
                                     community_id: e.target.value,
                                 })
                             }
-                            disabled={preSetCommunityId > 0}
+                            disabled={initData || preSetCommunityId > 0}
                             className={classes.select}
                             required
                         >
@@ -205,7 +225,7 @@ const CreateChannel = ({ page }) => {
                         }
                         required
                         sx={{ mb: 2 }}
-                        disabled={!editName}
+                        disabled={!editName || initData.type == 0}
                     />
                     <TextField
                         fullWidth
@@ -223,10 +243,7 @@ const CreateChannel = ({ page }) => {
                         sx={{ mb: 2 }}
                     />
                     <Box display="flex" justifyContent={"end"} sx={{ gap: 2 }}>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setShowChannelEditor(false)}
-                        >
+                        <Button variant="outlined" onClick={handleClose}>
                             キャンセル
                         </Button>
                         <Button variant="contained" type="submit">

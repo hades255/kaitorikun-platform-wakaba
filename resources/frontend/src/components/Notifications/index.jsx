@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../api";
+import { getItem } from "../helper";
 import myEcho from "../helper/Echo";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
@@ -52,10 +53,18 @@ const Notifications = () => {
                 comIds?.includes(Number(data.channel.community_id))
             ) {
                 if (auth?.id != data.channel.user_id) {
-                    if (data.name)
-                        showNotification("新しいチャンネル", {
-                            message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
-                        });
+                    if (data.name) {
+                        const pre = getItem("nonNotifiedCommunities");
+                        if (
+                            (pre || []).find(
+                                (item) => item == data.channel.community_id
+                            )
+                        ) {
+                        } else
+                            showNotification("新しいチャンネル", {
+                                message: `${data.name} さんがチャンネルを作成しました.\n${data.channel.name}`,
+                            });
+                    }
                     dispatch(
                         actionChannel.handleAddUser({
                             id: data.channel.user_id,
@@ -78,35 +87,32 @@ const Notifications = () => {
                     data.post.community_id == 0 ||
                     comIds?.includes(Number(data.post.community_id))
                 ) {
-                    if (data.name)
-                        showNotification("新しい投稿", {
-                            message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
-                        });
-                    if (data.post.community_id == 0) {
-                        dispatch(
-                            actionSChannel.handleAddUser({
-                                id: data.post.user_id,
-                                name: data.name,
-                            })
-                        );
-                        dispatch(actionSChannel.handleAddPost(data.post));
-                    } else {
-                        dispatch(
-                            actionChannel.handleAddUser({
-                                id: data.post.user_id,
-                                name: data.name,
-                            })
-                        );
-                        dispatch(
-                            actionChannel.handleAddPostToChannel(data.post)
-                        );
-                        if (scomIds?.includes(Number(data.post.community_id)))
-                            updateUnreadTab("scom", {
-                                com: data.post.community_id,
-                                cha: data.post.channel_id,
+                    if (data.name) {
+                        const pre = getItem("nonNotifiedCommunities");
+                        if (
+                            (pre || []).find(
+                                (item) => item == data.post.community_id
+                            )
+                        ) {
+                        } else {
+                            showNotification("新しい投稿", {
+                                message: `${data.name} さんが投稿を作成しました.\n${data.post.title}`,
                             });
-                        else updateUnreadTab("com", true);
+                        }
                     }
+                    dispatch(
+                        actionChannel.handleAddUser({
+                            id: data.post.user_id,
+                            name: data.name,
+                        })
+                    );
+                    dispatch(actionChannel.handleAddPostToChannel(data.post));
+                    if (scomIds?.includes(Number(data.post.community_id)))
+                        updateUnreadTab("scom", {
+                            com: data.post.community_id,
+                            cha: data.post.channel_id,
+                        });
+                    else updateUnreadTab("com", true);
                 }
             }
         };
@@ -125,10 +131,18 @@ const Notifications = () => {
                 comIds?.includes(Number(data.community.id))
             ) {
                 if (auth?.id != data.community.user_id) {
-                    if (data.name)
-                        showNotification("コミュニティを削除しました", {
-                            message: `${data.name} がコミュニティを削除しました.\n${data.community.name}`,
-                        });
+                    if (data.name) {
+                        const pre = getItem("nonNotifiedCommunities");
+                        if (
+                            (pre || []).find(
+                                (item) => item == data.community.id
+                            )
+                        ) {
+                        } else
+                            showNotification("コミュニティを削除しました", {
+                                message: `${data.name} がコミュニティを削除しました.\n${data.community.name}`,
+                            });
+                    }
                     dispatch(
                         actionChannel.handleRemoveCommunity(data.community)
                     );
@@ -142,10 +156,18 @@ const Notifications = () => {
                 comIds?.includes(Number(data.channel.community_id))
             ) {
                 if (auth?.id != data.channel.user_id) {
-                    if (data.name)
-                        showNotification("チャンネルを削除しました", {
-                            message: `${data.name} がチャンネルを削除しました.\n${data.channel.name}`,
-                        });
+                    if (data.name) {
+                        const pre = getItem("nonNotifiedCommunities");
+                        if (
+                            (pre || []).find(
+                                (item) => item == data.channel.community_id
+                            )
+                        ) {
+                        } else
+                            showNotification("チャンネルを削除しました", {
+                                message: `${data.name} がチャンネルを削除しました.\n${data.channel.name}`,
+                            });
+                    }
                     dispatch(actionChannel.handleRemoveChannel(data.channel));
                 }
             }

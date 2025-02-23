@@ -1,7 +1,7 @@
 import { Avatar, Box, Typography } from "@mui/material";
 import { stringAvatar } from "../helper/func";
 
-const Creator = ({ creature, users }) => {
+const Creator = ({ creature, users, init = "削除されたユーザー" }) => {
     const user =
         Array.isArray(users) &&
         users.find((item) => item.id == creature.user_id);
@@ -11,8 +11,8 @@ const Creator = ({ creature, users }) => {
             <Box display={"flex"} alignItems={"center"} gap={1}>
                 <Avatar
                     {...stringAvatar({
-                        name: user.name,
-                        src: user.icon,
+                        name: user ? user.name : init,
+                        src: user ? user.icon : init,
                         sx: {
                             color: "black",
                             width: 36,
@@ -20,7 +20,7 @@ const Creator = ({ creature, users }) => {
                         },
                     })}
                 />
-                <Typography>{user?.name}</Typography>
+                <Typography>{user ? user.name : init}</Typography>
             </Box>
         )
     );

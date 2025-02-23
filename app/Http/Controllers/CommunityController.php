@@ -6,6 +6,7 @@ use App\Jobs\NewCommunityJob;
 use App\Jobs\RemoveCommunityJob;
 use App\Models\Channel;
 use App\Models\Community;
+use App\Models\CommunityUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -109,9 +110,23 @@ class CommunityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Community $community)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'guideline' => 'nullable|string|max:1000',
+            'icon' => 'nullable|string',
+        ]);
+        $community->name = $validatedData['name'];
+        $community->description = $validatedData['description'] ?? null;
+        $community->guideline = $validatedData['guideline'];
+        $community->icon = $validatedData['icon'] ?? null;
+        if ($community->save()) {
+            // NewCommunityJob::dispatch($community, $channel, Auth::user()->name); todo    update community
+            return response()->json($community);
+        }
+        return response()->json(['error' => 'Failed to update community'], 500);
     }
 
     /**
@@ -135,6 +150,13 @@ class CommunityController extends Controller
         } else {
             return response()->json(['error' => 'Failed to remove community', "message" => "Unauthorized user"], 401);
         }
+    }
+
+    public function users(Community $community)
+    {
+        $community->user;
+        $community->users;
+        return response()->json($community);
     }
 
     //   get public communities
@@ -172,5 +194,12 @@ class CommunityController extends Controller
         return response()->json([
             'communities' => $joinedCommunities
         ]);
+    }
+
+    public function leaveCommunity($community)
+    {
+        CommunityUser::where("community_id", $community)->where("user_id", Auth::id())->delete();
+        //  todo    send all about this
+        return response()->json(["community" => $community, "user" => Auth::id()]);
     }
 }

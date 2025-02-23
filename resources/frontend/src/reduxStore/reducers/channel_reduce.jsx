@@ -2,6 +2,7 @@ import {
     ADD_REACTION,
     ADD_USER,
     EDIT_POST,
+    LEAVE_COMMUNITY,
     NEW_CHANNEL,
     NEW_COMMUNITY,
     NEW_POST,
@@ -9,10 +10,13 @@ import {
     REMOVE_COMMUNITY,
     REMOVE_POST,
     REMOVE_REACTION,
+    REMOVE_USER,
     REPLY_POST,
     SELECT_CHANNEL,
     SET_CHANNEL,
     SET_COMMUNITY,
+    UPDATE_CHANNEL,
+    UPDATE_COMMUNITY,
 } from "../actions/channel_action";
 
 const initialState = {
@@ -33,6 +37,13 @@ const channels = (state = initialState, actions) => {
                     ? state.users
                     : [...state.users, data],
             };
+        case REMOVE_USER:
+            return {
+                ...state,
+                users: state.users.find((user) => user.id == data.id)
+                    ? state.users
+                    : [...state.users, data],
+            };
         case SET_COMMUNITY:
             return {
                 ...state,
@@ -42,6 +53,20 @@ const channels = (state = initialState, actions) => {
             return {
                 ...state,
                 communities: [...state.communities, data],
+            };
+        case UPDATE_COMMUNITY:
+            return {
+                ...state,
+                communities: state.communities.map((item) =>
+                    item.id == data.id ? data : item
+                ),
+            };
+        case LEAVE_COMMUNITY:
+            return {
+                ...state,
+                communities: state.communities.filter(
+                    (item) => item.id != data.community
+                ),
             };
         case REMOVE_COMMUNITY:
             return {
@@ -63,6 +88,19 @@ const channels = (state = initialState, actions) => {
                     channels:
                         item.id == data.community_id
                             ? [...item.channels, data]
+                            : item.channels,
+                })),
+            };
+        case UPDATE_CHANNEL:
+            return {
+                ...state,
+                communities: state.communities?.map((item) => ({
+                    ...item,
+                    channels:
+                        item.id == data.community_id
+                            ? item.channels.map((cha) =>
+                                  cha.id == data.id ? data : cha
+                              )
                             : item.channels,
                 })),
             };

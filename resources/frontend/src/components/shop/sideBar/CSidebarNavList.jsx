@@ -29,7 +29,7 @@ import GroupRemoveOutlinedIcon from "@mui/icons-material/GroupRemoveOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
-import { ToastNotification } from "../../helper";
+import { getItem, setItem, ToastNotification } from "../../helper";
 import { stringAvatar } from "../../helper/func";
 import api from "../../../api";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -37,6 +37,8 @@ import { useCommunity } from "../../../contexts/CommunityContext";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
 import { InvitationDialog } from "../../../pages/communities";
+import CreateCommunity from "../../community/New";
+import CreateChannel from "../../community/NewChannel";
 import "./CSidebarNavList.css";
 
 const CSidebarNavList = ({ data, page, path }) => {
@@ -241,17 +243,8 @@ const MoreButton = ({ data }) => {
                 {data.mood == "com" && (
                     <CommunityUsers data={data} onClose={handleClose} />
                 )}
-                {false && auth?.id == data?.user_id && (
-                    <MenuItem>
-                        <Box width={32}>
-                            <EditOutlinedIcon />
-                        </Box>
-                        <Typography>
-                            {data.mood == "com"
-                                ? "コミュニティの編集"
-                                : "チャネルの編集"}
-                        </Typography>
-                    </MenuItem>
+                {auth?.id == data?.user_id && (
+                    <Edit data={data} onClose={handleClose} />
                 )}
                 {data.mood == "com" && auth?.id != data?.user_id && (
                     <ConfirmCommunityOut data={data} onClose={handleClose} />
@@ -265,8 +258,9 @@ const MoreButton = ({ data }) => {
 };
 
 const CommunityUsers = ({ data, onClose }) => {
-    const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
+    const [owners, setOwners] = useState([]);
+    const [users, setUsers] = useState([]);
 
     const handleOpen = useCallback(() => {
         setOpen(true);
@@ -276,6 +270,24 @@ const CommunityUsers = ({ data, onClose }) => {
         setOpen(false);
         onClose();
     }, [onClose]);
+
+    const getUsers = useCallback(async (id) => {
+        try {
+            const response = await api.get(`communities/${id}/users`);
+            setOwners([response.data.user]);
+            setUsers(
+                response.data.users.filter(
+                    (item) => item.id != response.data.user.id
+                )
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (open) getUsers(data.id);
+    }, [open, data]);
 
     return (
         <>
@@ -298,26 +310,9 @@ const CommunityUsers = ({ data, onClose }) => {
                     <CommunityUsersBundle
                         title={"所有者"}
                         initOpen
-                        users={[
-                            { id: 1, name: "XXX", role: 0 },
-                            { id: 2, name: "YYY", role: 0 },
-                            { id: 3, name: "ZZZ", role: 0 },
-                            { id: 4, name: "DDD", role: 0 },
-                            { id: 5, name: "FFF", role: 0 },
-                            { id: 6, name: "GGG", role: 0 },
-                        ]}
+                        users={owners}
                     />
-                    <CommunityUsersBundle
-                        title={"メンバー"}
-                        users={[
-                            { id: 1, name: "XXX", role: 1 },
-                            { id: 2, name: "YYY", role: 0 },
-                            { id: 3, name: "ZZZ", role: 0 },
-                            { id: 4, name: "DDD", role: 0 },
-                            { id: 5, name: "FFF", role: 0 },
-                            { id: 6, name: "GGG", role: 0 },
-                        ]}
-                    />
+                    <CommunityUsersBundle title={"メンバー"} users={users} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>キャンセル</Button>
@@ -411,8 +406,8 @@ const CommunityUserItem = ({ user }) => {
 };
 
 const ConfigNotification = ({ data, onClose }) => {
-    //  todo    X
     const [open, setOpen] = useState(false);
+    const [active, setActive] = useState(0);
 
     const handleOpen = useCallback(() => {
         setOpen(true);
@@ -423,7 +418,27 @@ const ConfigNotification = ({ data, onClose }) => {
         onClose();
     }, [onClose]);
 
-    const handleAccept = useCallback(() => {}, []);
+    const handleAccept = useCallback(() => {
+        const pre = getItem("nonNotifiedCommunities");
+        if (active == 2) {
+            setItem("nonNotifiedCommunities", [...(pre || []), data.id]);
+        } else {
+            setItem(
+                "nonNotifiedCommunities",
+                (pre || []).filter((item) => item != data.id)
+            );
+        }
+        onClose();
+    }, [data, active, onClose]);
+
+    const handleClick = useCallback((param) => {
+        setActive(param);
+    }, []);
+
+    useEffect(() => {
+        const pre = getItem("nonNotifiedCommunities");
+        if ((pre || []).find((item) => item == data.id)) setActive(2);
+    }, [data]);
 
     return (
         <>
@@ -446,17 +461,23 @@ const ConfigNotification = ({ data, onClose }) => {
                 </DialogTitle>
                 <DialogContent>
                     <NotificationSettingItem
-                        active={true}
+                        active={active == 0}
+                        id={0}
+                        onClick={handleClick}
                         title1={"すべてのアクティビティ"}
                         title2={"投稿、返信、メンション"}
                     />
-                    <NotificationSettingItem
-                        active={false}
+                    {/* <NotificationSettingItem
+                        active={active==1}
+                        id={1}
+                        onClick={handleClick}
                         title1={"新しい投稿のみ"}
                         title2={"新しい投稿、メンション、個人の返信"}
-                    />
+                    /> */}
                     <NotificationSettingItem
-                        active={false}
+                        active={active == 2}
+                        id={2}
+                        onClick={handleClick}
                         title1={"オフ"}
                         title2={"個人の返信とメンション"}
                     />
@@ -478,9 +499,12 @@ const ConfigNotification = ({ data, onClose }) => {
     );
 };
 
-const NotificationSettingItem = ({ active, title1, title2 }) => {
+const NotificationSettingItem = ({ active, id, onClick, title1, title2 }) => {
+    const handleClick = () => onClick(id);
+
     return (
         <Box
+            onClick={handleClick}
             display={"flex"}
             alignItems={"center"}
             borderRadius={2}
@@ -508,6 +532,58 @@ const NotificationSettingItem = ({ active, title1, title2 }) => {
                 <Typography variant="subtitle2">{title2}</Typography>
             </Box>
         </Box>
+    );
+};
+
+const Edit = ({ data, onClose }) => {
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = useCallback(() => {
+        setOpen(true);
+    }, []);
+
+    const handleClose = useCallback(() => {
+        setOpen(false);
+        onClose();
+    }, [onClose]);
+
+    const handleAccept = useCallback(() => {}, []);
+
+    return (
+        <>
+            <MenuItem onClick={handleOpen}>
+                <Box width={32}>
+                    <EditOutlinedIcon />
+                </Box>
+                <Typography>
+                    {data.mood == "com"
+                        ? "コミュニティの編集"
+                        : "チャネルの編集"}
+                </Typography>
+            </MenuItem>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="edit-dialog-title"
+                aria-describedby="edit-dialog-description"
+                maxWidth="md"
+                fullWidth={true}
+            >
+                {data.mood == "com" ? (
+                    <CreateCommunity
+                        page={true}
+                        initData={data}
+                        onClose={handleClose}
+                    />
+                ) : (
+                    <CreateChannel
+                        page={true}
+                        initData={data}
+                        onClose={handleClose}
+                    />
+                )}
+            </Dialog>
+        </>
     );
 };
 
@@ -542,7 +618,7 @@ const ConfirmCommunityAdd = ({ data, onClose }) => {
 };
 
 const ConfirmCommunityOut = ({ data, onClose }) => {
-    //  todo    X
+    const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
 
     const handleOpen = useCallback(() => {
@@ -554,7 +630,21 @@ const ConfirmCommunityOut = ({ data, onClose }) => {
         onClose();
     }, [onClose]);
 
-    const handleAccept = useCallback(() => {}, []);
+    const handleAccept = useCallback(async () => {
+        try {
+            const response = await api.patch(`communities/${data.id}/leave`);
+            dispatch(actionChannel.handleLeaveCommunity(response.data));
+            ToastNotification("success", "コミュニティから退会しました");
+        } catch (error) {
+            console.log(error);
+            ToastNotification(
+                "warning",
+                "操作に失敗しました。後でもう一度お試しください"
+            );
+        } finally {
+            onClose();
+        }
+    }, [dispatch, data, onClose]);
 
     return (
         <>

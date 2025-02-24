@@ -58,15 +58,15 @@ class CommunityController extends Controller
                 $community->save();
 
                 $channel = null;
-                if (!$validatedData['type']) {
-                    $channel = new Channel();
-                    $channel->name = "全般";
-                    $channel->description = 'コミュニティのデフォルト チャンネル';
-                    $channel->user_id = Auth::id();
-                    $channel->community_id = $community->id;
-                    $channel->type = 0;
-                    $channel->save();
-                }
+                // if (!$validatedData['type']) {
+                $channel = new Channel();
+                $channel->name = "defaultCha";
+                $channel->description = 'コミュニティのデフォルト チャンネル';
+                $channel->user_id = Auth::id();
+                $channel->community_id = $community->id;
+                $channel->type = 0;
+                $channel->save();
+                // }
 
                 // if ($community->isPublic) {
                 //     NewCommunityJob::dispatch($community, $channel, Auth::user()->name);

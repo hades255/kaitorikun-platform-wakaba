@@ -12,11 +12,11 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { useCommunity } from "../../../contexts/CommunityContext";
 import { actionChannel, selectorChannel } from "../../../reduxStore";
+import { InvitationDialog } from "../../../pages/communities";
 import { useDispatch, useSelector } from "../../../components";
 import CreateCommunity from "../../community/New";
 import CreateChannel from "../../community/NewChannel";
 import CSidebarNavList from "./CSidebarNavList";
-import { InvitationDialog } from "../../../pages/communities";
 
 const ChannelSidebar = ({ page = true }) => {
     const dispatch = useDispatch();
@@ -26,19 +26,19 @@ const ChannelSidebar = ({ page = true }) => {
     const communityItems = useMemo(() => {
         if (communities && Array.isArray(communities)) {
             let res = [];
-            communities
-                .filter((item) => JSON.stringify(item).indexOf(search) != -1)
-                .forEach((item) => {
-                    if (!page && !item.type) return;
-                    if (page && item.type) return;
-                    let children = [];
-                    if (item.channels && Array.isArray(item.channels)) {
-                        item.channels
-                            .sort((a, b) =>
-                                a.type > b.type ? 1 : a.type < b.type ? -1 : 0
-                            )
-                            .forEach((cha) => {
-                                children.push({
+            communities.forEach((item) => {
+                if (!page && !item.type) return;
+                if (page && item.type) return;
+                let children = [];
+                let defaultCha = null;
+                if (item.channels && Array.isArray(item.channels)) {
+                    item.channels
+                        .sort((a, b) =>
+                            a.type > b.type ? 1 : a.type < b.type ? -1 : 0
+                        )
+                        .forEach((cha) => {
+                            if (cha.type == 0 && cha.name == "defaultCha") {
+                                defaultCha = {
                                     id: cha.id,
                                     path: "#",
                                     title: cha.name,
@@ -48,25 +48,39 @@ const ChannelSidebar = ({ page = true }) => {
                                     icon: null,
                                     mood: "cha",
                                     type: cha.type,
-                                });
+                                };
+                                return;
+                            }
+                            children.push({
+                                id: cha.id,
+                                path: "#",
+                                title: cha.name,
+                                description: cha.description,
+                                community_id: cha.community_id,
+                                user_id: cha.user_id,
+                                icon: null,
+                                mood: "cha",
+                                type: cha.type,
                             });
-                    }
-                    res.push({
-                        id: item.id,
-                        path: "#",
-                        title: item.name,
-                        description: item.description,
-                        guideline: item.guideline,
-                        user_id: item.user_id,
-                        icon: item.icon,
-                        mood: "com",
-                        type: item.type,
-                        children,
-                    });
+                        });
+                }
+                res.push({
+                    id: item.id,
+                    path: "#",
+                    title: item.name,
+                    description: item.description,
+                    guideline: item.guideline,
+                    user_id: item.user_id,
+                    icon: item.icon,
+                    mood: "com",
+                    type: item.type,
+                    children,
+                    defaultCha,
                 });
+            });
             return res;
         } else return [];
-    }, [communities, page, search]);
+    }, [communities, page]);
 
     useEffect(() => {
         return () => {
@@ -83,7 +97,7 @@ const ChannelSidebar = ({ page = true }) => {
 
     return (
         <>
-            <Box py={2}>
+            <Box py={1}>
                 <AddNewCommunityButton
                     page={page}
                     search={search}
@@ -96,14 +110,18 @@ const ChannelSidebar = ({ page = true }) => {
                 role="menu"
                 data-accordion="false"
             >
-                {communityItems.map((menu, i) => (
-                    <CSidebarNavList
-                        key={menu.mood + menu.id}
-                        data={menu}
-                        page={page}
-                        path={page ? "communities" : "channels"}
-                    />
-                ))}
+                {communityItems
+                    .filter(
+                        (item) => JSON.stringify(item).indexOf(search) != -1
+                    )
+                    .map((menu, i) => (
+                        <CSidebarNavList
+                            key={menu.mood + menu.id}
+                            data={menu}
+                            page={page}
+                            path={page ? "communities" : "channels"}
+                        />
+                    ))}
             </ul>
         </>
     );
@@ -216,11 +234,11 @@ export const AddNewCommunityButton = ({ page = true, search, setSearch }) => {
             >
                 {page && (
                     <MenuItem onClick={handleNewChannel}>
-                        {/* Add Channel */}チャンネルを追加
+                        チャンネルを追加
                     </MenuItem>
                 )}
                 <MenuItem onClick={handleNewCommunity}>
-                    {/* Add Community */}コミュニティを追加
+                    コミュニティを追加
                 </MenuItem>
                 {/* <MenuItem onClick={handleClose}> */}
                 {/* Join Community */}

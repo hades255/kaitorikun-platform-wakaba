@@ -61,26 +61,37 @@ const CSidebarNavList = ({ data, page, path }) => {
         [data, unreadTab]
     );
     const channelSelected = useMemo(
+        () => channel && data.mood == "cha" && data.id == channel.id,
+        [channel, data]
+    );
+    const comSelected = useMemo(
         () =>
-            channel && community && data.mood == "cha" && data.id == channel.id,
-        [channel, community, data]
+            channel &&
+            data.mood == "com" &&
+            data.defaultCha &&
+            data.defaultCha.id == channel.id,
+        [data, channel]
     );
 
-    const [isMenuExtended, setIsMenuExtended] = useState(false);
+    // const [isMenuExtended, setIsMenuExtended] = useState(false);
 
-    useEffect(() => {
-        if (
-            channel &&
-            community &&
-            data.mood == "com" &&
-            data.id == community.id
-        )
-            setIsMenuExtended(true);
-    }, [channel, community, data]);
+    // useEffect(() => {
+    //     if (
+    //         channel &&
+    //         community &&
+    //         data.mood == "com" &&
+    //         data.id == community.id
+    //     )
+    //         setIsMenuExtended(true);
+    // }, [channel, community, data]);
 
     const handleMainMenuAction = useCallback(() => {
-        setIsMenuExtended(!isMenuExtended);
-    }, [isMenuExtended]);
+        // setIsMenuExtended(!isMenuExtended);
+        if (data.defaultCha) {
+            setShowChannelEditor(false);
+            clearScomUnreadTab("cha", data.defaultCha.id);
+        }
+    }, [setShowChannelEditor, clearScomUnreadTab, data]);
 
     const handleMainSubMenuAction = useCallback(() => {
         setShowChannelEditor(false);
@@ -93,17 +104,19 @@ const CSidebarNavList = ({ data, page, path }) => {
     }, [setPreSetCommunityId, setShowChannelEditor, dataId]);
 
     return (
-        <li
-            className={clsx("nav-item", classes.navItem, {
-                "menu-open": isMenuExtended,
-            })}
-        >
+        <li className={clsx("nav-item", classes.navItem, "menu-open")}>
             {data.mood == "com" ? (
-                <div
+                <Link
+                    to={
+                        data.defaultCha && data.defaultCha.id
+                            ? `/${path}/${data.defaultCha.id}`
+                            : "#"
+                    }
                     className={clsx(
-                        { [classes.comMenuOpen]: isMenuExtended },
+                        classes.comMenuOpen,
                         "CSidebarNavListItem nav-link nav-link-font",
-                        classes.menuItem
+                        classes.menuItem,
+                        { [classes.comActive]: comSelected }
                     )}
                     onClick={handleMainMenuAction}
                 >
@@ -119,12 +132,9 @@ const CSidebarNavList = ({ data, page, path }) => {
                             },
                         })}
                     />
-                    <p>
-                        {data.title}
-                        <i className="right fas fa-angle-left extend-angle-left-icon" />
-                    </p>
+                    <p>{data.title}</p>
                     <MoreButton data={data} />
-                </div>
+                </Link>
             ) : (
                 <Link
                     to={`/${path}/${dataId}`}
@@ -149,36 +159,34 @@ const CSidebarNavList = ({ data, page, path }) => {
                     {auth?.id == data?.user_id && <MoreButton data={data} />}
                 </Link>
             )}
-            {isMenuExtended && (
-                <ul className="nav nav-treeview">
-                    {data.mood == "com" &&
-                        data.children &&
-                        data.children.map((submenu, i) => (
-                            <CSidebarNavList
-                                data={submenu}
-                                page={page}
-                                path={page ? "communities" : "channels"}
-                                key={i}
-                                submenu="active"
-                            />
-                        ))}
-                    {auth && auth.id == data.user_id && (
-                        <div
-                            className={clsx(
-                                "nav-link nav-link-font",
-                                classes.menuItem
-                            )}
-                            onClick={handleClickNew}
-                        >
-                            <i
-                                className="far fa-plus nav-icon"
-                                style={{ minWidth: 24, width: 24 }}
-                            />
-                            <p>チャンネルを作成</p>
-                        </div>
-                    )}
-                </ul>
-            )}
+            <ul className="nav nav-treeview">
+                {data.children &&
+                    Array.isArray(data.children) &&
+                    data.children.map((submenu, i) => (
+                        <CSidebarNavList
+                            data={submenu}
+                            page={page}
+                            path={page ? "communities" : "channels"}
+                            key={i}
+                            submenu="active"
+                        />
+                    ))}
+                {data.mood == "com" && auth && auth.id == data.user_id && (
+                    <div
+                        className={clsx(
+                            "nav-link nav-link-font",
+                            classes.menuItem
+                        )}
+                        onClick={handleClickNew}
+                    >
+                        <i
+                            className="far fa-plus nav-icon"
+                            style={{ minWidth: 24, width: 24 }}
+                        />
+                        <p>チャンネルを作成</p>
+                    </div>
+                )}
+            </ul>
             {count > 0 && <div className={classes.countBox}>{count}</div>}
         </li>
     );
@@ -818,9 +826,14 @@ const useStyles = makeStyles((theme) => ({
     },
     comMenuOpen: {
         backgroundColor: "transparent !important",
-        borderBottom: "1px solid grey",
+        borderBottom: "1px solid #FFF2",
+        borderTop: "1px solid #FFF2",
+        borderRadius: "0 !important",
         "&:hover": {
             backgroundColor: "#FFF1 !important",
         },
+    },
+    comActive: {
+        backgroundColor: "#FFF1 !important",
     },
 }));

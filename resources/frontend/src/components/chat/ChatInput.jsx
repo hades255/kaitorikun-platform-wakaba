@@ -37,7 +37,9 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
         () => ({
             enforceWhitelist: true,
             whitelist:
-                currentUser && currentUser.users
+                currentUser &&
+                currentUser.users &&
+                Array.isArray(currentUser.users)
                     ? currentUser.users.map(({ id, name, email }) => ({
                           value: name,
                           text: name,
@@ -139,7 +141,10 @@ const ChatInput = ({ sending, setSending, selectedUser, reply, setReply }) => {
                                     : 0,
                             status: "unread",
                             reply: reply ? reply.id : 0,
-                            group_id: selectedUser.type == "group" ? selectedUser.id : null,
+                            group_id:
+                                selectedUser.type == "group"
+                                    ? selectedUser.id
+                                    : null,
                             ...item,
                         })),
                     });

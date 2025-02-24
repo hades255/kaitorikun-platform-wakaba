@@ -20,7 +20,12 @@ const TagInput = ({ setValues }) => {
     const whitelist = useMemo(
         () =>
             users.filter(
-                ({ email }) => !tags.map((item) => item.email).includes(email)
+                ({ email }) =>
+                    !(
+                        tags &&
+                        Array.isArray(tags) &&
+                        tags.map((item) => item.email).includes(email)
+                    )
             ),
         [users, tags]
     );

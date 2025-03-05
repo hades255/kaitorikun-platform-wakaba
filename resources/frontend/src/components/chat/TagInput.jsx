@@ -76,7 +76,7 @@ const TagInput = ({ setValues }) => {
         tagify.on("input", (e) => {
             const text = e.detail.value;
             if (timer) clearTimeout(timer);
-            if (text.length > 2)
+            if (text.length > 0)
                 timer = setTimeout(async () => {
                     const res = await getUsers(text);
                 }, 500);

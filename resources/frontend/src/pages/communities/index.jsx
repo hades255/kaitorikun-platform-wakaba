@@ -410,7 +410,7 @@ export const InvitationDialog = ({ onClose, data = null }) => {
         (e) => {
             setInviteEmail(e.target.value);
             if (timer) clearTimeout(timer);
-            if (e.target.value.length > 2)
+            if (e.target.value.length > 0)
                 setTimer(setTimeout(() => getUsers(e.target.value), 500));
             else setUsers([]);
         },

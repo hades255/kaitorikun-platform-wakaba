@@ -282,12 +282,13 @@ const CommunityUsers = ({ data, onClose }) => {
     const getUsers = useCallback(async (id) => {
         try {
             const response = await api.get(`communities/${id}/users`);
-            setOwners([response.data.user]);
-            setUsers(
-                response.data.users.filter(
-                    (item) => item.id != response.data.user.id
-                )
-            );
+            const resUsers =
+                response.data.users && Array.isArray(response.data.users)
+                    ? response.data.users
+                    : [];
+            const resUser = response.data.user || {};
+            setOwners([resUser]);
+            setUsers(resUsers.filter((item) => item.id != resUser?.id));
         } catch (error) {
             console.log(error);
         }

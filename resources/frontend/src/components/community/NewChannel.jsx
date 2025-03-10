@@ -225,7 +225,7 @@ const CreateChannel = ({
                         }
                         required
                         sx={{ mb: 2 }}
-                        disabled={!editName || initData.type == 0}
+                        disabled={!editName || initData?.type == 0}
                     />
                     <TextField
                         fullWidth

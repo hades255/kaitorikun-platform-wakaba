@@ -21,7 +21,7 @@ const HorizontalSeparator = ({ children, BottomComponent, divider }) => {
                         ((e.clientY - containerRect.top) /
                             containerRect.height) *
                         100;
-                    setSplitPosition(Math.min(Math.max(percentage, 10), 90));
+                    setSplitPosition(Math.min(Math.max(percentage, 0), 100));
                 }
             }
         },

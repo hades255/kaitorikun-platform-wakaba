@@ -5,7 +5,7 @@ import React, {
     useRef,
     useState,
 } from "react";
-import { Avatar, Box, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Chip, TextField, Typography } from "@mui/material";
 import Tagify from "@yaireo/tagify";
 import "@yaireo/tagify/dist/tagify.css";
 import "./TagInput.css";
@@ -168,6 +168,7 @@ export const UserItem = ({ user, onClick }) => {
             onClick={handleClick}
             display={"flex"}
             alignItems={"center"}
+            justifyContent={"space-between"}
             gap={2}
             sx={{
                 cursor: "pointer",
@@ -178,11 +179,23 @@ export const UserItem = ({ user, onClick }) => {
             px={2}
             py={1}
         >
-            <Avatar alt="Remy Sharp">{user.name[0]}</Avatar>
-            <Box>
-                <Typography variant="subtitle1">{user.name}</Typography>
-                <Typography variant="subtitle2">{user.email}</Typography>
+            <Box display={"flex"} alignItems={"center"}>
+                <Avatar alt="Remy Sharp">{user.name[0]}</Avatar>
+                <Box>
+                    <Typography variant="subtitle1">{user.name}</Typography>
+                    <Typography variant="subtitle2">{user.email}</Typography>
+                </Box>
             </Box>
+            {user.role && user.role.role_name && (
+                <Box>
+                    <Chip
+                        label={user.role.role_name}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                    />
+                </Box>
+            )}
         </Box>
     );
 };

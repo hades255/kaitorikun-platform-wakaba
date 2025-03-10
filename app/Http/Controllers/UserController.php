@@ -67,12 +67,19 @@ class UserController extends Controller
     public function search_users(Request $request)
     {
         $search = $request->search;
+        // $users = User::where(function ($query) use ($search) {
+        //     $query->where('name', 'like', '%' . $search . '%')
+        //         ->orWhere('email', 'like', '%' . $search . '%');
+        // })
+        //     ->select('id', 'name', 'email')
+        //     ->get();
+
         $users = User::where(function ($query) use ($search) {
             $query->where('name', 'like', '%' . $search . '%')
                 ->orWhere('email', 'like', '%' . $search . '%');
-        })
-            ->select('id', 'name', 'email')
-            ->get();
+        })->orWhereHas('role', function ($query) use ($search) {
+            $query->where('role_name', 'like', '%' . $search . '%');
+        })->with('role')->select('id', 'name', 'email', 'role')->get();
         return response()->json($users);
     }
 }

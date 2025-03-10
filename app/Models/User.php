@@ -82,4 +82,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Chatgroup::class, 'chatgroup_users', 'user_id', 'chatgroup_id')->where('status', 'accepted')->with("users");
     }
+
+    public function role()
+    {
+        return $this->belongsTo(UserRole::class, 'role');
+    }
+
+    public function getRoleNameAttribute()
+    {
+        return $this->role->role_name ?? '';
+    }
 }

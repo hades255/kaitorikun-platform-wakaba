@@ -163,12 +163,11 @@ class InvitationController extends Controller
         $users = User::where(function ($query) use ($search) {
             $query->where('name', 'like', '%' . $search . '%')
                 ->orWhere('email', 'like', '%' . $search . '%');
-        })
-            ->whereDoesntHave('communityUsers', function ($query) use ($community_id) {
-                $query->where('community_id', $community_id);
-            })
-            ->select('id', 'name', 'email')
-            ->get();
+        })->orWhereHas('role', function ($query) use ($search) {
+            $query->where('role_name', 'like', '%' . $search . '%');
+        })->whereDoesntHave('communityUsers', function ($query) use ($community_id) {
+            $query->where('community_id', $community_id);
+        })->with('role')->select('id', 'name', 'email', 'role')->get();
         return response()->json($users);
     }
 }
